@@ -1,0 +1,104 @@
+{{- define "main" }}
+
+{{- $blog        := where .Site.RegularPages "Section" "blog" }}
+{{- $experiments := where .Site.RegularPages "Section" "experiments" }}
+{{- $projects    := where .Site.RegularPages "Section" "projects" }}
+
+<div class="home-wrap">
+
+  {{/* ── PROFILE ── */}}
+  <section class="profile-section">
+    {{- with .Site.Params.profileMode }}
+      {{- if .imageUrl }}
+      <img
+        src="{{ .imageUrl }}"
+        alt="{{ .imageTitle | default "avatar" }}"
+        class="profile-avatar"
+        onerror="this.style.display='none'"
+      >
+      {{- end }}
+    {{- end }}
+
+    <h1 class="profile-name">{{ .Site.Title }}</h1>
+    <p class="profile-tagline">{{ .Site.Params.subtitle }}</p>
+
+    <p class="profile-bio">
+      Senior HPC &amp; ML infrastructure engineer at a quantitative trading firm.
+      Building production AI systems at the intersection of GPU computing,
+      distributed training, and quantitative finance.
+      Completing <a href="https://omscs.gatech.edu/" target="_blank" rel="noopener">GT&nbsp;OMSCS</a>
+      (ML specialization) and the
+      <a href="https://www.cqfinstitute.org/" target="_blank" rel="noopener">CQF</a>.
+      <a href="/about/">More about me →</a>
+    </p>
+
+    <nav class="profile-links">
+      {{- range .Site.Params.socialIcons }}
+        {{- if ne .name "rss" }}
+        <a href="{{ .url }}" target="_blank" rel="noopener me">{{ .name | title }}</a>
+        {{- end }}
+      {{- end }}
+      <a href="/about/">About</a>
+      <a href="/resume.pdf">Resume&nbsp;↓</a>
+    </nav>
+  </section>
+
+  <hr class="section-divider">
+
+  {{/* ── BLOG ── */}}
+  {{- if $blog }}
+  <section class="home-section">
+    <h2 class="home-section-title"><a href="/blog/">Blog</a></h2>
+    <p class="home-section-desc">Technical deep dives — 2,000–4,000 words.</p>
+    <ul class="post-list">
+      {{- range first 5 (sort $blog "Date" "desc") }}
+      <li class="post-list-item">
+        <a href="{{ .Permalink }}" class="post-list-title">{{ .Title }}</a>
+        <span class="post-list-date">{{ .Date.Format "Jan 2, 2006" }}</span>
+      </li>
+      {{- end }}
+    </ul>
+    <a href="/blog/" class="see-all-link">All posts →</a>
+  </section>
+  <hr class="section-divider">
+  {{- end }}
+
+  {{/* ── EXPERIMENTS ── */}}
+  {{- if $experiments }}
+  <section class="home-section">
+    <h2 class="home-section-title"><a href="/experiments/">Experiments</a></h2>
+    <p class="home-section-desc">Lab notebook — tool deployments, benchmarks, field reports.</p>
+    <ul class="post-list">
+      {{- range first 5 (sort $experiments "Date" "desc") }}
+      <li class="post-list-item">
+        <a href="{{ .Permalink }}" class="post-list-title">{{ .Title }}</a>
+        <span class="post-list-date">{{ .Date.Format "Jan 2, 2006" }}</span>
+      </li>
+      {{- end }}
+    </ul>
+    <a href="/experiments/" class="see-all-link">All experiments →</a>
+  </section>
+  <hr class="section-divider">
+  {{- end }}
+
+  {{/* ── PROJECTS ── */}}
+  {{- if $projects }}
+  <section class="home-section">
+    <h2 class="home-section-title"><a href="/projects/">Projects</a></h2>
+    <p class="home-section-desc">Three portfolio projects in progress — updated as milestones ship.</p>
+    <ul class="post-list">
+      {{- range (sort $projects "Weight") }}
+      <li class="post-list-item">
+        <a href="{{ .Permalink }}" class="post-list-title">{{ .Title }}</a>
+        <span class="post-list-date post-list-status">
+          {{- with .Params.status }}{{ . }}{{ else }}In Progress{{ end }}
+        </span>
+      </li>
+      {{- end }}
+    </ul>
+  </section>
+  {{- end }}
+
+</div>
+
+{{- end }}

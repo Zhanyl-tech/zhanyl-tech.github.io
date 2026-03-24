@@ -20,7 +20,7 @@ params:
   keywords: [ML Infrastructure, HPC, GPU Inference, Quantitative Finance, Distributed Training, CUDA]
   author: "Zhanyl Abdybaeva"
   DateFormat: "January 2, 2006"
-  defaultTheme: dark
+  defaultTheme: light
   disableThemeToggle: false
 
   ShowReadingTime: true
@@ -52,31 +52,17 @@ params:
     icon: /favicon.ico
     iconHeight: 35
 
-  # Profile mode for homepage
+  # Profile mode — used by custom index.html for avatar + bio
   profileMode:
-    enabled: true
+    enabled: false
     title: "Zhanyl Abdybaeva"
-    subtitle: "Senior HPC & ML Infrastructure Engineer building production AI systems at the intersection of GPU computing, distributed training, and quantitative finance."
+    subtitle: "Senior HPC & ML Infrastructure Engineer"
     imageUrl: "/images/avatar.jpg"
-    imageWidth: 120
-    imageHeight: 120
+    imageWidth: 80
+    imageHeight: 80
     imageTitle: "Zhanyl Abdybaeva"
-    buttons:
-      - name: Blog
-        url: /blog/
-      - name: Experiments
-        url: /experiments/
-      - name: Projects
-        url: /projects/
-      - name: About
-        url: /about/
 
-  homeInfoParams:
-    Title: "Hi, I'm Zhanyl 👋"
-    Content: >
-      Senior HPC & ML Infrastructure Engineer at a quantitative trading firm.
-      GT OMSCS (ML specialization) + CQF.
-      I write about GPU inference, distributed training, and production ML systems.
+  subtitle: "Senior HPC & ML Infrastructure Engineer"
 
   socialIcons:
     - name: github
