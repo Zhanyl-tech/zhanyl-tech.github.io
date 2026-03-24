@@ -1,13 +1,13 @@
-# Jekyll
-_site/
-.sass-cache/
-.jekyll-cache/
-.jekyll-metadata
+# Hugo build output
+public/
+resources/_gen/
+.hugo_build.lock
 
-# Ruby
-*.gem
-.bundle/
-vendor/
+# Theme (managed as git submodule)
+# themes/
+
+# COPE drafts — local only, never published
+cope-drafts/
 
 # OS
 .DS_Store
@@ -20,6 +20,10 @@ Thumbs.db
 *.swo
 *~
 
-# Logs
-*.log
+# Python
+__pycache__/
+*.pyc
+.env
 
+# Node (for mermaid-cli)
+node_modules/
