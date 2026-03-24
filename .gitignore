@@ -20,6 +20,9 @@ Thumbs.db
 *.swo
 *~
 
+# Local reference docs (not for public repo)
+PLAYBOOK.md
+
 # Python
 __pycache__/
 *.pyc
