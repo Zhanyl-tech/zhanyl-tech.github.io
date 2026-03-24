@@ -10,7 +10,7 @@ ShowToc: false
 
 I'm a senior HPC and cluster infrastructure engineer at a quantitative trading firm with 8+ years building and operating large-scale distributed systems — Kubernetes, SLURM, GPU clusters, and cloud platforms.
 
-I'm completing my MS in Computer Science at Georgia Tech (Machine Learning specialization) and the Certificate in Quantitative Finance (CQF). This gives me production infrastructure expertise, ML systems depth, and the mathematical foundations for derivatives pricing and risk modeling.
+I'm completing an MS in Computer Science with an ML specialization at Georgia Tech, and the Certificate in Quantitative Finance (CQF). This gives me production infrastructure expertise, ML systems depth, and the mathematical foundations for derivatives pricing and risk modeling.
 
 ## What I Build
 
@@ -29,7 +29,7 @@ I also maintain [project pages](/projects/) for my portfolio work, [notes](/note
 ## Current Focus
 
 - **Production:** Expanding ML infrastructure scope — vLLM inference optimization, GPU cluster operations
-- **Academic:** GT OMSCS ML specialization (May 2027) + CQF final project (July 2026)
+- **Academic:** MS in CS (ML specialization, Georgia Tech, May 2027) + CQF final project (July 2026)
 - **Portfolio:** Three projects at the intersection of HPC inference, distributed training, and quantitative finance
 - **Learning:** Agentic AI infrastructure (LangGraph, MCP, NemoClaw/OpenClaw), hardware-agnostic inference (vLLM, Ray, JAX)
 
