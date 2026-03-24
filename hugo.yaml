@@ -1,0 +1,166 @@
+baseURL: "https://zhanyl-tech.github.io/"
+title: "Zhanyl Abdybaeva"
+paginate: 10
+theme: PaperMod
+languageCode: en-us
+
+enableRobotsTXT: true
+buildDrafts: false
+buildFuture: false
+buildExpired: false
+
+minify:
+  disableXML: true
+  minifyOutput: true
+
+params:
+  env: production
+  title: "Zhanyl Abdybaeva"
+  description: "Senior HPC & ML Infrastructure Engineer | MS CS (GT) + CQF | Building production AI systems for quantitative trading"
+  keywords: [ML Infrastructure, HPC, GPU Inference, Quantitative Finance, Distributed Training, CUDA]
+  author: "Zhanyl Abdybaeva"
+  DateFormat: "January 2, 2006"
+  defaultTheme: dark
+  disableThemeToggle: false
+
+  ShowReadingTime: true
+  ShowShareButtons: false
+  ShowPostNavLinks: true
+  ShowBreadCrumbs: true
+  ShowCodeCopyButtons: true
+  ShowWordCount: false
+  ShowRssButtonInSectionTermList: false
+  UseHugoToc: true
+  disableSpecial1stPost: false
+  disableScrollToTop: false
+  comments: false
+  hidemeta: false
+  hideSummary: false
+  showtoc: false
+  tocopen: false
+
+  assets:
+    disableHLJS: true
+    favicon: "/favicon.ico"
+    favicon16x16: "/favicon-16x16.png"
+    favicon32x32: "/favicon-32x32.png"
+    apple_touch_icon: "/apple-touch-icon.png"
+    safari_pinned_tab: "/safari-pinned-tab.svg"
+
+  label:
+    text: "Zhanyl Abdybaeva"
+    icon: /favicon.ico
+    iconHeight: 35
+
+  # Profile mode for homepage
+  profileMode:
+    enabled: true
+    title: "Zhanyl Abdybaeva"
+    subtitle: "Senior HPC & ML Infrastructure Engineer building production AI systems at the intersection of GPU computing, distributed training, and quantitative finance."
+    imageUrl: "/images/avatar.jpg"
+    imageWidth: 120
+    imageHeight: 120
+    imageTitle: "Zhanyl Abdybaeva"
+    buttons:
+      - name: Blog
+        url: /blog/
+      - name: Experiments
+        url: /experiments/
+      - name: Projects
+        url: /projects/
+      - name: About
+        url: /about/
+
+  homeInfoParams:
+    Title: "Hi, I'm Zhanyl 👋"
+    Content: >
+      Senior HPC & ML Infrastructure Engineer at a quantitative trading firm.
+      GT OMSCS (ML specialization) + CQF.
+      I write about GPU inference, distributed training, and production ML systems.
+
+  socialIcons:
+    - name: github
+      url: "https://github.com/zhanyl-tech"
+    - name: linkedin
+      url: "https://linkedin.com/in/YOURUSERNAME"
+    - name: x
+      url: "https://twitter.com/YOURUSERNAME"
+    - name: email
+      url: "mailto:YOUR@EMAIL.COM"
+    - name: rss
+      url: "/index.xml"
+
+  # Search
+  fuseOpts:
+    isCaseSensitive: false
+    shouldSort: true
+    location: 0
+    distance: 1000
+    threshold: 0.4
+    minMatchCharLength: 0
+    limit: 10
+    keys: ["title", "permalink", "summary", "content"]
+
+  cover:
+    hidden: false
+    hiddenInList: false
+    hiddenInSingle: false
+
+  editPost:
+    URL: "https://github.com/zhanyl-tech/zhanyl-tech.github.io/blob/main/content"
+    Text: "Suggest Changes"
+    appendFilePath: true
+
+outputs:
+  home:
+    - HTML
+    - RSS
+    - JSON
+
+menu:
+  main:
+    - identifier: blog
+      name: Blog
+      url: /blog/
+      weight: 10
+    - identifier: experiments
+      name: Experiments
+      url: /experiments/
+      weight: 15
+    - identifier: projects
+      name: Projects
+      url: /projects/
+      weight: 20
+    - identifier: notes
+      name: Notes
+      url: /notes/
+      weight: 30
+    - identifier: reading
+      name: Reading
+      url: /reading/
+      weight: 35
+    - identifier: about
+      name: About
+      url: /about/
+      weight: 40
+    - identifier: search
+      name: Search
+      url: /search/
+      weight: 50
+
+taxonomies:
+  category: categories
+  tag: tags
+  series: series
+
+markup:
+  goldmark:
+    renderer:
+      unsafe: true
+  highlight:
+    noClasses: false
+    anchorLineNos: true
+    codeFences: true
+    guessSyntax: true
+    lineNos: true
+    style: monokai
