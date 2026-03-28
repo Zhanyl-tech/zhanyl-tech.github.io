@@ -1,6 +1,7 @@
 {{- define "main" }}
 <div class="list-wrap">
   <header class="list-header">
+    <p class="list-kicker">{{ .Title }}</p>
     <h1>{{ .Title }}</h1>
     {{- with .Description }}
     <p class="list-desc">{{ . }}</p>
@@ -11,7 +12,7 @@
   {{- if not $pages }}
   <p class="empty">Nothing here yet.</p>
   {{- else }}
-  <ul class="post-list">
+  <ul class="post-list post-list-detailed">
     {{- range sort $pages "Date" "desc" }}
     <li>
       <a href="{{ .Permalink }}">{{ .Title }}</a>

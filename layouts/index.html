@@ -3,25 +3,28 @@
 {{- $blog        := where (where .Site.RegularPages "Section" "blog") "Draft" false }}
 {{- $experiments := where (where .Site.RegularPages "Section" "experiments") "Draft" false }}
 {{- $projects    := where .Site.RegularPages "Section" "projects" }}
+{{- $latestBlog  := first 1 (sort $blog "Date" "desc") }}
+{{- $latestExp   := first 4 (sort $experiments "Date" "desc") }}
 
 <div class="home-wrap">
 
-  {{/* ── BIO ── */}}
-  <section class="bio">
-    <p>
-      I'm <strong>Zhanyl Abdybaeva</strong>, an ML infrastructure and quantitative finance engineer.
-      I work at a quantitative trading firm building GPU clusters, inference systems, and
-      distributed training infrastructure. I'm completing an
-      <a href="https://omscs.gatech.edu/">MS in CS</a> (ML specialization, Georgia Tech)
-      and the <a href="https://www.cqfinstitute.org/">CQF</a>.
-    </p>
-    <p>
-      I write about what I build and what I learn. Long-form technical analysis goes
-      in <a href="/blog/">Blog</a>. Shorter benchmarks and field notes go in
-      <a href="/experiments/">Experiments</a>. Three production-grade
-      <a href="/projects/">projects</a> are in progress.
-    </p>
-    <p class="bio-links">
+  <section class="hero">
+    <p class="hero-kicker">ML Infrastructure · Quantitative Finance</p>
+    <h1 class="hero-title">Building systems for models, markets, and scale.</h1>
+    <div class="hero-copy">
+      <p>
+        I'm <strong>Zhanyl Abdybaeva</strong>, an ML infrastructure and quantitative finance engineer
+        working at a quantitative trading firm. My work spans GPU clusters, inference systems,
+        distributed training, and the infrastructure behind production AI.
+      </p>
+      <p>
+        I'm completing an <a href="https://omscs.gatech.edu/">MS in CS</a> with an ML specialization
+        at Georgia Tech and the <a href="https://www.cqfinstitute.org/">CQF</a>.
+        This site is where I publish long-form technical writing, shorter field notes, and
+        project pages for the systems I'm building.
+      </p>
+    </div>
+    <p class="hero-links">
       <a href="https://github.com/zhanyl-tech">GitHub</a>
       <a href="https://linkedin.com/in/YOURUSERNAME">LinkedIn</a>
       <a href="https://twitter.com/YOURUSERNAME">X</a>
@@ -31,40 +34,61 @@
     </p>
   </section>
 
-  {{/* ── LATEST WRITING ── */}}
-  {{- $allPosts := union $blog $experiments }}
-  {{- if $allPosts }}
-  <section class="home-section">
-    <h2 class="home-heading">Latest</h2>
-    <ul class="post-list">
-      {{- range first 8 (sort $allPosts "Date" "desc") }}
-      <li>
-        <a href="{{ .Permalink }}">{{ .Title }}</a>
-        <span class="post-meta-inline">{{ .Date.Format "Jan 2006" }}
-          {{- if eq .Section "experiments" }} · experiment{{ else }} · blog{{ end }}</span>
-      </li>
-      {{- end }}
-    </ul>
-  </section>
-  {{- end }}
-
-  {{/* ── PROJECTS ── */}}
-  {{- if $projects }}
-  <section class="home-section">
-    <h2 class="home-heading">Projects</h2>
-    <ul class="project-list-simple">
-      {{- range sort $projects "Weight" }}
-      <li>
-        <a href="{{ .Permalink }}">{{ .Title }}</a>
-        <span class="post-meta-inline">{{ .Params.status | default "In progress" }}</span>
-        {{- with .Description }}
-        <p class="project-oneliner">{{ . }}</p>
+  <section class="home-grid">
+    <div class="home-primary">
+      {{- if $latestBlog }}
+      <section class="home-section">
+        <h2 class="home-heading">Featured Writing</h2>
+        {{- range $latestBlog }}
+        <article class="feature-story">
+          <p class="feature-meta">{{ .Date.Format "January 2006" }} · blog</p>
+          <h3><a href="{{ .Permalink }}">{{ .Title }}</a></h3>
+          {{- with .Description }}
+          <p>{{ . }}</p>
+          {{- end }}
+        </article>
         {{- end }}
-      </li>
+      </section>
       {{- end }}
-    </ul>
+
+      {{- if $latestExp }}
+      <section class="home-section">
+        <h2 class="home-heading">Recent Experiments</h2>
+        <ul class="post-list post-list-compact">
+          {{- range $latestExp }}
+          <li>
+            <a href="{{ .Permalink }}">{{ .Title }}</a>
+            <span class="post-meta-inline">{{ .Date.Format "Jan 2006" }}</span>
+          </li>
+          {{- end }}
+        </ul>
+      </section>
+      {{- end }}
+    </div>
+
+    {{- if $projects }}
+    <aside class="home-secondary">
+      <section class="home-section">
+        <h2 class="home-heading">Projects</h2>
+        <ul class="project-list-simple">
+          {{- range sort $projects "Weight" }}
+          <li>
+            <a href="{{ .Permalink }}">{{ .Title }}</a>
+            <span class="post-meta-inline">{{ .Params.status | default "In Progress" }}</span>
+            {{- with .Summary }}
+            <p class="project-oneliner">{{ . }}</p>
+            {{- else }}
+            {{- with .Description }}
+            <p class="project-oneliner">{{ . }}</p>
+            {{- end }}
+            {{- end }}
+          </li>
+          {{- end }}
+        </ul>
+      </section>
+    </aside>
+    {{- end }}
   </section>
-  {{- end }}
 
 </div>
 {{- end }}
