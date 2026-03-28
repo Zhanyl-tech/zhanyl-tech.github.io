@@ -1,29 +1,27 @@
 {{- define "main" }}
-
 <div class="list-wrap">
   <header class="list-header">
-    <h1 class="list-title">{{ .Title }}</h1>
+    <h1>{{ .Title }}</h1>
     {{- with .Description }}
-    <p class="list-description">{{ . }}</p>
-    {{- end }}
-    {{- with .Content }}
-    <div class="list-content">{{ . }}</div>
+    <p class="list-desc">{{ . }}</p>
     {{- end }}
   </header>
 
   {{- $pages := .Pages }}
   {{- if not $pages }}
-  <p class="no-posts">No posts yet — first one coming soon.</p>
+  <p class="empty">Nothing here yet.</p>
   {{- else }}
   <ul class="post-list">
     {{- range sort $pages "Date" "desc" }}
-    <li class="post-list-item">
-      <a href="{{ .Permalink }}" class="post-list-title">{{ .Title }}</a>
-      <span class="post-list-date">{{ .Date.Format "Jan 2, 2006" }}</span>
+    <li>
+      <a href="{{ .Permalink }}">{{ .Title }}</a>
+      <span class="post-meta-inline">{{ .Date.Format "Jan 2, 2006" }}</span>
+      {{- with .Description }}
+      <p class="post-summary">{{ . }}</p>
+      {{- end }}
     </li>
     {{- end }}
   </ul>
   {{- end }}
 </div>
-
 {{- end }}

@@ -1,134 +1,65 @@
 {{- define "main" }}
 
-{{- $allPosts    := where .Site.RegularPages "Section" "in" (slice "blog" "experiments") }}
-{{- $blog        := where .Site.RegularPages "Section" "blog" }}
-{{- $experiments := where .Site.RegularPages "Section" "experiments" }}
+{{- $blog        := where (where .Site.RegularPages "Section" "blog") "Draft" false }}
+{{- $experiments := where (where .Site.RegularPages "Section" "experiments") "Draft" false }}
 {{- $projects    := where .Site.RegularPages "Section" "projects" }}
 
 <div class="home-wrap">
 
-  {{/* ══ INTRO ══ */}}
-  <section class="intro-section">
-    {{- with .Site.Params.profileMode }}
-      {{- if .imageUrl }}
-      <img src="{{ .imageUrl }}" alt="{{ .imageTitle | default "avatar" }}"
-           class="intro-avatar" onerror="this.style.display='none'">
+  {{/* ── BIO ── */}}
+  <section class="bio">
+    <p>
+      I'm <strong>Zhanyl Abdybaeva</strong>, an ML infrastructure and quantitative finance engineer.
+      I work at a quantitative trading firm building GPU clusters, inference systems, and
+      distributed training infrastructure. I'm completing an
+      <a href="https://omscs.gatech.edu/">MS in CS</a> (ML specialization, Georgia Tech)
+      and the <a href="https://www.cqfinstitute.org/">CQF</a>.
+    </p>
+    <p>
+      I write about what I build and what I learn. Long-form technical analysis goes
+      in <a href="/blog/">Blog</a>. Shorter benchmarks and field notes go in
+      <a href="/experiments/">Experiments</a>. Three production-grade
+      <a href="/projects/">projects</a> are in progress.
+    </p>
+    <p class="bio-links">
+      <a href="https://github.com/zhanyl-tech">GitHub</a>
+      <a href="https://linkedin.com/in/YOURUSERNAME">LinkedIn</a>
+      <a href="https://twitter.com/YOURUSERNAME">X</a>
+      <a href="mailto:YOUR@EMAIL.COM">Email</a>
+      <a href="/resume.pdf">Resume</a>
+      <a href="/about/">About</a>
+    </p>
+  </section>
+
+  {{/* ── LATEST WRITING ── */}}
+  {{- $allPosts := union $blog $experiments }}
+  {{- if $allPosts }}
+  <section class="home-section">
+    <h2 class="home-heading">Latest</h2>
+    <ul class="post-list">
+      {{- range first 8 (sort $allPosts "Date" "desc") }}
+      <li>
+        <a href="{{ .Permalink }}">{{ .Title }}</a>
+        <span class="post-meta-inline">{{ .Date.Format "Jan 2006" }}
+          {{- if eq .Section "experiments" }} · experiment{{ else }} · blog{{ end }}</span>
+      </li>
       {{- end }}
-    {{- end }}
-
-    <div class="intro-text">
-      <h1 class="intro-name">{{ .Site.Title }}</h1>
-      <p class="intro-role">ML Infrastructure &amp; Quantitative Finance Engineer</p>
-      <p class="intro-bio">
-        Senior HPC &amp; ML infrastructure engineer at a quantitative trading firm.
-        I build the systems that make large-scale AI fast and reliable — GPU clusters,
-        inference optimization, distributed training, and agentic infrastructure.
-        Completing an MS in CS (ML specialization, Georgia Tech) and the
-        <a href="https://www.cqfinstitute.org/" target="_blank" rel="noopener">CQF</a>.
-      </p>
-      <p class="intro-bio">
-        I write technical deep dives in <a href="/blog/">Blog</a> and run field experiments
-        in <a href="/experiments/">Experiments</a>. Three production projects are
-        <a href="/projects/">in progress</a>.
-        <a href="/about/">More about me →</a>
-      </p>
-      <nav class="intro-links">
-        {{- range .Site.Params.socialIcons }}
-          {{- if ne .name "rss" }}
-          <a href="{{ .url }}" target="_blank" rel="noopener me">{{ .name | title }}</a>
-          {{- end }}
-        {{- end }}
-        <a href="/resume.pdf">Resume&nbsp;PDF</a>
-      </nav>
-    </div>
+    </ul>
   </section>
+  {{- end }}
 
-  {{/* ══ CURRENT FOCUS ══ */}}
-  <section class="focus-section">
-    <span class="section-label">Current Focus</span>
-    <div class="focus-chips">
-      <span class="chip">vLLM inference optimization</span>
-      <span class="chip">Distributed training · FSDP</span>
-      <span class="chip">Agentic AI infrastructure</span>
-      <span class="chip">GPU-accelerated quant systems</span>
-      <span class="chip">GT OMSCS · CQF</span>
-    </div>
-  </section>
-
-  {{/* ══ PROJECTS ══ */}}
+  {{/* ── PROJECTS ── */}}
   {{- if $projects }}
-  <section class="home-section projects-section">
-    <div class="section-header">
-      <span class="section-label">Projects</span>
-      <a href="/projects/" class="section-link">All →</a>
-    </div>
-    <div class="project-list">
-      {{- range (sort $projects "Weight") }}
-      {{- $status := .Params.status | default "In Progress" }}
-      {{- $statusClass := "status-progress" }}
-      {{- if in $status "Design" }}{{- $statusClass = "status-design" }}{{- end }}
-      {{- if in $status "Complete" }}{{- $statusClass = "status-complete" }}{{- end }}
-      <a href="{{ .Permalink }}" class="project-item">
-        <div class="project-top">
-          <span class="project-title">{{ .Title }}</span>
-          <span class="project-status {{ $statusClass }}">{{ $status }}</span>
-        </div>
+  <section class="home-section">
+    <h2 class="home-heading">Projects</h2>
+    <ul class="project-list-simple">
+      {{- range sort $projects "Weight" }}
+      <li>
+        <a href="{{ .Permalink }}">{{ .Title }}</a>
+        <span class="post-meta-inline">{{ .Params.status | default "In progress" }}</span>
         {{- with .Description }}
-        <p class="project-desc">{{ . }}</p>
+        <p class="project-oneliner">{{ . }}</p>
         {{- end }}
-        {{- with .Params.tags }}
-        <div class="project-stack">
-          {{- range first 5 . }}
-          <span class="stack-chip">{{ . }}</span>
-          {{- end }}
-        </div>
-        {{- end }}
-      </a>
-      {{- end }}
-    </div>
-  </section>
-  {{- end }}
-
-  {{/* ══ WRITING (blog posts with summary) ══ */}}
-  {{- $publishedBlog := where $blog "Draft" false }}
-  {{- if $publishedBlog }}
-  <section class="home-section writing-section">
-    <div class="section-header">
-      <span class="section-label">Writing</span>
-      <a href="/blog/" class="section-link">All posts →</a>
-    </div>
-    <div class="writing-list">
-      {{- range first 4 (sort $publishedBlog "Date" "desc") }}
-      <a href="{{ .Permalink }}" class="writing-item">
-        <div class="writing-top">
-          <span class="writing-title">{{ .Title }}</span>
-          <span class="writing-meta">
-            {{ .Date.Format "Jan 2006" }}
-            {{- if .ReadingTime }} · {{ .ReadingTime }} min{{- end }}
-          </span>
-        </div>
-        {{- with .Description }}
-        <p class="writing-desc">{{ . }}</p>
-        {{- end }}
-      </a>
-      {{- end }}
-    </div>
-  </section>
-  {{- end }}
-
-  {{/* ══ EXPERIMENTS (compact log) ══ */}}
-  {{- $publishedExp := where $experiments "Draft" false }}
-  {{- if $publishedExp }}
-  <section class="home-section experiments-section">
-    <div class="section-header">
-      <span class="section-label">Experiments</span>
-      <a href="/experiments/" class="section-link">All →</a>
-    </div>
-    <ul class="log-list">
-      {{- range first 6 (sort $publishedExp "Date" "desc") }}
-      <li class="log-item">
-        <span class="log-date">{{ .Date.Format "2006-01-02" }}</span>
-        <a href="{{ .Permalink }}" class="log-title">{{ .Title }}</a>
       </li>
       {{- end }}
     </ul>
