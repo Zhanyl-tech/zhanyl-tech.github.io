@@ -1,98 +1,134 @@
 {{- define "main" }}
 
+{{- $allPosts    := where .Site.RegularPages "Section" "in" (slice "blog" "experiments") }}
 {{- $blog        := where .Site.RegularPages "Section" "blog" }}
 {{- $experiments := where .Site.RegularPages "Section" "experiments" }}
 {{- $projects    := where .Site.RegularPages "Section" "projects" }}
 
 <div class="home-wrap">
 
-  {{/* ── PROFILE ── */}}
-  <section class="profile-section">
+  {{/* ══ INTRO ══ */}}
+  <section class="intro-section">
     {{- with .Site.Params.profileMode }}
       {{- if .imageUrl }}
-      <img
-        src="{{ .imageUrl }}"
-        alt="{{ .imageTitle | default "avatar" }}"
-        class="profile-avatar"
-        onerror="this.style.display='none'"
-      >
+      <img src="{{ .imageUrl }}" alt="{{ .imageTitle | default "avatar" }}"
+           class="intro-avatar" onerror="this.style.display='none'">
       {{- end }}
     {{- end }}
 
-    <h1 class="profile-name">{{ .Site.Title }}</h1>
-    <p class="profile-tagline">{{ .Site.Params.subtitle }}</p>
-
-    <p class="profile-bio">
-      Senior HPC &amp; ML infrastructure engineer at a quantitative trading firm.
-      Building production AI systems at the intersection of GPU computing,
-      distributed training, and quantitative finance.
-      Completing an <a href="https://omscs.gatech.edu/" target="_blank" rel="noopener">MS in CS</a>
-      (ML specialization, Georgia Tech) and the
-      <a href="https://www.cqfinstitute.org/" target="_blank" rel="noopener">CQF</a>.
-      <a href="/about/">More about me →</a>
-    </p>
-
-    <nav class="profile-links">
-      {{- range .Site.Params.socialIcons }}
-        {{- if ne .name "rss" }}
-        <a href="{{ .url }}" target="_blank" rel="noopener me">{{ .name | title }}</a>
+    <div class="intro-text">
+      <h1 class="intro-name">{{ .Site.Title }}</h1>
+      <p class="intro-role">ML Infrastructure &amp; Quantitative Finance Engineer</p>
+      <p class="intro-bio">
+        Senior HPC &amp; ML infrastructure engineer at a quantitative trading firm.
+        I build the systems that make large-scale AI fast and reliable — GPU clusters,
+        inference optimization, distributed training, and agentic infrastructure.
+        Completing an MS in CS (ML specialization, Georgia Tech) and the
+        <a href="https://www.cqfinstitute.org/" target="_blank" rel="noopener">CQF</a>.
+      </p>
+      <p class="intro-bio">
+        I write technical deep dives in <a href="/blog/">Blog</a> and run field experiments
+        in <a href="/experiments/">Experiments</a>. Three production projects are
+        <a href="/projects/">in progress</a>.
+        <a href="/about/">More about me →</a>
+      </p>
+      <nav class="intro-links">
+        {{- range .Site.Params.socialIcons }}
+          {{- if ne .name "rss" }}
+          <a href="{{ .url }}" target="_blank" rel="noopener me">{{ .name | title }}</a>
+          {{- end }}
         {{- end }}
-      {{- end }}
-      <a href="/about/">About</a>
-      <a href="/resume.pdf">Resume&nbsp;↓</a>
-    </nav>
+        <a href="/resume.pdf">Resume&nbsp;PDF</a>
+      </nav>
+    </div>
   </section>
 
-  <hr class="section-divider">
-
-  {{/* ── BLOG ── */}}
-  {{- if $blog }}
-  <section class="home-section">
-    <h2 class="home-section-title"><a href="/blog/">Blog</a></h2>
-    <p class="home-section-desc">Technical deep dives — 2,000–4,000 words.</p>
-    <ul class="post-list">
-      {{- range first 5 (sort $blog "Date" "desc") }}
-      <li class="post-list-item">
-        <a href="{{ .Permalink }}" class="post-list-title">{{ .Title }}</a>
-        <span class="post-list-date">{{ .Date.Format "Jan 2, 2006" }}</span>
-      </li>
-      {{- end }}
-    </ul>
-    <a href="/blog/" class="see-all-link">All posts →</a>
+  {{/* ══ CURRENT FOCUS ══ */}}
+  <section class="focus-section">
+    <span class="section-label">Current Focus</span>
+    <div class="focus-chips">
+      <span class="chip">vLLM inference optimization</span>
+      <span class="chip">Distributed training · FSDP</span>
+      <span class="chip">Agentic AI infrastructure</span>
+      <span class="chip">GPU-accelerated quant systems</span>
+      <span class="chip">GT OMSCS · CQF</span>
+    </div>
   </section>
-  <hr class="section-divider">
-  {{- end }}
 
-  {{/* ── EXPERIMENTS ── */}}
-  {{- if $experiments }}
-  <section class="home-section">
-    <h2 class="home-section-title"><a href="/experiments/">Experiments</a></h2>
-    <p class="home-section-desc">Lab notebook — tool deployments, benchmarks, field reports.</p>
-    <ul class="post-list">
-      {{- range first 5 (sort $experiments "Date" "desc") }}
-      <li class="post-list-item">
-        <a href="{{ .Permalink }}" class="post-list-title">{{ .Title }}</a>
-        <span class="post-list-date">{{ .Date.Format "Jan 2, 2006" }}</span>
-      </li>
-      {{- end }}
-    </ul>
-    <a href="/experiments/" class="see-all-link">All experiments →</a>
-  </section>
-  <hr class="section-divider">
-  {{- end }}
-
-  {{/* ── PROJECTS ── */}}
+  {{/* ══ PROJECTS ══ */}}
   {{- if $projects }}
-  <section class="home-section">
-    <h2 class="home-section-title"><a href="/projects/">Projects</a></h2>
-    <p class="home-section-desc">Three portfolio projects in progress — updated as milestones ship.</p>
-    <ul class="post-list">
+  <section class="home-section projects-section">
+    <div class="section-header">
+      <span class="section-label">Projects</span>
+      <a href="/projects/" class="section-link">All →</a>
+    </div>
+    <div class="project-list">
       {{- range (sort $projects "Weight") }}
-      <li class="post-list-item">
-        <a href="{{ .Permalink }}" class="post-list-title">{{ .Title }}</a>
-        <span class="post-list-date post-list-status">
-          {{- with .Params.status }}{{ . }}{{ else }}In Progress{{ end }}
-        </span>
+      {{- $status := .Params.status | default "In Progress" }}
+      {{- $statusClass := "status-progress" }}
+      {{- if in $status "Design" }}{{- $statusClass = "status-design" }}{{- end }}
+      {{- if in $status "Complete" }}{{- $statusClass = "status-complete" }}{{- end }}
+      <a href="{{ .Permalink }}" class="project-item">
+        <div class="project-top">
+          <span class="project-title">{{ .Title }}</span>
+          <span class="project-status {{ $statusClass }}">{{ $status }}</span>
+        </div>
+        {{- with .Description }}
+        <p class="project-desc">{{ . }}</p>
+        {{- end }}
+        {{- with .Params.tags }}
+        <div class="project-stack">
+          {{- range first 5 . }}
+          <span class="stack-chip">{{ . }}</span>
+          {{- end }}
+        </div>
+        {{- end }}
+      </a>
+      {{- end }}
+    </div>
+  </section>
+  {{- end }}
+
+  {{/* ══ WRITING (blog posts with summary) ══ */}}
+  {{- $publishedBlog := where $blog "Draft" false }}
+  {{- if $publishedBlog }}
+  <section class="home-section writing-section">
+    <div class="section-header">
+      <span class="section-label">Writing</span>
+      <a href="/blog/" class="section-link">All posts →</a>
+    </div>
+    <div class="writing-list">
+      {{- range first 4 (sort $publishedBlog "Date" "desc") }}
+      <a href="{{ .Permalink }}" class="writing-item">
+        <div class="writing-top">
+          <span class="writing-title">{{ .Title }}</span>
+          <span class="writing-meta">
+            {{ .Date.Format "Jan 2006" }}
+            {{- if .ReadingTime }} · {{ .ReadingTime }} min{{- end }}
+          </span>
+        </div>
+        {{- with .Description }}
+        <p class="writing-desc">{{ . }}</p>
+        {{- end }}
+      </a>
+      {{- end }}
+    </div>
+  </section>
+  {{- end }}
+
+  {{/* ══ EXPERIMENTS (compact log) ══ */}}
+  {{- $publishedExp := where $experiments "Draft" false }}
+  {{- if $publishedExp }}
+  <section class="home-section experiments-section">
+    <div class="section-header">
+      <span class="section-label">Experiments</span>
+      <a href="/experiments/" class="section-link">All →</a>
+    </div>
+    <ul class="log-list">
+      {{- range first 6 (sort $publishedExp "Date" "desc") }}
+      <li class="log-item">
+        <span class="log-date">{{ .Date.Format "2006-01-02" }}</span>
+        <a href="{{ .Permalink }}" class="log-title">{{ .Title }}</a>
       </li>
       {{- end }}
     </ul>
@@ -100,5 +136,4 @@
   {{- end }}
 
 </div>
-
 {{- end }}
