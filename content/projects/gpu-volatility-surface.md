@@ -6,6 +6,7 @@ tags: [quantitative-finance, cuda, gpu, volatility, derivatives, pricing, hpc]
 summary: "Applying HPC and GPU computing to quantitative finance: calibrating volatility surfaces in real-time using CUDA kernels, finite difference methods, and Monte Carlo simulation."
 ShowToc: true
 weight: 3
+status: "Design Phase"
 ---
 
 **Status:** 🔵 Design Phase — Deadline November 2026  

@@ -21,7 +21,7 @@ params:
   author: "Zhanyl Abdybaeva"
   DateFormat: "January 2, 2006"
   defaultTheme: light
-  disableThemeToggle: false
+  disableThemeToggle: true
 
   ShowReadingTime: true
   ShowShareButtons: false

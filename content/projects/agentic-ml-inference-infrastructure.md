@@ -6,6 +6,7 @@ tags: [inference, vllm, agentic-ai, langraph, mcp, gpu, production]
 summary: "Building the infrastructure layer for autonomous AI systems in production — serving, orchestration, and tooling for LLM-powered agents at scale."
 ShowToc: true
 weight: 1
+status: "In Progress"
 ---
 
 **Status:** 🟡 In Progress — Deadline August 2026  
