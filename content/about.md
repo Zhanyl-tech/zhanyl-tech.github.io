@@ -22,7 +22,7 @@ This site has two main content streams:
 
 **[Blog](/blog/)** — Technical deep dives on ML infrastructure, GPU inference, distributed training, and the systems engineering behind quantitative platforms. Written from a practitioner's perspective.
 
-**[Experiments](/experiments/)** — My public lab notebook. Shorter field reports on deploying new tools, running benchmarks, and documenting what I find before anyone else does.
+**[Lab Notes](/experiments/)** — My public lab notebook. Shorter field reports on deploying new tools, running benchmarks, and documenting what I find before anyone else does.
 
 I also maintain [project pages](/projects/) for my portfolio work, [notes](/notes/) for quick technical observations, and a [reading list](/reading/) of books I recommend.
 
@@ -42,6 +42,4 @@ Outside of engineering, I play chess and poker — both sharpen the strategic an
 ## Contact
 
 - [GitHub](https://github.com/zhanyl-tech)
-- [Twitter/X](https://twitter.com/YOURUSERNAME)
-- [LinkedIn](https://linkedin.com/in/YOURUSERNAME)
-- Email: [YOUR@EMAIL.COM](mailto:YOUR@EMAIL.COM)
+- Resume: [Download PDF](/resume.pdf)
