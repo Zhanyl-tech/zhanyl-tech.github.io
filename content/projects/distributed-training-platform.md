@@ -6,6 +6,7 @@ tags: [distributed-training, fsdp, pytorch, gpu, hpc, kubernetes, multi-node]
 summary: "Design notes for multi-node distributed training infrastructure — orchestration, fault tolerance, and cost optimization for large model training."
 ShowToc: true
 weight: 2
+status: "In Progress"
 ---
 
 **Status:** 🟡 In Progress — Deadline August 2026  
