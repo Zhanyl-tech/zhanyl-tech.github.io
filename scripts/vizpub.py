@@ -175,7 +175,7 @@ def generate_all_content(topic: str, paper_context: str = "", focus: str = "") -
         context_parts.append(f"\nSpecific focus: {focus}")
     context_parts.append(
         "\ninfrastructure engineer. "
-        "GT OMSCS ML specialization. CQF. Writes about GPU inference, distributed training, "
+        "MS in CS with an ML specialization at Georgia Tech. CQF. Writes about GPU inference, distributed training, "
         "agentic AI infrastructure. Staff-engineer voice."
     )
 

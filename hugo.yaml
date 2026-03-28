@@ -67,12 +67,6 @@ params:
   socialIcons:
     - name: github
       url: "https://github.com/zhanyl-tech"
-    - name: linkedin
-      url: "https://linkedin.com/in/YOURUSERNAME"
-    - name: x
-      url: "https://twitter.com/YOURUSERNAME"
-    - name: email
-      url: "mailto:YOUR@EMAIL.COM"
     - name: rss
       url: "/index.xml"
 
@@ -109,7 +103,7 @@ menu:
       url: /blog/
       weight: 10
     - identifier: experiments
-      name: Experiments
+      name: Lab Notes
       url: /experiments/
       weight: 20
     - identifier: projects
