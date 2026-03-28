@@ -93,9 +93,8 @@ params:
     hiddenInSingle: false
 
   editPost:
-    URL: "https://github.com/zhanyl-tech/zhanyl-tech.github.io/blob/main/content"
-    Text: "Suggest Changes"
-    appendFilePath: true
+    URL: ""
+    Text: ""
 
 outputs:
   home:
