@@ -27,6 +27,7 @@ PLAYBOOK.md
 __pycache__/
 *.pyc
 .env
+.venv/
 
 # Node (for mermaid-cli)
 node_modules/

@@ -33,6 +33,7 @@ import argparse
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 from datetime import datetime
@@ -85,6 +86,33 @@ def slugify(text: str) -> str:
     text = re.sub(r'[^\w\s-]', '', text)
     text = re.sub(r'[-\s]+', '-', text)
     return text[:60].rstrip('-')
+
+
+def load_local_env() -> None:
+    env_file = HUGO_ROOT / ".env"
+    if not env_file.exists():
+        return
+
+    for line in env_file.read_text().splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        key = key.strip()
+        value = value.strip().strip('"').strip("'")
+        os.environ.setdefault(key, value)
+
+
+def resolve_mmdc_binary() -> str:
+    local_mmdc = HUGO_ROOT / "node_modules" / ".bin" / "mmdc"
+    if local_mmdc.exists():
+        return str(local_mmdc)
+
+    global_mmdc = shutil.which("mmdc")
+    if global_mmdc:
+        return global_mmdc
+
+    return "mmdc"
 
 
 def fetch_paper_abstract(url: str) -> str:
@@ -201,6 +229,7 @@ def generate_all_content(topic: str, paper_context: str = "", focus: str = "") -
 def render_mermaid(mermaid_code: str, output_path: Path) -> bool:
     temp_mmd = output_path.with_suffix('.mmd')
     temp_config = output_path.parent / "mermaid-config.json"
+    mmdc_bin = resolve_mmdc_binary()
 
     temp_mmd.write_text(mermaid_code)
     temp_config.write_text(json.dumps(MERMAID_CONFIG))
@@ -208,7 +237,7 @@ def render_mermaid(mermaid_code: str, output_path: Path) -> bool:
     try:
         result = subprocess.run(
             [
-                "mmdc",
+                mmdc_bin,
                 "-i", str(temp_mmd),
                 "-o", str(output_path),
                 "-c", str(temp_config),
@@ -380,8 +409,11 @@ def main():
                         help="Your site URL for social post links")
     args = parser.parse_args()
 
+    load_local_env()
+
     if not os.environ.get("ANTHROPIC_API_KEY"):
         print("Error: Set ANTHROPIC_API_KEY environment variable")
+        print("You can also add it to a local .env file in the repo root.")
         print("  export ANTHROPIC_API_KEY=sk-ant-...")
         sys.exit(1)
 
