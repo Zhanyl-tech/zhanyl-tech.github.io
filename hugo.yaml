@@ -111,19 +111,11 @@ menu:
     - identifier: experiments
       name: Experiments
       url: /experiments/
-      weight: 15
+      weight: 20
     - identifier: projects
       name: Projects
       url: /projects/
-      weight: 20
-    - identifier: notes
-      name: Notes
-      url: /notes/
       weight: 30
-    - identifier: reading
-      name: Reading
-      url: /reading/
-      weight: 35
     - identifier: about
       name: About
       url: /about/
