@@ -1,0 +1,11 @@
+<footer class="footer">
+  <div>
+    <span>© {{ now.Format "2006" }} {{ .Site.Title }}</span>
+    {{- range .Site.Params.socialIcons }}
+      {{- if ne .name "rss" }}
+      <a href="{{ .url }}" target="_blank" rel="noopener">{{ .name | title }}</a>
+      {{- end }}
+    {{- end }}
+    <a href="/index.xml">RSS</a>
+  </div>
+</footer>
