@@ -11,6 +11,13 @@ if [ -x "node_modules/.bin/mmdc" ]; then
   MMDC_BIN="node_modules/.bin/mmdc"
 fi
 
+if [ -z "${ANTHROPIC_API_KEY}" ] && [ -f ".env" ]; then
+  ENV_KEY=$(sed -n 's/^ANTHROPIC_API_KEY=//p' .env | tail -1 | sed 's/^"//;s/"$//;s/^'\''//;s/'\''$//')
+  if [ -n "${ENV_KEY}" ]; then
+    export ANTHROPIC_API_KEY="${ENV_KEY}"
+  fi
+fi
+
 echo "Publishing setup check"
 echo "======================"
 echo ""
@@ -71,8 +78,8 @@ echo ""
 if [ "$missing" -eq 0 ]; then
   echo "All publishing dependencies are ready."
   echo "You can run:"
-  echo "  ./scripts/cope.sh content/blog/your-post.md"
-  echo "  ${PYTHON_BIN} scripts/vizpub.py --topic \"Your topic here\""
+  echo "  ./scripts/cope.sh content/blog/your-post.md --hn"
+  echo "  ${PYTHON_BIN} scripts/vizpub.py --interactive"
 else
   echo "Some dependencies are missing."
   echo "Install with:"
@@ -80,5 +87,6 @@ else
   echo "  .venv/bin/python -m pip install anthropic requests"
   echo "  npm install -D @mermaid-js/mermaid-cli"
   echo "  export ANTHROPIC_API_KEY=sk-ant-..."
+  echo "  # or: echo 'ANTHROPIC_API_KEY=sk-ant-...' > .env"
   exit 1
 fi
