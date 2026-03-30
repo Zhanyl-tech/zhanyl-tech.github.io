@@ -1,14 +1,25 @@
 #!/bin/bash
 # COPE Workflow: Create Once, Publish Everywhere
-# Usage: ./scripts/cope.sh content/blog/my-post.md
+# Usage: ./scripts/cope.sh content/blog/my-post.md [--hn]
 
 set -e
 
 POST_PATH="$1"
+shift || true
+
+GENERATE_HN=0
+
+for arg in "$@"; do
+  case "$arg" in
+    --hn)
+      GENERATE_HN=1
+      ;;
+  esac
+done
 
 if [ -z "$POST_PATH" ]; then
   echo "Usage: ./scripts/cope.sh <path-to-markdown-file>"
-  echo "Example: ./scripts/cope.sh content/experiments/nemoclaw-memory-profiling.md"
+  echo "Example: ./scripts/cope.sh content/experiments/nemoclaw-memory-profiling.md --hn"
   exit 1
 fi
 
@@ -24,9 +35,11 @@ TAGS=$(grep '^tags:' "$POST_PATH" | head -1 | sed 's/tags: *\[//;s/\]//')
 DATE=$(date +%Y-%m-%d)
 
 # Create output dirs
-mkdir -p cope-drafts/linkedin cope-drafts/x
+mkdir -p cope-drafts/linkedin cope-drafts/x cope-drafts/hn
 
 SLUG=$(basename "$POST_PATH" .md)
+SECTION=$(dirname "$POST_PATH" | sed 's|content/||')
+POST_URL="https://zhanyl-tech.github.io/${SECTION}/${SLUG}/"
 
 # ── Generate LinkedIn Draft ──
 cat > "cope-drafts/linkedin/${SLUG}.md" << EOF
@@ -56,7 +69,7 @@ Here's what I found:
 ### FIRST COMMENT
 ### (Post this immediately after publishing — this is where the link goes)
 
-Full writeup with code and benchmarks: https://zhanyl-tech.github.io/$(dirname "$POST_PATH" | sed 's|content/||')/${SLUG}/
+Full writeup with code and benchmarks: ${POST_URL}
 
 ---
 
@@ -111,15 +124,44 @@ If this was useful, follow for more on GPU inference, ML infrastructure, and bui
 
 EOF
 
+if [ "$GENERATE_HN" -eq 1 ]; then
+cat > "cope-drafts/hn/${SLUG}.md" << EOF
+# Hacker News Draft — ${DATE}
+## For: ${TITLE}
+
+### Suggested Title
+${TITLE}
+
+### URL
+${POST_URL}
+
+### Optional submission text
+[1-3 sentences: why this is technically useful, what readers will learn, and why you wrote it.]
+
+### CHECKLIST
+- [ ] Only submit if this is a real deep dive worth HN attention
+- [ ] Keep title factual, not hypey
+- [ ] If discussion needs context, use a self-post
+
+EOF
+fi
+
 echo ""
 echo "✅ COPE drafts generated:"
 echo "   LinkedIn: cope-drafts/linkedin/${SLUG}.md"
 echo "   X Thread: cope-drafts/x/${SLUG}.md"
+if [ "$GENERATE_HN" -eq 1 ]; then
+  echo "   HN Draft:  cope-drafts/hn/${SLUG}.md"
+fi
 echo ""
 echo "📝 Next steps:"
 echo "   1. Edit both drafts — fill in the specific insights from your post"
 echo "   2. Create visuals: architecture diagram or terminal screenshot"
 echo "   3. Post LinkedIn: Tuesday–Thursday 8–10 AM EST"
 echo "   4. Post X thread: Wednesday 8–10 AM EST"
-echo "   5. Submit to HN (deep dives only): news.ycombinator.com/submit"
+if [ "$GENERATE_HN" -eq 1 ]; then
+  echo "   5. Submit to HN if it's strong enough: news.ycombinator.com/submit"
+else
+  echo "   5. Re-run with --hn if this piece is HN-worthy"
+fi
 echo ""

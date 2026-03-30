@@ -1,4 +1,9 @@
 {
+  "scripts": {
+    "check:publishing": "./scripts/check-publishing-setup.sh",
+    "cope": "./scripts/cope.sh",
+    "vizpub": ".venv/bin/python scripts/vizpub.py"
+  },
   "devDependencies": {
     "@mermaid-js/mermaid-cli": "^11.12.0"
   }
