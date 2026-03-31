@@ -1,0 +1,28 @@
+<svg width="1200" height="1500" viewBox="0 0 1200 1500" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="1500" fill="#FCFCFA"/>
+  <text x="72" y="112" fill="#111111" font-family="Inter, Arial, sans-serif" font-size="56" font-weight="700">What I Would Keep from Both Papers</text>
+  <text x="72" y="180" fill="#575757" font-family="Inter, Arial, sans-serif" font-size="28">A production-focused mental model for long-context inference.</text>
+
+  <rect x="72" y="274" width="1056" height="220" rx="32" fill="#F4F1EA" stroke="#DDD6C8"/>
+  <text x="112" y="340" fill="#7A5C1E" font-family="Inter, Arial, sans-serif" font-size="30" font-weight="700">1. Prefill and decode are different optimization problems.</text>
+  <text x="112" y="394" fill="#1B1B1B" font-family="Inter, Arial, sans-serif" font-size="26">If the bottlenecks differ, the sparse mechanism should differ too.</text>
+  <text x="112" y="438" fill="#5A5A5A" font-family="Inter, Arial, sans-serif" font-size="24">That is LServe's most useful systems lesson.</text>
+
+  <rect x="72" y="542" width="1056" height="220" rx="32" fill="#F6F9FF" stroke="#C8D7FF"/>
+  <text x="112" y="608" fill="#2345B8" font-family="Inter, Arial, sans-serif" font-size="30" font-weight="700">2. The best sparse patterns are structured, not arbitrary.</text>
+  <text x="112" y="662" fill="#1B1B1B" font-family="Inter, Arial, sans-serif" font-size="26">Columns preserve global anchors. Slashes preserve local continuity.</text>
+  <text x="112" y="706" fill="#5A5A5A" font-family="Inter, Arial, sans-serif" font-size="24">That is SampleAttention's cleanest conceptual contribution.</text>
+
+  <rect x="72" y="810" width="1056" height="220" rx="32" fill="#FFF8F1" stroke="#F0D3AE"/>
+  <text x="112" y="876" fill="#B86716" font-family="Inter, Arial, sans-serif" font-size="30" font-weight="700">3. Accuracy needs a runtime control signal.</text>
+  <text x="112" y="930" fill="#1B1B1B" font-family="Inter, Arial, sans-serif" font-size="26">CRA is useful because it tracks how much important attention mass survives.</text>
+  <text x="112" y="974" fill="#5A5A5A" font-family="Inter, Arial, sans-serif" font-size="24">That is better than a fixed sparsity ratio or offline pattern choice.</text>
+
+  <rect x="72" y="1082" width="1056" height="238" rx="32" fill="#111111"/>
+  <text x="112" y="1160" fill="#FFFFFF" font-family="Inter, Arial, sans-serif" font-size="34" font-weight="700">Bottom line</text>
+  <text x="112" y="1220" fill="#FFFFFF" font-family="Inter, Arial, sans-serif" font-size="30">SampleAttention tells you what to keep during prefill.</text>
+  <text x="112" y="1264" fill="#FFFFFF" font-family="Inter, Arial, sans-serif" font-size="30">LServe tells you how to serve sparse attention across prefill and decode.</text>
+
+  <text x="72" y="1410" fill="#6A6A6A" font-family="Inter, Arial, sans-serif" font-size="22">Slide 4 of 4</text>
+  <text x="930" y="1410" fill="#6A6A6A" font-family="Inter, Arial, sans-serif" font-size="22">zhanyl-tech.github.io</text>
+</svg>
