@@ -15,11 +15,19 @@ Two recent papers answer that question from different angles:
 - **LServe** asks how to turn structured sparsity into a full serving system for long-context LLMs, including both **prefill** and **decode**.
 - **SampleAttention** asks what sparse patterns dominate real attention maps during **prefill**, and how to choose them adaptively without paying the cost of dense attention first.
 
+**Visual summary:** [review the 4-slide deck](/slides/lserve-sampleattention.html) or [download the PDF version](/slides/lserve-sampleattention.pdf)
+
 ![LServe and SampleAttention sparse attention overview](/images/vizpub/lserve-sampleattention-overview.svg)
 
 My read is that these papers are complementary.
 
 SampleAttention gives the clean conceptual picture: attention sparsity is not random noise, and two recurring structures explain a surprising amount of the retained attention mass. LServe then takes the next systems step: if sparse structure is real, how do you make it hardware-friendly enough to speed up actual serving, especially once decoding and KV-cache pressure dominate?
+
+## TL;DR
+
+- **LServe:** use different sparse mechanisms for different serving bottlenecks. Prefill skips KV blocks; decode prunes KV pages.
+- **SampleAttention:** two sparse patterns explain much of the useful structure in prefill attention. Columns preserve global anchors; slashes preserve local continuity.
+- **CRA:** a practical runtime proxy for accuracy because it tracks how much important attention mass remains after sparsification.
 
 ## The Shared Idea: Sparsity Has Structure
 
@@ -208,6 +216,15 @@ SampleAttention is more about the **selection principle**.
 LServe is more about the **serving-system realization**.
 
 That also explains why LServe spends so much energy on decode. A lot of sparse-attention discussion stops at TTFT. Real serving systems cannot stop there, because long outputs and reasoning-heavy workloads shift the bottleneck toward decode-time KV access.
+
+## Why This Matters in Production
+
+If you are building long-context inference infrastructure, the important lesson is not just that attention is sparse. It is that **serving-time bottlenecks move**, and the sparse structure you can exploit depends on where the bottleneck lives.
+
+- In prefill, the enemy is the cost of walking a long KV history over many query tokens.
+- In decode, the enemy is the bandwidth cost of repeatedly touching a large KV cache for one query token at a time.
+
+That is why these papers are more useful together than separately. One clarifies the sparse structure. The other clarifies the serving architecture.
 
 ## The Practical Mental Model
 

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LServe + SampleAttention Slides</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f4ef;
+      --card: #ffffff;
+      --text: #111111;
+      --muted: #666666;
+      --border: #e6e1d7;
+      --link: #2345b8;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 40px 20px 80px;
+    }
+
+    .intro {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 24px 28px;
+      margin-bottom: 28px;
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      font-size: 36px;
+      line-height: 1.15;
+    }
+
+    p {
+      margin: 0 0 10px;
+      font-size: 18px;
+      line-height: 1.6;
+    }
+
+    a {
+      color: var(--link);
+      text-decoration: none;
+    }
+
+    .slides {
+      display: grid;
+      gap: 28px;
+    }
+
+    .slide {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 18px;
+    }
+
+    .slide img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 12px;
+    }
+
+    .meta {
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    @media print {
+      body {
+        background: #ffffff;
+      }
+
+      .wrap {
+        max-width: none;
+        padding: 0;
+      }
+
+      .intro {
+        border: 0;
+        border-radius: 0;
+        padding: 0 0 16px;
+      }
+
+      .slide {
+        border: 0;
+        border-radius: 0;
+        padding: 0;
+        break-after: page;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="intro">
+      <h1>LServe + SampleAttention Slide Deck</h1>
+      <p>Review online here, or download the prebuilt PDF for a LinkedIn document upload.</p>
+      <p class="meta">PDF: <a href="./lserve-sampleattention.pdf">./lserve-sampleattention.pdf</a></p>
+      <p class="meta">Post URL: <a href="../blog/2026-01-30-lserve-sampleattention-sparse-attention/">../blog/2026-01-30-lserve-sampleattention-sparse-attention/</a></p>
+    </section>
+
+    <section class="slides">
+      <figure class="slide">
+        <img src="../images/slides/lserve-sampleattention-01.svg" alt="Slide 1">
+      </figure>
+      <figure class="slide">
+        <img src="../images/slides/lserve-sampleattention-02.svg" alt="Slide 2">
+      </figure>
+      <figure class="slide">
+        <img src="../images/slides/lserve-sampleattention-03.svg" alt="Slide 3">
+      </figure>
+      <figure class="slide">
+        <img src="../images/slides/lserve-sampleattention-04.svg" alt="Slide 4">
+      </figure>
+    </section>
+  </div>
+</body>
+</html>

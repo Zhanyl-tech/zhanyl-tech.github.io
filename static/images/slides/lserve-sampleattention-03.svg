@@ -1,0 +1,36 @@
+<svg width="1200" height="1500" viewBox="0 0 1200 1500" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="1500" fill="#FCFCFA"/>
+  <text x="72" y="112" fill="#111111" font-family="Inter, Arial, sans-serif" font-size="56" font-weight="700">SampleAttention Says Two</text>
+  <text x="72" y="176" fill="#111111" font-family="Inter, Arial, sans-serif" font-size="56" font-weight="700">Sparse Patterns Matter Most</text>
+  <text x="72" y="244" fill="#575757" font-family="Inter, Arial, sans-serif" font-size="28">The paper's contribution is not just sparsity. It is runtime-adaptive sparsity with an accuracy proxy.</text>
+
+  <rect x="72" y="320" width="504" height="520" rx="36" fill="#FFF8F1" stroke="#F0D3AE"/>
+  <text x="112" y="384" fill="#B86716" font-family="Inter, Arial, sans-serif" font-size="34" font-weight="700">Column pattern</text>
+  <rect x="112" y="434" width="424" height="172" rx="24" fill="#FFFFFF" stroke="#F3DFC6"/>
+  <line x1="244" y1="468" x2="244" y2="572" stroke="#E08A2E" stroke-width="18" stroke-linecap="round"/>
+  <line x1="404" y1="468" x2="404" y2="572" stroke="#E08A2E" stroke-width="18" stroke-linecap="round"/>
+  <text x="112" y="668" fill="#2F2F2F" font-family="Inter, Arial, sans-serif" font-size="25">Semantic meaning:</text>
+  <text x="112" y="710" fill="#2F2F2F" font-family="Inter, Arial, sans-serif" font-size="24">Global anchors and attention sinks.</text>
+  <text x="112" y="752" fill="#555555" font-family="Inter, Arial, sans-serif" font-size="22">Many queries still need the same key positions.</text>
+
+  <rect x="624" y="320" width="504" height="520" rx="36" fill="#FFF8F1" stroke="#F0D3AE"/>
+  <text x="664" y="384" fill="#B86716" font-family="Inter, Arial, sans-serif" font-size="34" font-weight="700">Slash pattern</text>
+  <rect x="664" y="434" width="424" height="172" rx="24" fill="#FFFFFF" stroke="#F3DFC6"/>
+  <line x1="730" y1="568" x2="870" y2="454" stroke="#E08A2E" stroke-width="18" stroke-linecap="round"/>
+  <line x1="842" y1="586" x2="982" y2="472" stroke="#E08A2E" stroke-width="18" stroke-linecap="round"/>
+  <text x="664" y="668" fill="#2F2F2F" font-family="Inter, Arial, sans-serif" font-size="25">Semantic meaning:</text>
+  <text x="664" y="710" fill="#2F2F2F" font-family="Inter, Arial, sans-serif" font-size="24">Local continuity and recent context.</text>
+  <text x="664" y="752" fill="#555555" font-family="Inter, Arial, sans-serif" font-size="22">Queries attend along relative position bands.</text>
+
+  <rect x="72" y="900" width="1056" height="386" rx="36" fill="#F6F9FF" stroke="#C8D7FF"/>
+  <text x="112" y="964" fill="#2345B8" font-family="Inter, Arial, sans-serif" font-size="34" font-weight="700">CRA = Cumulative Residual Attention</text>
+  <text x="112" y="1022" fill="#1B1B1B" font-family="Inter, Arial, sans-serif" font-size="30">Defined as the minimum remaining attention probability mass</text>
+  <text x="112" y="1064" fill="#1B1B1B" font-family="Inter, Arial, sans-serif" font-size="30">per query after sparsification.</text>
+
+  <rect x="112" y="1110" width="976" height="118" rx="24" fill="#FFFFFF" stroke="#D9E4FF"/>
+  <text x="148" y="1160" fill="#2F2F2F" font-family="Inter, Arial, sans-serif" font-size="24">Why it matters: CRA is a runtime proxy for whether the sparse mask kept enough useful attention mass.</text>
+  <text x="148" y="1198" fill="#2F2F2F" font-family="Inter, Arial, sans-serif" font-size="24">SampleAttention approximates it with query-guided chunked sampling, then picks top-k column and slash blocks.</text>
+
+  <text x="72" y="1410" fill="#6A6A6A" font-family="Inter, Arial, sans-serif" font-size="22">Slide 3 of 4</text>
+  <text x="930" y="1410" fill="#6A6A6A" font-family="Inter, Arial, sans-serif" font-size="22">zhanyl-tech.github.io</text>
+</svg>
