@@ -8,7 +8,7 @@
   --font-sans:  'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono:  'JetBrains Mono', 'Fira Code', monospace;
 
-  --page-bg:    #e7ebf8;
+  --page-bg:    #e8e0e6;
   --theme:      var(--page-bg);
   --bg:         #fcfcfb;
   --bg-code:    #f5f5f3;
@@ -45,8 +45,18 @@ article,
 .paginav,
 .toc,
 footer,
-.footer {
+.footer,
+.page-header,
+#page-header {
   background: transparent !important;
+}
+
+/* Content area — warm white card so text is readable on the tinted bg */
+.post-single .post-content,
+.post-entry {
+  background: rgba(255,255,255,0.70) !important;
+  border-radius: 12px;
+  padding: 28px 32px;
 }
 
 a { color: var(--link); text-decoration: none; }
