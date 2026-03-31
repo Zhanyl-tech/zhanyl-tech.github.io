@@ -8,7 +8,8 @@
   --font-sans:  'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono:  'JetBrains Mono', 'Fira Code', monospace;
 
-  --page-bg:    #f5f6fb;
+  --page-bg:    #f1f3fb;
+  --theme:      var(--page-bg);
   --bg:         #fcfcfb;
   --bg-code:    #f5f5f3;
   --text:       #111114;
@@ -23,6 +24,10 @@
 }
 
 /* ── Base ── */
+html {
+  background: var(--page-bg);
+}
+
 body {
   font-family: var(--font-sans);
   font-size: 17px;
