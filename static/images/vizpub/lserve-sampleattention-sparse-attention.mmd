@@ -1,0 +1,29 @@
+flowchart TD
+    A[Long-context attention bottleneck] --> B[Prefill]
+    A --> C[Decode]
+
+    B --> D[LServe prefill]
+    B --> E[SampleAttention]
+
+    D --> D1[Unified block-sparse attention]
+    D --> D2[Half the heads become streaming heads]
+    D --> D3[Skip low-value KV blocks]
+
+    E --> E1[Query-guided chunked sampling]
+    E --> E2[Column pattern]
+    E --> E3[Slash pattern]
+    E --> E4[CRA threshold]
+
+    E2 --> E21[Global anchors / attention sinks]
+    E3 --> E31[Local continuity / recent context]
+    E4 --> E41[Keep enough attention mass for worst query]
+
+    C --> F[LServe decode]
+    F --> F1[Hierarchical KV page selection]
+    F --> F2[Reuse selected pages across nearby tokens]
+    F --> F3[Combine sparsity with KV quantization]
+
+    classDef box fill:#f7f7f7,stroke:#222,stroke-width:1px,color:#111;
+    classDef accent fill:#eef4ff,stroke:#3559e0,stroke-width:1px,color:#111;
+    class A,B,C box;
+    class D,E,F accent;
