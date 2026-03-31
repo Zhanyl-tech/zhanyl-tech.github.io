@@ -8,6 +8,7 @@
   --font-sans:  'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono:  'JetBrains Mono', 'Fira Code', monospace;
 
+  --page-bg:    #f5f6fb;
   --bg:         #fcfcfb;
   --bg-code:    #f5f5f3;
   --text:       #111114;
@@ -27,7 +28,7 @@ body {
   font-size: 17px;
   line-height: 1.7;
   color: var(--text);
-  background: var(--bg);
+  background: var(--page-bg);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -38,7 +39,7 @@ a:hover { color: var(--link-h); }
 
 /* ── Nav ── */
 .header {
-  background: var(--bg);
+  background: #ffffff;
   border-bottom: 1px solid var(--rule);
   position: sticky;
   top: 0;

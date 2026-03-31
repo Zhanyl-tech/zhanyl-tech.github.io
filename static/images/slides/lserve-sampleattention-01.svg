@@ -1,0 +1,41 @@
+<svg width="1200" height="1500" viewBox="0 0 1200 1500" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="1500" fill="#FCFCFA"/>
+  <rect x="72" y="70" width="220" height="40" rx="20" fill="#EEF3FF"/>
+  <text x="102" y="97" fill="#2A4EBB" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="700">LONG-CONTEXT SERVING</text>
+
+  <text x="72" y="180" fill="#111111" font-family="Inter, Arial, sans-serif" font-size="64" font-weight="700">Sparse Attention</text>
+  <text x="72" y="250" fill="#111111" font-family="Inter, Arial, sans-serif" font-size="64" font-weight="700">That Actually Survives</text>
+  <text x="72" y="320" fill="#111111" font-family="Inter, Arial, sans-serif" font-size="64" font-weight="700">Contact with Serving</text>
+
+  <text x="72" y="404" fill="#575757" font-family="Inter, Arial, sans-serif" font-size="30">A visual summary of what LServe and SampleAttention change in practice.</text>
+
+  <rect x="72" y="472" width="1056" height="180" rx="28" fill="#F4F1EA" stroke="#DDD6C8"/>
+  <text x="112" y="540" fill="#7A5C1E" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="700">The shared thesis</text>
+  <text x="112" y="598" fill="#1B1B1B" font-family="Inter, Arial, sans-serif" font-size="40" font-weight="600">The win comes from structured sparsity</text>
+  <text x="112" y="648" fill="#1B1B1B" font-family="Inter, Arial, sans-serif" font-size="40" font-weight="600">that kernels can exploit cheaply.</text>
+
+  <rect x="72" y="720" width="500" height="528" rx="32" fill="#F6F9FF" stroke="#C8D7FF"/>
+  <text x="110" y="784" fill="#2345B8" font-family="Inter, Arial, sans-serif" font-size="34" font-weight="700">LServe</text>
+  <text x="110" y="834" fill="#1B1B1B" font-family="Inter, Arial, sans-serif" font-size="28">Turns sparse attention into a</text>
+  <text x="110" y="874" fill="#1B1B1B" font-family="Inter, Arial, sans-serif" font-size="28">serving-system design across</text>
+  <text x="110" y="914" fill="#1B1B1B" font-family="Inter, Arial, sans-serif" font-size="28">prefill and decode.</text>
+
+  <rect x="110" y="972" width="424" height="206" rx="24" fill="#FFFFFF" stroke="#D9E4FF"/>
+  <text x="142" y="1032" fill="#111111" font-family="Inter, Arial, sans-serif" font-size="25" font-weight="700">Key idea</text>
+  <text x="142" y="1080" fill="#333333" font-family="Inter, Arial, sans-serif" font-size="23">Use the right sparse structure for</text>
+  <text x="142" y="1116" fill="#333333" font-family="Inter, Arial, sans-serif" font-size="23">the actual bottleneck in each phase.</text>
+
+  <rect x="628" y="720" width="500" height="528" rx="32" fill="#FFF8F1" stroke="#F0D3AE"/>
+  <text x="666" y="784" fill="#B86716" font-family="Inter, Arial, sans-serif" font-size="34" font-weight="700">SampleAttention</text>
+  <text x="666" y="834" fill="#1B1B1B" font-family="Inter, Arial, sans-serif" font-size="28">Explains which sparse patterns</text>
+  <text x="666" y="874" fill="#1B1B1B" font-family="Inter, Arial, sans-serif" font-size="28">matter during prefill and how</text>
+  <text x="666" y="914" fill="#1B1B1B" font-family="Inter, Arial, sans-serif" font-size="28">to adapt them at runtime.</text>
+
+  <rect x="666" y="972" width="424" height="206" rx="24" fill="#FFFFFF" stroke="#F3DFC6"/>
+  <text x="698" y="1032" fill="#111111" font-family="Inter, Arial, sans-serif" font-size="25" font-weight="700">Key idea</text>
+  <text x="698" y="1080" fill="#333333" font-family="Inter, Arial, sans-serif" font-size="23">Columns preserve global anchors.</text>
+  <text x="698" y="1116" fill="#333333" font-family="Inter, Arial, sans-serif" font-size="23">Slashes preserve local continuity.</text>
+
+  <text x="72" y="1394" fill="#6A6A6A" font-family="Inter, Arial, sans-serif" font-size="22">Slide 1 of 4</text>
+  <text x="930" y="1394" fill="#6A6A6A" font-family="Inter, Arial, sans-serif" font-size="22">zhanyl-tech.github.io</text>
+</svg>

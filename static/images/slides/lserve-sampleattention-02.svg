@@ -1,0 +1,38 @@
+<svg width="1200" height="1500" viewBox="0 0 1200 1500" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="1500" fill="#FCFCFA"/>
+  <text x="72" y="112" fill="#111111" font-family="Inter, Arial, sans-serif" font-size="56" font-weight="700">LServe Uses Different Sparsity</text>
+  <text x="72" y="176" fill="#111111" font-family="Inter, Arial, sans-serif" font-size="56" font-weight="700">for Prefill and Decode</text>
+  <text x="72" y="244" fill="#575757" font-family="Inter, Arial, sans-serif" font-size="28">One paper, two bottlenecks, two serving-time strategies.</text>
+
+  <rect x="72" y="320" width="1056" height="460" rx="36" fill="#F6F9FF" stroke="#C8D7FF"/>
+  <text x="114" y="382" fill="#2345B8" font-family="Inter, Arial, sans-serif" font-size="36" font-weight="700">Prefill</text>
+  <text x="114" y="432" fill="#1B1B1B" font-family="Inter, Arial, sans-serif" font-size="28">Goal: reduce sequential KV-block iterations.</text>
+
+  <rect x="114" y="478" width="972" height="238" rx="24" fill="#FFFFFF" stroke="#D9E4FF"/>
+  <text x="150" y="536" fill="#111111" font-family="Inter, Arial, sans-serif" font-size="26" font-weight="700">How it works</text>
+  <text x="150" y="584" fill="#2F2F2F" font-family="Inter, Arial, sans-serif" font-size="24">1. Partition history into blocks.</text>
+  <text x="150" y="622" fill="#2F2F2F" font-family="Inter, Arial, sans-serif" font-size="24">2. Always keep the newest block.</text>
+  <text x="150" y="660" fill="#2F2F2F" font-family="Inter, Arial, sans-serif" font-size="24">3. Skip lower-value old blocks entirely.</text>
+  <text x="620" y="584" fill="#2F2F2F" font-family="Inter, Arial, sans-serif" font-size="24">4. Convert about half the heads</text>
+  <text x="620" y="622" fill="#2F2F2F" font-family="Inter, Arial, sans-serif" font-size="24">into streaming heads.</text>
+  <text x="620" y="660" fill="#2F2F2F" font-family="Inter, Arial, sans-serif" font-size="24">5. Fuse sparse and standard heads in unified kernels.</text>
+
+  <rect x="72" y="832" width="1056" height="500" rx="36" fill="#FFF8F1" stroke="#F0D3AE"/>
+  <text x="114" y="894" fill="#B86716" font-family="Inter, Arial, sans-serif" font-size="36" font-weight="700">Decode</text>
+  <text x="114" y="944" fill="#1B1B1B" font-family="Inter, Arial, sans-serif" font-size="28">Goal: reduce memory-bound KV-page reads for each query token.</text>
+
+  <rect x="114" y="990" width="972" height="278" rx="24" fill="#FFFFFF" stroke="#F3DFC6"/>
+  <text x="150" y="1048" fill="#111111" font-family="Inter, Arial, sans-serif" font-size="26" font-weight="700">How it works</text>
+  <text x="150" y="1096" fill="#2F2F2F" font-family="Inter, Arial, sans-serif" font-size="24">1. Treat KV cache as pages.</text>
+  <text x="150" y="1134" fill="#2F2F2F" font-family="Inter, Arial, sans-serif" font-size="24">2. Use a hierarchical selector to score which pages matter.</text>
+  <text x="150" y="1172" fill="#2F2F2F" font-family="Inter, Arial, sans-serif" font-size="24">3. Reuse page-selection results across nearby decode steps.</text>
+  <text x="150" y="1210" fill="#2F2F2F" font-family="Inter, Arial, sans-serif" font-size="24">4. Combine sparsity with KV quantization.</text>
+
+  <rect x="770" y="1082" width="274" height="118" rx="20" fill="#FFF4E8"/>
+  <text x="806" y="1132" fill="#A45A11" font-family="Inter, Arial, sans-serif" font-size="25" font-weight="700">Mental model</text>
+  <text x="806" y="1170" fill="#2F2F2F" font-family="Inter, Arial, sans-serif" font-size="21">Prefill skips blocks.</text>
+  <text x="806" y="1202" fill="#2F2F2F" font-family="Inter, Arial, sans-serif" font-size="21">Decode prunes pages.</text>
+
+  <text x="72" y="1410" fill="#6A6A6A" font-family="Inter, Arial, sans-serif" font-size="22">Slide 2 of 4</text>
+  <text x="930" y="1410" fill="#6A6A6A" font-family="Inter, Arial, sans-serif" font-size="22">zhanyl-tech.github.io</text>
+</svg>
