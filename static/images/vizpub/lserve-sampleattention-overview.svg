@@ -1,60 +1,91 @@
 <svg width="1600" height="1100" viewBox="0 0 1600 1100" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="1600" height="1100" fill="#FCFCFA"/>
-  <text x="100" y="96" fill="#111111" font-family="Inter, Arial, sans-serif" font-size="40" font-weight="700">Sparse Attention for Long-Context Serving</text>
-  <text x="100" y="136" fill="#555555" font-family="Inter, Arial, sans-serif" font-size="22">LServe explains the serving-system realization. SampleAttention explains the runtime sparse structure.</text>
+  <defs>
+    <linearGradient id="bg" x1="120" y1="80" x2="1480" y2="1020" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F7F9FF"/>
+      <stop offset="1" stop-color="#FBFAFF"/>
+    </linearGradient>
+    <linearGradient id="blueCard" x1="100" y1="340" x2="760" y2="980" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F2F7FF"/>
+      <stop offset="1" stop-color="#F7FAFF"/>
+    </linearGradient>
+    <linearGradient id="amberCard" x1="840" y1="340" x2="1500" y2="980" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF7EF"/>
+      <stop offset="1" stop-color="#FFFDF9"/>
+    </linearGradient>
+  </defs>
 
-  <rect x="100" y="190" width="1400" height="120" rx="28" fill="#F4F1EA" stroke="#DDD6C8"/>
-  <text x="135" y="238" fill="#7A5C1E" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="700">Shared Thesis</text>
-  <text x="135" y="278" fill="#1B1B1B" font-family="Inter, Arial, sans-serif" font-size="28" font-weight="600">The win comes from structured sparsity that kernels can exploit cheaply.</text>
-  <text x="135" y="316" fill="#4D4D4D" font-family="Inter, Arial, sans-serif" font-size="21">Not arbitrary dropped scores. Not a fixed global sparsity ratio. The shape of sparsity matters.</text>
+  <rect width="1600" height="1100" fill="url(#bg)"/>
+  <circle cx="1420" cy="140" r="180" fill="#EEF2FF"/>
+  <circle cx="152" cy="980" r="140" fill="#F7EDE3"/>
 
-  <rect x="100" y="360" width="670" height="640" rx="32" fill="#F6F9FF" stroke="#C8D7FF"/>
-  <text x="136" y="414" fill="#2345B8" font-family="Inter, Arial, sans-serif" font-size="30" font-weight="700">LServe: System Design Across Both Phases</text>
-  <text x="136" y="450" fill="#4D5B84" font-family="Inter, Arial, sans-serif" font-size="20">Optimization target changes when you move from prefilling to decoding.</text>
+  <rect x="100" y="70" width="220" height="42" rx="21" fill="#EEF3FF"/>
+  <text x="132" y="98" fill="#2848B8" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="700">LONG-CONTEXT INFERENCE</text>
 
-  <rect x="136" y="488" width="598" height="190" rx="24" fill="#FFFFFF" stroke="#D9E4FF"/>
-  <text x="164" y="530" fill="#111111" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="700">Prefill</text>
-  <text x="164" y="568" fill="#222222" font-family="Inter, Arial, sans-serif" font-size="21">1. Partition KV history into blocks.</text>
-  <text x="164" y="602" fill="#222222" font-family="Inter, Arial, sans-serif" font-size="21">2. Skip older low-value blocks entirely.</text>
-  <text x="164" y="636" fill="#222222" font-family="Inter, Arial, sans-serif" font-size="21">3. Convert about half the heads into cheap streaming heads.</text>
-  <text x="164" y="670" fill="#555555" font-family="Inter, Arial, sans-serif" font-size="19">Goal: reduce sequential KV iterations in the attention kernel.</text>
+  <text x="100" y="180" fill="#111111" font-family="Inter, Arial, sans-serif" font-size="52" font-weight="700">Sparse Attention That Actually Changes Serving</text>
+  <text x="100" y="230" fill="#5B6170" font-family="Inter, Arial, sans-serif" font-size="24">LServe changes the serving path. SampleAttention clarifies the sparse structure worth keeping.</text>
 
-  <rect x="136" y="716" width="598" height="230" rx="24" fill="#FFFFFF" stroke="#D9E4FF"/>
-  <text x="164" y="758" fill="#111111" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="700">Decode</text>
-  <text x="164" y="796" fill="#222222" font-family="Inter, Arial, sans-serif" font-size="21">1. Treat KV cache as pages.</text>
-  <text x="164" y="830" fill="#222222" font-family="Inter, Arial, sans-serif" font-size="21">2. Score which pages matter for the current query.</text>
-  <text x="164" y="864" fill="#222222" font-family="Inter, Arial, sans-serif" font-size="21">3. Read only selected pages, then combine with KV quantization.</text>
-  <text x="164" y="898" fill="#555555" font-family="Inter, Arial, sans-serif" font-size="19">Goal: cut memory-bound KV access while preserving long-context behavior.</text>
+  <rect x="100" y="278" width="1400" height="96" rx="28" fill="#FFFFFF" stroke="#E8ECF6"/>
+  <text x="136" y="318" fill="#6E5B22" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="700">ONE-SENTENCE SUMMARY</text>
+  <text x="136" y="355" fill="#202020" font-family="Inter, Arial, sans-serif" font-size="28" font-weight="600">Use structured sparsity that kernels can exploit cheaply, then adapt the structure to the actual bottleneck.</text>
 
-  <path d="M793 520H866" stroke="#9FB6FF" stroke-width="4" stroke-linecap="round"/>
-  <path d="M853 508L873 520L853 532" stroke="#9FB6FF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M793 824H866" stroke="#9FB6FF" stroke-width="4" stroke-linecap="round"/>
-  <path d="M853 812L873 824L853 836" stroke="#9FB6FF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="100" y="410" width="650" height="560" rx="34" fill="url(#blueCard)" stroke="#D5E3FF"/>
+  <text x="136" y="466" fill="#2345B8" font-family="Inter, Arial, sans-serif" font-size="34" font-weight="700">LServe</text>
+  <text x="136" y="504" fill="#55617B" font-family="Inter, Arial, sans-serif" font-size="22">Serving-system view: use different sparsity for prefill and decode.</text>
 
-  <rect x="830" y="360" width="670" height="640" rx="32" fill="#FFF8F1" stroke="#F0D3AE"/>
-  <text x="866" y="414" fill="#B86716" font-family="Inter, Arial, sans-serif" font-size="30" font-weight="700">SampleAttention: Runtime Sparse Structure</text>
-  <text x="866" y="450" fill="#8A6A46" font-family="Inter, Arial, sans-serif" font-size="20">The dominant sparse pattern changes by head, prompt, and model, but two shapes recur.</text>
+  <rect x="136" y="544" width="578" height="164" rx="24" fill="#FFFFFF" stroke="#D9E6FF"/>
+  <text x="166" y="588" fill="#111111" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="700">Prefill path</text>
+  <rect x="166" y="614" width="148" height="54" rx="16" fill="#EEF3FF" stroke="#CFE0FF"/>
+  <rect x="176" y="629" width="16" height="24" rx="6" fill="#86A8FF"/>
+  <rect x="198" y="629" width="16" height="24" rx="6" fill="#86A8FF"/>
+  <rect x="220" y="629" width="16" height="24" rx="6" fill="#D4E2FF"/>
+  <rect x="242" y="629" width="16" height="24" rx="6" fill="#D4E2FF"/>
+  <rect x="264" y="629" width="16" height="24" rx="6" fill="#86A8FF"/>
+  <text x="334" y="648" fill="#2B3857" font-family="Inter, Arial, sans-serif" font-size="22">Block-sparse attention + streaming heads</text>
+  <text x="166" y="691" fill="#5B6170" font-family="Inter, Arial, sans-serif" font-size="19">Reduce sequential KV-block iterations across many query tokens.</text>
 
-  <rect x="866" y="488" width="282" height="230" rx="24" fill="#FFFFFF" stroke="#F3DFC6"/>
-  <text x="894" y="530" fill="#111111" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="700">Column Pattern</text>
-  <rect x="894" y="556" width="226" height="112" rx="16" fill="#FFF4E8"/>
-  <line x1="964" y1="568" x2="964" y2="656" stroke="#E08A2E" stroke-width="12" stroke-linecap="round"/>
-  <line x1="1038" y1="568" x2="1038" y2="656" stroke="#E08A2E" stroke-width="12" stroke-linecap="round"/>
-  <text x="894" y="694" fill="#555555" font-family="Inter, Arial, sans-serif" font-size="19">Semantic role: global anchors and attention sinks.</text>
+  <rect x="136" y="740" width="578" height="188" rx="24" fill="#FFFFFF" stroke="#D9E6FF"/>
+  <text x="166" y="784" fill="#111111" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="700">Decode path</text>
+  <rect x="166" y="810" width="188" height="72" rx="18" fill="#EEF3FF" stroke="#CFE0FF"/>
+  <rect x="182" y="830" width="24" height="30" rx="7" fill="#86A8FF"/>
+  <rect x="212" y="830" width="24" height="30" rx="7" fill="#D4E2FF"/>
+  <rect x="242" y="830" width="24" height="30" rx="7" fill="#86A8FF"/>
+  <rect x="272" y="830" width="24" height="30" rx="7" fill="#D4E2FF"/>
+  <rect x="302" y="830" width="24" height="30" rx="7" fill="#86A8FF"/>
+  <path d="M374 846H446" stroke="#8AA9F6" stroke-width="6" stroke-linecap="round"/>
+  <path d="M432 832L454 846L432 860" stroke="#8AA9F6" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="470" y="814" width="194" height="64" rx="16" fill="#F8FBFF" stroke="#D9E6FF"/>
+  <text x="496" y="854" fill="#2B3857" font-family="Inter, Arial, sans-serif" font-size="22">Hierarchical page selection</text>
+  <text x="166" y="914" fill="#5B6170" font-family="Inter, Arial, sans-serif" font-size="19">Prune KV pages for each query, then combine with KV quantization.</text>
 
-  <rect x="1182" y="488" width="282" height="230" rx="24" fill="#FFFFFF" stroke="#F3DFC6"/>
-  <text x="1210" y="530" fill="#111111" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="700">Slash Pattern</text>
-  <rect x="1210" y="556" width="226" height="112" rx="16" fill="#FFF4E8"/>
-  <line x1="1248" y1="648" x2="1338" y2="568" stroke="#E08A2E" stroke-width="12" stroke-linecap="round"/>
-  <line x1="1302" y1="648" x2="1392" y2="568" stroke="#E08A2E" stroke-width="12" stroke-linecap="round"/>
-  <text x="1210" y="694" fill="#555555" font-family="Inter, Arial, sans-serif" font-size="19">Semantic role: local continuity and recent context.</text>
+  <rect x="850" y="410" width="650" height="560" rx="34" fill="url(#amberCard)" stroke="#F1D8B8"/>
+  <text x="886" y="466" fill="#B96815" font-family="Inter, Arial, sans-serif" font-size="34" font-weight="700">SampleAttention</text>
+  <text x="886" y="504" fill="#8A6B47" font-family="Inter, Arial, sans-serif" font-size="22">Sparse-structure view: two patterns dominate much of the useful attention mass.</text>
 
-  <rect x="866" y="760" width="598" height="186" rx="24" fill="#FFFFFF" stroke="#F3DFC6"/>
-  <text x="894" y="802" fill="#111111" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="700">CRA: Accuracy Proxy</text>
-  <text x="894" y="840" fill="#222222" font-family="Inter, Arial, sans-serif" font-size="21">CRA = minimum remaining attention probability mass per query after sparsification.</text>
-  <text x="894" y="876" fill="#222222" font-family="Inter, Arial, sans-serif" font-size="21">Higher CRA means the sparse mask retained more useful attention mass.</text>
-  <text x="894" y="912" fill="#555555" font-family="Inter, Arial, sans-serif" font-size="19">SampleAttention approximates CRA with query-guided chunked sampling, then selects top-k column and slash blocks.</text>
+  <rect x="886" y="544" width="272" height="200" rx="24" fill="#FFFFFF" stroke="#F2E0CA"/>
+  <text x="914" y="586" fill="#111111" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="700">Column pattern</text>
+  <rect x="914" y="612" width="216" height="90" rx="18" fill="#FFF6EA"/>
+  <g opacity="0.95">
+    <line x1="982" y1="626" x2="982" y2="688" stroke="#E0882F" stroke-width="12" stroke-linecap="round"/>
+    <line x1="1056" y1="626" x2="1056" y2="688" stroke="#E0882F" stroke-width="12" stroke-linecap="round"/>
+  </g>
+  <text x="914" y="724" fill="#6D6257" font-family="Inter, Arial, sans-serif" font-size="18">Global anchors and attention sinks</text>
 
-  <rect x="100" y="1030" width="1400" height="32" rx="16" fill="#F1F1ED"/>
-  <text x="126" y="1052" fill="#555555" font-family="Inter, Arial, sans-serif" font-size="18">Mental model: SampleAttention explains what to keep in prefill; LServe explains how to serve sparse attention efficiently across prefill and decode.</text>
+  <rect x="1192" y="544" width="272" height="200" rx="24" fill="#FFFFFF" stroke="#F2E0CA"/>
+  <text x="1220" y="586" fill="#111111" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="700">Slash pattern</text>
+  <rect x="1220" y="612" width="216" height="90" rx="18" fill="#FFF6EA"/>
+  <g opacity="0.95">
+    <line x1="1258" y1="688" x2="1346" y2="626" stroke="#E0882F" stroke-width="12" stroke-linecap="round"/>
+    <line x1="1316" y1="688" x2="1404" y2="626" stroke="#E0882F" stroke-width="12" stroke-linecap="round"/>
+  </g>
+  <text x="1220" y="724" fill="#6D6257" font-family="Inter, Arial, sans-serif" font-size="18">Local continuity and recent context</text>
+
+  <rect x="886" y="774" width="578" height="154" rx="24" fill="#FFFFFF" stroke="#F2E0CA"/>
+  <text x="914" y="816" fill="#111111" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="700">CRA</text>
+  <text x="914" y="854" fill="#2C2C2C" font-family="Inter, Arial, sans-serif" font-size="22">Minimum remaining attention probability mass per query after sparsification.</text>
+  <rect x="914" y="880" width="330" height="14" rx="7" fill="#F3E8D9"/>
+  <rect x="914" y="880" width="248" height="14" rx="7" fill="#E0882F"/>
+  <text x="1260" y="892" fill="#8A6B47" font-family="Inter, Arial, sans-serif" font-size="18">accuracy proxy</text>
+
+  <rect x="100" y="1000" width="1400" height="50" rx="25" fill="#111111"/>
+  <text x="136" y="1033" fill="#FFFFFF" font-family="Inter, Arial, sans-serif" font-size="22">Mental model: SampleAttention tells you what to keep in prefill; LServe tells you how to serve sparse attention efficiently across prefill and decode.</text>
 </svg>

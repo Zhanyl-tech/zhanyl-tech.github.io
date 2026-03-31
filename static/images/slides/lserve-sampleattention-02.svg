@@ -1,38 +1,55 @@
 <svg width="1200" height="1500" viewBox="0 0 1200 1500" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="1200" height="1500" fill="#FCFCFA"/>
-  <text x="72" y="112" fill="#111111" font-family="Inter, Arial, sans-serif" font-size="56" font-weight="700">LServe Uses Different Sparsity</text>
-  <text x="72" y="176" fill="#111111" font-family="Inter, Arial, sans-serif" font-size="56" font-weight="700">for Prefill and Decode</text>
-  <text x="72" y="244" fill="#575757" font-family="Inter, Arial, sans-serif" font-size="28">One paper, two bottlenecks, two serving-time strategies.</text>
+  <rect width="1200" height="1500" fill="#F8FAFF"/>
+  <text x="72" y="112" fill="#111111" font-family="Inter, Arial, sans-serif" font-size="58" font-weight="700">LServe: Two Phases,</text>
+  <text x="72" y="178" fill="#111111" font-family="Inter, Arial, sans-serif" font-size="58" font-weight="700">Two Sparse Mechanisms</text>
+  <text x="72" y="244" fill="#5F6672" font-family="Inter, Arial, sans-serif" font-size="28">The paper is most useful when you stop treating prefill and decode as the same optimization problem.</text>
 
-  <rect x="72" y="320" width="1056" height="460" rx="36" fill="#F6F9FF" stroke="#C8D7FF"/>
-  <text x="114" y="382" fill="#2345B8" font-family="Inter, Arial, sans-serif" font-size="36" font-weight="700">Prefill</text>
-  <text x="114" y="432" fill="#1B1B1B" font-family="Inter, Arial, sans-serif" font-size="28">Goal: reduce sequential KV-block iterations.</text>
+  <rect x="72" y="314" width="1056" height="468" rx="34" fill="#F4F8FF" stroke="#D5E3FF"/>
+  <text x="108" y="374" fill="#2345B8" font-family="Inter, Arial, sans-serif" font-size="34" font-weight="700">Prefill</text>
+  <text x="108" y="418" fill="#56627A" font-family="Inter, Arial, sans-serif" font-size="24">Goal: reduce sequential KV-block work over many query tokens.</text>
+  <rect x="108" y="458" width="984" height="278" rx="24" fill="#FFFFFF" stroke="#DCE7FF"/>
+  <rect x="140" y="510" width="184" height="80" rx="22" fill="#EEF3FF" stroke="#D4E2FF"/>
+  <text x="174" y="558" fill="#2D3B59" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="700">Prompt KV history</text>
+  <rect x="156" y="606" width="16" height="28" rx="6" fill="#88A8FF"/>
+  <rect x="178" y="606" width="16" height="28" rx="6" fill="#88A8FF"/>
+  <rect x="200" y="606" width="16" height="28" rx="6" fill="#D7E4FF"/>
+  <rect x="222" y="606" width="16" height="28" rx="6" fill="#88A8FF"/>
+  <rect x="244" y="606" width="16" height="28" rx="6" fill="#D7E4FF"/>
+  <path d="M340 550H430" stroke="#8BAAF5" stroke-width="8" stroke-linecap="round"/>
+  <path d="M414 534L440 550L414 566" stroke="#8BAAF5" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="448" y="506" width="220" height="90" rx="24" fill="#F8FBFF" stroke="#DCE7FF"/>
+  <text x="476" y="542" fill="#2D3B59" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="700">Block-sparse attention</text>
+  <text x="476" y="576" fill="#607088" font-family="Inter, Arial, sans-serif" font-size="20">Skip old low-value blocks</text>
+  <path d="M684 550H774" stroke="#8BAAF5" stroke-width="8" stroke-linecap="round"/>
+  <path d="M758 534L784 550L758 566" stroke="#8BAAF5" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="792" y="506" width="268" height="90" rx="24" fill="#F8FBFF" stroke="#DCE7FF"/>
+  <text x="820" y="542" fill="#2D3B59" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="700">Streaming heads</text>
+  <text x="820" y="576" fill="#607088" font-family="Inter, Arial, sans-serif" font-size="20">Cheap static sparsity</text>
+  <text x="140" y="680" fill="#59647B" font-family="Inter, Arial, sans-serif" font-size="22">Mental model: prefill acceleration comes from skipping whole blocks, not a few scalar ops inside each block.</text>
 
-  <rect x="114" y="478" width="972" height="238" rx="24" fill="#FFFFFF" stroke="#D9E4FF"/>
-  <text x="150" y="536" fill="#111111" font-family="Inter, Arial, sans-serif" font-size="26" font-weight="700">How it works</text>
-  <text x="150" y="584" fill="#2F2F2F" font-family="Inter, Arial, sans-serif" font-size="24">1. Partition history into blocks.</text>
-  <text x="150" y="622" fill="#2F2F2F" font-family="Inter, Arial, sans-serif" font-size="24">2. Always keep the newest block.</text>
-  <text x="150" y="660" fill="#2F2F2F" font-family="Inter, Arial, sans-serif" font-size="24">3. Skip lower-value old blocks entirely.</text>
-  <text x="620" y="584" fill="#2F2F2F" font-family="Inter, Arial, sans-serif" font-size="24">4. Convert about half the heads</text>
-  <text x="620" y="622" fill="#2F2F2F" font-family="Inter, Arial, sans-serif" font-size="24">into streaming heads.</text>
-  <text x="620" y="660" fill="#2F2F2F" font-family="Inter, Arial, sans-serif" font-size="24">5. Fuse sparse and standard heads in unified kernels.</text>
+  <rect x="72" y="832" width="1056" height="520" rx="34" fill="#FFF8F1" stroke="#F0D8BC"/>
+  <text x="108" y="892" fill="#BA6814" font-family="Inter, Arial, sans-serif" font-size="34" font-weight="700">Decode</text>
+  <text x="108" y="936" fill="#8B6B47" font-family="Inter, Arial, sans-serif" font-size="24">Goal: reduce memory-bound KV-page reads for one query token at a time.</text>
+  <rect x="108" y="976" width="984" height="314" rx="24" fill="#FFFFFF" stroke="#F3E3D0"/>
+  <rect x="140" y="1030" width="208" height="90" rx="22" fill="#FFF6EA" stroke="#F3E3D0"/>
+  <text x="172" y="1082" fill="#7C5826" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="700">KV cache pages</text>
+  <rect x="160" y="1140" width="24" height="26" rx="7" fill="#E0882F"/>
+  <rect x="190" y="1140" width="24" height="26" rx="7" fill="#F5D2A7"/>
+  <rect x="220" y="1140" width="24" height="26" rx="7" fill="#E0882F"/>
+  <rect x="250" y="1140" width="24" height="26" rx="7" fill="#F5D2A7"/>
+  <rect x="280" y="1140" width="24" height="26" rx="7" fill="#E0882F"/>
+  <path d="M364 1074H456" stroke="#E29B52" stroke-width="8" stroke-linecap="round"/>
+  <path d="M440 1058L466 1074L440 1090" stroke="#E29B52" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="482" y="1030" width="250" height="90" rx="22" fill="#FFFBF6" stroke="#F3E3D0"/>
+  <text x="510" y="1066" fill="#7C5826" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="700">Hierarchical selector</text>
+  <text x="510" y="1100" fill="#8C7151" font-family="Inter, Arial, sans-serif" font-size="20">Score which pages matter</text>
+  <path d="M748 1074H840" stroke="#E29B52" stroke-width="8" stroke-linecap="round"/>
+  <path d="M824 1058L850 1074L824 1090" stroke="#E29B52" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="866" y="1030" width="194" height="90" rx="22" fill="#FFFBF6" stroke="#F3E3D0"/>
+  <text x="894" y="1066" fill="#7C5826" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="700">Quantized decode</text>
+  <text x="894" y="1100" fill="#8C7151" font-family="Inter, Arial, sans-serif" font-size="20">Cheaper selected-page access</text>
+  <text x="140" y="1232" fill="#7E6B57" font-family="Inter, Arial, sans-serif" font-size="22">Mental model: prefill skips blocks; decode prunes pages, then makes each selected page cheaper to read.</text>
 
-  <rect x="72" y="832" width="1056" height="500" rx="36" fill="#FFF8F1" stroke="#F0D3AE"/>
-  <text x="114" y="894" fill="#B86716" font-family="Inter, Arial, sans-serif" font-size="36" font-weight="700">Decode</text>
-  <text x="114" y="944" fill="#1B1B1B" font-family="Inter, Arial, sans-serif" font-size="28">Goal: reduce memory-bound KV-page reads for each query token.</text>
-
-  <rect x="114" y="990" width="972" height="278" rx="24" fill="#FFFFFF" stroke="#F3DFC6"/>
-  <text x="150" y="1048" fill="#111111" font-family="Inter, Arial, sans-serif" font-size="26" font-weight="700">How it works</text>
-  <text x="150" y="1096" fill="#2F2F2F" font-family="Inter, Arial, sans-serif" font-size="24">1. Treat KV cache as pages.</text>
-  <text x="150" y="1134" fill="#2F2F2F" font-family="Inter, Arial, sans-serif" font-size="24">2. Use a hierarchical selector to score which pages matter.</text>
-  <text x="150" y="1172" fill="#2F2F2F" font-family="Inter, Arial, sans-serif" font-size="24">3. Reuse page-selection results across nearby decode steps.</text>
-  <text x="150" y="1210" fill="#2F2F2F" font-family="Inter, Arial, sans-serif" font-size="24">4. Combine sparsity with KV quantization.</text>
-
-  <rect x="770" y="1082" width="274" height="118" rx="20" fill="#FFF4E8"/>
-  <text x="806" y="1132" fill="#A45A11" font-family="Inter, Arial, sans-serif" font-size="25" font-weight="700">Mental model</text>
-  <text x="806" y="1170" fill="#2F2F2F" font-family="Inter, Arial, sans-serif" font-size="21">Prefill skips blocks.</text>
-  <text x="806" y="1202" fill="#2F2F2F" font-family="Inter, Arial, sans-serif" font-size="21">Decode prunes pages.</text>
-
-  <text x="72" y="1410" fill="#6A6A6A" font-family="Inter, Arial, sans-serif" font-size="22">Slide 2 of 4</text>
-  <text x="930" y="1410" fill="#6A6A6A" font-family="Inter, Arial, sans-serif" font-size="22">zhanyl-tech.github.io</text>
+  <text x="72" y="1412" fill="#6A6A6A" font-family="Inter, Arial, sans-serif" font-size="22">Slide 2 of 4</text>
+  <text x="930" y="1412" fill="#6A6A6A" font-family="Inter, Arial, sans-serif" font-size="22">zhanyl-tech.github.io</text>
 </svg>

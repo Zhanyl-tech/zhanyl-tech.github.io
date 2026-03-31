@@ -1,41 +1,70 @@
 <svg width="1200" height="1500" viewBox="0 0 1200 1500" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="1200" height="1500" fill="#FCFCFA"/>
-  <rect x="72" y="70" width="220" height="40" rx="20" fill="#EEF3FF"/>
-  <text x="102" y="97" fill="#2A4EBB" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="700">LONG-CONTEXT SERVING</text>
+  <defs>
+    <linearGradient id="bg1" x1="40" y1="60" x2="1120" y2="1460" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F7F9FF"/>
+      <stop offset="1" stop-color="#FCFBFF"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="1500" fill="url(#bg1)"/>
+  <circle cx="1020" cy="160" r="150" fill="#EEF2FF"/>
+  <circle cx="170" cy="1290" r="120" fill="#F7EDE4"/>
 
-  <text x="72" y="180" fill="#111111" font-family="Inter, Arial, sans-serif" font-size="64" font-weight="700">Sparse Attention</text>
-  <text x="72" y="250" fill="#111111" font-family="Inter, Arial, sans-serif" font-size="64" font-weight="700">That Actually Survives</text>
-  <text x="72" y="320" fill="#111111" font-family="Inter, Arial, sans-serif" font-size="64" font-weight="700">Contact with Serving</text>
+  <rect x="72" y="72" width="236" height="42" rx="21" fill="#EEF3FF"/>
+  <text x="104" y="100" fill="#2848B8" font-family="Inter, Arial, sans-serif" font-size="19" font-weight="700">LONG-CONTEXT INFERENCE</text>
 
-  <text x="72" y="404" fill="#575757" font-family="Inter, Arial, sans-serif" font-size="30">A visual summary of what LServe and SampleAttention change in practice.</text>
+  <text x="72" y="190" fill="#111111" font-family="Inter, Arial, sans-serif" font-size="68" font-weight="700">Sparse Attention</text>
+  <text x="72" y="262" fill="#111111" font-family="Inter, Arial, sans-serif" font-size="68" font-weight="700">That Actually</text>
+  <text x="72" y="334" fill="#111111" font-family="Inter, Arial, sans-serif" font-size="68" font-weight="700">Changes Serving</text>
+  <text x="72" y="410" fill="#5E6470" font-family="Inter, Arial, sans-serif" font-size="30">LServe explains the serving path. SampleAttention explains the sparse structure.</text>
 
-  <rect x="72" y="472" width="1056" height="180" rx="28" fill="#F4F1EA" stroke="#DDD6C8"/>
-  <text x="112" y="540" fill="#7A5C1E" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="700">The shared thesis</text>
-  <text x="112" y="598" fill="#1B1B1B" font-family="Inter, Arial, sans-serif" font-size="40" font-weight="600">The win comes from structured sparsity</text>
-  <text x="112" y="648" fill="#1B1B1B" font-family="Inter, Arial, sans-serif" font-size="40" font-weight="600">that kernels can exploit cheaply.</text>
+  <rect x="72" y="474" width="1056" height="156" rx="30" fill="#FFFFFF" stroke="#E5EBF7"/>
+  <text x="110" y="526" fill="#6C5A28" font-family="Inter, Arial, sans-serif" font-size="22" font-weight="700">SHARED THESIS</text>
+  <text x="110" y="578" fill="#1B1B1B" font-family="Inter, Arial, sans-serif" font-size="40" font-weight="600">The real win comes from structured sparsity</text>
+  <text x="110" y="624" fill="#1B1B1B" font-family="Inter, Arial, sans-serif" font-size="40" font-weight="600">that kernels can exploit cheaply.</text>
 
-  <rect x="72" y="720" width="500" height="528" rx="32" fill="#F6F9FF" stroke="#C8D7FF"/>
-  <text x="110" y="784" fill="#2345B8" font-family="Inter, Arial, sans-serif" font-size="34" font-weight="700">LServe</text>
-  <text x="110" y="834" fill="#1B1B1B" font-family="Inter, Arial, sans-serif" font-size="28">Turns sparse attention into a</text>
-  <text x="110" y="874" fill="#1B1B1B" font-family="Inter, Arial, sans-serif" font-size="28">serving-system design across</text>
-  <text x="110" y="914" fill="#1B1B1B" font-family="Inter, Arial, sans-serif" font-size="28">prefill and decode.</text>
+  <rect x="72" y="694" width="500" height="594" rx="34" fill="#F4F8FF" stroke="#D5E3FF"/>
+  <text x="108" y="752" fill="#2345B8" font-family="Inter, Arial, sans-serif" font-size="36" font-weight="700">LServe</text>
+  <text x="108" y="796" fill="#58647C" font-family="Inter, Arial, sans-serif" font-size="24">Serving-time view</text>
+  <rect x="108" y="834" width="428" height="166" rx="24" fill="#FFFFFF" stroke="#DCE7FF"/>
+  <text x="138" y="878" fill="#111111" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="700">Use different sparsity</text>
+  <text x="138" y="914" fill="#111111" font-family="Inter, Arial, sans-serif" font-size="24">for different bottlenecks:</text>
+  <text x="138" y="958" fill="#2C3A57" font-family="Inter, Arial, sans-serif" font-size="22">Prefill skips KV blocks.</text>
+  <text x="138" y="992" fill="#2C3A57" font-family="Inter, Arial, sans-serif" font-size="22">Decode prunes KV pages.</text>
 
-  <rect x="110" y="972" width="424" height="206" rx="24" fill="#FFFFFF" stroke="#D9E4FF"/>
-  <text x="142" y="1032" fill="#111111" font-family="Inter, Arial, sans-serif" font-size="25" font-weight="700">Key idea</text>
-  <text x="142" y="1080" fill="#333333" font-family="Inter, Arial, sans-serif" font-size="23">Use the right sparse structure for</text>
-  <text x="142" y="1116" fill="#333333" font-family="Inter, Arial, sans-serif" font-size="23">the actual bottleneck in each phase.</text>
+  <rect x="108" y="1034" width="428" height="210" rx="24" fill="#FFFFFF" stroke="#DCE7FF"/>
+  <rect x="138" y="1070" width="130" height="56" rx="18" fill="#EEF3FF"/>
+  <rect x="150" y="1086" width="16" height="24" rx="6" fill="#84A7FF"/>
+  <rect x="172" y="1086" width="16" height="24" rx="6" fill="#84A7FF"/>
+  <rect x="194" y="1086" width="16" height="24" rx="6" fill="#D7E4FF"/>
+  <rect x="216" y="1086" width="16" height="24" rx="6" fill="#84A7FF"/>
+  <text x="288" y="1108" fill="#31405F" font-family="Inter, Arial, sans-serif" font-size="22">Block-sparse prefill</text>
+  <rect x="138" y="1150" width="170" height="60" rx="18" fill="#EEF3FF"/>
+  <rect x="154" y="1168" width="20" height="24" rx="6" fill="#84A7FF"/>
+  <rect x="180" y="1168" width="20" height="24" rx="6" fill="#D7E4FF"/>
+  <rect x="206" y="1168" width="20" height="24" rx="6" fill="#84A7FF"/>
+  <rect x="232" y="1168" width="20" height="24" rx="6" fill="#D7E4FF"/>
+  <text x="330" y="1190" fill="#31405F" font-family="Inter, Arial, sans-serif" font-size="22">Page-pruned decode</text>
 
-  <rect x="628" y="720" width="500" height="528" rx="32" fill="#FFF8F1" stroke="#F0D3AE"/>
-  <text x="666" y="784" fill="#B86716" font-family="Inter, Arial, sans-serif" font-size="34" font-weight="700">SampleAttention</text>
-  <text x="666" y="834" fill="#1B1B1B" font-family="Inter, Arial, sans-serif" font-size="28">Explains which sparse patterns</text>
-  <text x="666" y="874" fill="#1B1B1B" font-family="Inter, Arial, sans-serif" font-size="28">matter during prefill and how</text>
-  <text x="666" y="914" fill="#1B1B1B" font-family="Inter, Arial, sans-serif" font-size="28">to adapt them at runtime.</text>
+  <rect x="628" y="694" width="500" height="594" rx="34" fill="#FFF8F1" stroke="#F0D8BC"/>
+  <text x="664" y="752" fill="#BA6814" font-family="Inter, Arial, sans-serif" font-size="36" font-weight="700">SampleAttention</text>
+  <text x="664" y="796" fill="#8B6B47" font-family="Inter, Arial, sans-serif" font-size="24">Sparse-structure view</text>
+  <rect x="664" y="834" width="428" height="166" rx="24" fill="#FFFFFF" stroke="#F4E3D0"/>
+  <text x="694" y="878" fill="#111111" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="700">The key claim</text>
+  <text x="694" y="922" fill="#2F2F2F" font-family="Inter, Arial, sans-serif" font-size="22">Two recurring patterns explain</text>
+  <text x="694" y="956" fill="#2F2F2F" font-family="Inter, Arial, sans-serif" font-size="22">much of the useful attention mass:</text>
+  <text x="694" y="996" fill="#7A5B31" font-family="Inter, Arial, sans-serif" font-size="22">columns for global anchors, slashes for local continuity.</text>
 
-  <rect x="666" y="972" width="424" height="206" rx="24" fill="#FFFFFF" stroke="#F3DFC6"/>
-  <text x="698" y="1032" fill="#111111" font-family="Inter, Arial, sans-serif" font-size="25" font-weight="700">Key idea</text>
-  <text x="698" y="1080" fill="#333333" font-family="Inter, Arial, sans-serif" font-size="23">Columns preserve global anchors.</text>
-  <text x="698" y="1116" fill="#333333" font-family="Inter, Arial, sans-serif" font-size="23">Slashes preserve local continuity.</text>
+  <rect x="664" y="1034" width="428" height="210" rx="24" fill="#FFFFFF" stroke="#F4E3D0"/>
+  <rect x="694" y="1070" width="164" height="70" rx="18" fill="#FFF6EA"/>
+  <line x1="760" y1="1086" x2="760" y2="1124" stroke="#E0882F" stroke-width="12" stroke-linecap="round"/>
+  <line x1="804" y1="1086" x2="804" y2="1124" stroke="#E0882F" stroke-width="12" stroke-linecap="round"/>
+  <rect x="882" y="1070" width="164" height="70" rx="18" fill="#FFF6EA"/>
+  <line x1="914" y1="1122" x2="978" y2="1088" stroke="#E0882F" stroke-width="12" stroke-linecap="round"/>
+  <line x1="958" y1="1122" x2="1022" y2="1088" stroke="#E0882F" stroke-width="12" stroke-linecap="round"/>
+  <rect x="694" y="1162" width="352" height="16" rx="8" fill="#F4E8DA"/>
+  <rect x="694" y="1162" width="248" height="16" rx="8" fill="#E0882F"/>
+  <text x="694" y="1212" fill="#7D6855" font-family="Inter, Arial, sans-serif" font-size="21">CRA acts like a runtime accuracy guardrail.</text>
 
-  <text x="72" y="1394" fill="#6A6A6A" font-family="Inter, Arial, sans-serif" font-size="22">Slide 1 of 4</text>
-  <text x="930" y="1394" fill="#6A6A6A" font-family="Inter, Arial, sans-serif" font-size="22">zhanyl-tech.github.io</text>
+  <text x="72" y="1412" fill="#6A6A6A" font-family="Inter, Arial, sans-serif" font-size="22">Slide 1 of 4</text>
+  <text x="930" y="1412" fill="#6A6A6A" font-family="Inter, Arial, sans-serif" font-size="22">zhanyl-tech.github.io</text>
 </svg>
