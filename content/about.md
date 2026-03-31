@@ -10,7 +10,7 @@ ShowToc: false
 
 I'm a senior HPC and cluster infrastructure engineer at a quantitative trading firm with 8+ years building and operating large-scale distributed systems — Kubernetes, SLURM, GPU clusters, and cloud platforms.
 
-I'm completing an MS in Computer Science with an ML specialization at Georgia Tech, and the Certificate in Quantitative Finance (CQF). This gives me production infrastructure expertise, ML systems depth, and the mathematical foundations for derivatives pricing and risk modeling.
+I'm pursuing an MS in Computer Science with an ML specialization at Georgia Tech, alongside the Certificate in Quantitative Finance (CQF). This gives me production infrastructure expertise, ML systems depth, and the mathematical foundations for derivatives pricing and risk modeling.
 
 ## What I Build
 
