@@ -24,8 +24,8 @@
 }
 
 /* ── Base ── */
-html {
-  background: var(--page-bg);
+html, body {
+  background: #e7ebf8 !important;
 }
 
 body {
@@ -33,19 +33,24 @@ body {
   font-size: 17px;
   line-height: 1.7;
   color: var(--text);
-  background: var(--page-bg);
   -webkit-font-smoothing: antialiased;
+}
+
+/* Kill every PaperMod white-background override */
+.list,
+.main,
+.post-entry,
+.post-single,
+article,
+.paginav,
+.toc,
+footer,
+.footer {
+  background: transparent !important;
 }
 
 a { color: var(--link); text-decoration: none; }
 a:hover { color: var(--link-h); }
-
-.main {
-  max-width: var(--w);
-  margin: 0 auto;
-  padding: 0 24px;
-  background: transparent !important;
-}
 
 /* ── Nav ── */
 .header {

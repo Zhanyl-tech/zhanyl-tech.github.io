@@ -1,70 +1,132 @@
 <svg width="1200" height="1500" viewBox="0 0 1200 1500" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="bg1" x1="40" y1="60" x2="1120" y2="1460" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#F7F9FF"/>
-      <stop offset="1" stop-color="#FCFBFF"/>
-    </linearGradient>
-  </defs>
-  <rect width="1200" height="1500" fill="url(#bg1)"/>
-  <circle cx="1020" cy="160" r="150" fill="#EEF2FF"/>
-  <circle cx="170" cy="1290" r="120" fill="#F7EDE4"/>
+  <rect width="1200" height="1500" fill="#FFFFFF"/>
 
-  <rect x="72" y="72" width="236" height="42" rx="21" fill="#EEF3FF"/>
-  <text x="104" y="100" fill="#2848B8" font-family="Inter, Arial, sans-serif" font-size="19" font-weight="700">LONG-CONTEXT INFERENCE</text>
+  <!-- header band -->
+  <rect width="1200" height="140" fill="#1A2B6D"/>
+  <text x="60" y="72" fill="#FFFFFF" font-family="Inter,Arial,sans-serif" font-size="22" font-weight="700" letter-spacing="3">ML INFRASTRUCTURE · PAPER BREAKDOWN</text>
+  <text x="60" y="112" fill="#FFFFFF" font-family="Inter,Arial,sans-serif" font-size="50" font-weight="700">Sparse Attention for LLM Serving</text>
 
-  <text x="72" y="190" fill="#111111" font-family="Inter, Arial, sans-serif" font-size="68" font-weight="700">Sparse Attention</text>
-  <text x="72" y="262" fill="#111111" font-family="Inter, Arial, sans-serif" font-size="68" font-weight="700">That Actually</text>
-  <text x="72" y="334" fill="#111111" font-family="Inter, Arial, sans-serif" font-size="68" font-weight="700">Changes Serving</text>
-  <text x="72" y="410" fill="#5E6470" font-family="Inter, Arial, sans-serif" font-size="30">LServe explains the serving path. SampleAttention explains the sparse structure.</text>
+  <!-- label pill -->
+  <rect x="60" y="168" width="238" height="40" rx="20" fill="#FFF3E0"/>
+  <text x="88" y="194" fill="#E65100" font-family="Inter,Arial,sans-serif" font-size="20" font-weight="700">TWO PAPERS, ONE IDEA</text>
 
-  <rect x="72" y="474" width="1056" height="156" rx="30" fill="#FFFFFF" stroke="#E5EBF7"/>
-  <text x="110" y="526" fill="#6C5A28" font-family="Inter, Arial, sans-serif" font-size="22" font-weight="700">SHARED THESIS</text>
-  <text x="110" y="578" fill="#1B1B1B" font-family="Inter, Arial, sans-serif" font-size="40" font-weight="600">The real win comes from structured sparsity</text>
-  <text x="110" y="624" fill="#1B1B1B" font-family="Inter, Arial, sans-serif" font-size="40" font-weight="600">that kernels can exploit cheaply.</text>
+  <text x="60" y="264" fill="#111111" font-family="Inter,Arial,sans-serif" font-size="38" font-weight="700">The win comes from structured sparsity</text>
+  <text x="60" y="308" fill="#111111" font-family="Inter,Arial,sans-serif" font-size="38" font-weight="700">that kernels can exploit cheaply.</text>
+  <text x="60" y="360" fill="#555555" font-family="Inter,Arial,sans-serif" font-size="24">Not arbitrary dropped scores. The shape of sparsity matters.</text>
 
-  <rect x="72" y="694" width="500" height="594" rx="34" fill="#F4F8FF" stroke="#D5E3FF"/>
-  <text x="108" y="752" fill="#2345B8" font-family="Inter, Arial, sans-serif" font-size="36" font-weight="700">LServe</text>
-  <text x="108" y="796" fill="#58647C" font-family="Inter, Arial, sans-serif" font-size="24">Serving-time view</text>
-  <rect x="108" y="834" width="428" height="166" rx="24" fill="#FFFFFF" stroke="#DCE7FF"/>
-  <text x="138" y="878" fill="#111111" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="700">Use different sparsity</text>
-  <text x="138" y="914" fill="#111111" font-family="Inter, Arial, sans-serif" font-size="24">for different bottlenecks:</text>
-  <text x="138" y="958" fill="#2C3A57" font-family="Inter, Arial, sans-serif" font-size="22">Prefill skips KV blocks.</text>
-  <text x="138" y="992" fill="#2C3A57" font-family="Inter, Arial, sans-serif" font-size="22">Decode prunes KV pages.</text>
+  <!-- LServe card -->
+  <rect x="60" y="404" width="510" height="620" rx="28" fill="#E8F0FE" stroke="#4285F4" stroke-width="2"/>
+  <rect x="60" y="404" width="510" height="68" rx="28" fill="#4285F4"/>
+  <rect x="60" y="438" width="510" height="34" fill="#4285F4"/>
+  <text x="100" y="448" fill="#FFFFFF" font-family="Inter,Arial,sans-serif" font-size="28" font-weight="700">LServe</text>
+  <text x="100" y="510" fill="#1A237E" font-family="Inter,Arial,sans-serif" font-size="22" font-weight="600">SERVING-SYSTEM VIEW</text>
+  <text x="100" y="554" fill="#1A237E" font-family="Inter,Arial,sans-serif" font-size="22">Use different sparse mechanisms</text>
+  <text x="100" y="584" fill="#1A237E" font-family="Inter,Arial,sans-serif" font-size="22">for different bottlenecks.</text>
 
-  <rect x="108" y="1034" width="428" height="210" rx="24" fill="#FFFFFF" stroke="#DCE7FF"/>
-  <rect x="138" y="1070" width="130" height="56" rx="18" fill="#EEF3FF"/>
-  <rect x="150" y="1086" width="16" height="24" rx="6" fill="#84A7FF"/>
-  <rect x="172" y="1086" width="16" height="24" rx="6" fill="#84A7FF"/>
-  <rect x="194" y="1086" width="16" height="24" rx="6" fill="#D7E4FF"/>
-  <rect x="216" y="1086" width="16" height="24" rx="6" fill="#84A7FF"/>
-  <text x="288" y="1108" fill="#31405F" font-family="Inter, Arial, sans-serif" font-size="22">Block-sparse prefill</text>
-  <rect x="138" y="1150" width="170" height="60" rx="18" fill="#EEF3FF"/>
-  <rect x="154" y="1168" width="20" height="24" rx="6" fill="#84A7FF"/>
-  <rect x="180" y="1168" width="20" height="24" rx="6" fill="#D7E4FF"/>
-  <rect x="206" y="1168" width="20" height="24" rx="6" fill="#84A7FF"/>
-  <rect x="232" y="1168" width="20" height="24" rx="6" fill="#D7E4FF"/>
-  <text x="330" y="1190" fill="#31405F" font-family="Inter, Arial, sans-serif" font-size="22">Page-pruned decode</text>
+  <!-- prefill mini diagram -->
+  <rect x="100" y="620" width="390" height="90" rx="16" fill="#FFFFFF" stroke="#90CAF9"/>
+  <text x="124" y="655" fill="#1A237E" font-family="Inter,Arial,sans-serif" font-size="20" font-weight="700">PREFILL</text>
+  <!-- kv blocks row -->
+  <rect x="124" y="668" width="42" height="28" rx="6" fill="#4285F4"/>
+  <rect x="172" y="668" width="42" height="28" rx="6" fill="#4285F4"/>
+  <rect x="220" y="668" width="42" height="28" rx="6" fill="#BBDEFB"/>
+  <rect x="268" y="668" width="42" height="28" rx="6" fill="#BBDEFB"/>
+  <rect x="316" y="668" width="42" height="28" rx="6" fill="#4285F4"/>
+  <rect x="364" y="668" width="42" height="28" rx="6" fill="#BBDEFB"/>
+  <text x="424" y="690" fill="#555" font-family="Inter,Arial,sans-serif" font-size="18">Skip blocks</text>
 
-  <rect x="628" y="694" width="500" height="594" rx="34" fill="#FFF8F1" stroke="#F0D8BC"/>
-  <text x="664" y="752" fill="#BA6814" font-family="Inter, Arial, sans-serif" font-size="36" font-weight="700">SampleAttention</text>
-  <text x="664" y="796" fill="#8B6B47" font-family="Inter, Arial, sans-serif" font-size="24">Sparse-structure view</text>
-  <rect x="664" y="834" width="428" height="166" rx="24" fill="#FFFFFF" stroke="#F4E3D0"/>
-  <text x="694" y="878" fill="#111111" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="700">The key claim</text>
-  <text x="694" y="922" fill="#2F2F2F" font-family="Inter, Arial, sans-serif" font-size="22">Two recurring patterns explain</text>
-  <text x="694" y="956" fill="#2F2F2F" font-family="Inter, Arial, sans-serif" font-size="22">much of the useful attention mass:</text>
-  <text x="694" y="996" fill="#7A5B31" font-family="Inter, Arial, sans-serif" font-size="22">columns for global anchors, slashes for local continuity.</text>
+  <!-- decode mini diagram -->
+  <rect x="100" y="730" width="390" height="90" rx="16" fill="#FFFFFF" stroke="#90CAF9"/>
+  <text x="124" y="765" fill="#1A237E" font-family="Inter,Arial,sans-serif" font-size="20" font-weight="700">DECODE</text>
+  <!-- kv pages -->
+  <rect x="124" y="778" width="30" height="28" rx="6" fill="#E65100"/>
+  <rect x="160" y="778" width="30" height="28" rx="6" fill="#FFE0B2"/>
+  <rect x="196" y="778" width="30" height="28" rx="6" fill="#E65100"/>
+  <rect x="232" y="778" width="30" height="28" rx="6" fill="#FFE0B2"/>
+  <rect x="268" y="778" width="30" height="28" rx="6" fill="#E65100"/>
+  <rect x="304" y="778" width="30" height="28" rx="6" fill="#FFE0B2"/>
+  <path d="M352 792H390" stroke="#E65100" stroke-width="5" stroke-linecap="round"/>
+  <path d="M376 780L396 792L376 804" stroke="#E65100" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="402" y="800" fill="#555" font-family="Inter,Arial,sans-serif" font-size="18">Select pages</text>
 
-  <rect x="664" y="1034" width="428" height="210" rx="24" fill="#FFFFFF" stroke="#F4E3D0"/>
-  <rect x="694" y="1070" width="164" height="70" rx="18" fill="#FFF6EA"/>
-  <line x1="760" y1="1086" x2="760" y2="1124" stroke="#E0882F" stroke-width="12" stroke-linecap="round"/>
-  <line x1="804" y1="1086" x2="804" y2="1124" stroke="#E0882F" stroke-width="12" stroke-linecap="round"/>
-  <rect x="882" y="1070" width="164" height="70" rx="18" fill="#FFF6EA"/>
-  <line x1="914" y1="1122" x2="978" y2="1088" stroke="#E0882F" stroke-width="12" stroke-linecap="round"/>
-  <line x1="958" y1="1122" x2="1022" y2="1088" stroke="#E0882F" stroke-width="12" stroke-linecap="round"/>
-  <rect x="694" y="1162" width="352" height="16" rx="8" fill="#F4E8DA"/>
-  <rect x="694" y="1162" width="248" height="16" rx="8" fill="#E0882F"/>
-  <text x="694" y="1212" fill="#7D6855" font-family="Inter, Arial, sans-serif" font-size="21">CRA acts like a runtime accuracy guardrail.</text>
+  <text x="100" y="880" fill="#1A237E" font-family="Inter,Arial,sans-serif" font-size="20">Gains are multiplicative: sparsity reduces</text>
+  <text x="100" y="906" fill="#1A237E" font-family="Inter,Arial,sans-serif" font-size="20">page reads; quantization reduces each read.</text>
 
-  <text x="72" y="1412" fill="#6A6A6A" font-family="Inter, Arial, sans-serif" font-size="22">Slide 1 of 4</text>
-  <text x="930" y="1412" fill="#6A6A6A" font-family="Inter, Arial, sans-serif" font-size="22">zhanyl-tech.github.io</text>
+  <text x="100" y="966" fill="#1A237E" font-family="Inter,Arial,sans-serif" font-size="20" font-weight="600">Result: up to 2.9× prefill, 1.3–2.1× decode</text>
+  <text x="100" y="994" fill="#1A237E" font-family="Inter,Arial,sans-serif" font-size="20">speedup vs vLLM on Llama-3-8B.</text>
+
+  <!-- SampleAttention card -->
+  <rect x="630" y="404" width="510" height="620" rx="28" fill="#FFF8E1" stroke="#F9A825" stroke-width="2"/>
+  <rect x="630" y="404" width="510" height="68" rx="28" fill="#F9A825"/>
+  <rect x="630" y="438" width="510" height="34" fill="#F9A825"/>
+  <text x="670" y="448" fill="#FFFFFF" font-family="Inter,Arial,sans-serif" font-size="28" font-weight="700">SampleAttention</text>
+  <text x="670" y="510" fill="#E65100" font-family="Inter,Arial,sans-serif" font-size="22" font-weight="600">SPARSE-STRUCTURE VIEW</text>
+  <text x="670" y="554" fill="#4E342E" font-family="Inter,Arial,sans-serif" font-size="22">Two patterns explain most of the</text>
+  <text x="670" y="584" fill="#4E342E" font-family="Inter,Arial,sans-serif" font-size="22">useful attention mass during prefill.</text>
+
+  <!-- column pattern mini -->
+  <rect x="670" y="620" width="186" height="148" rx="16" fill="#FFFFFF" stroke="#FFD54F"/>
+  <text x="714" y="650" fill="#4E342E" font-family="Inter,Arial,sans-serif" font-size="18" font-weight="700">COLUMN</text>
+  <!-- mini attention grid -->
+  <g opacity="0.3">
+    <rect x="690" y="666" width="18" height="18" rx="3" fill="#F9A825"/>
+    <rect x="714" y="666" width="18" height="18" rx="3" fill="#F9A825"/>
+    <rect x="738" y="666" width="18" height="18" rx="3" fill="#F9A825"/>
+    <rect x="762" y="666" width="18" height="18" rx="3" fill="#F9A825"/>
+    <rect x="690" y="690" width="18" height="18" rx="3" fill="#F9A825"/>
+    <rect x="714" y="690" width="18" height="18" rx="3" fill="#F9A825"/>
+    <rect x="738" y="690" width="18" height="18" rx="3" fill="#F9A825"/>
+    <rect x="762" y="690" width="18" height="18" rx="3" fill="#F9A825"/>
+    <rect x="690" y="714" width="18" height="18" rx="3" fill="#F9A825"/>
+    <rect x="714" y="714" width="18" height="18" rx="3" fill="#F9A825"/>
+    <rect x="738" y="714" width="18" height="18" rx="3" fill="#F9A825"/>
+    <rect x="762" y="714" width="18" height="18" rx="3" fill="#F9A825"/>
+  </g>
+  <!-- column highlights -->
+  <rect x="700" y="660" width="18" height="80" rx="3" fill="#E65100" opacity="0.9"/>
+  <rect x="748" y="660" width="18" height="80" rx="3" fill="#E65100" opacity="0.9"/>
+  <text x="680" y="762" fill="#4E342E" font-family="Inter,Arial,sans-serif" font-size="15">Global anchors</text>
+
+  <!-- slash pattern mini -->
+  <rect x="876" y="620" width="186" height="148" rx="16" fill="#FFFFFF" stroke="#FFD54F"/>
+  <text x="920" y="650" fill="#4E342E" font-family="Inter,Arial,sans-serif" font-size="18" font-weight="700">SLASH</text>
+  <!-- mini grid -->
+  <g opacity="0.3">
+    <rect x="896" y="666" width="18" height="18" rx="3" fill="#F9A825"/>
+    <rect x="920" y="666" width="18" height="18" rx="3" fill="#F9A825"/>
+    <rect x="944" y="666" width="18" height="18" rx="3" fill="#F9A825"/>
+    <rect x="968" y="666" width="18" height="18" rx="3" fill="#F9A825"/>
+    <rect x="896" y="690" width="18" height="18" rx="3" fill="#F9A825"/>
+    <rect x="920" y="690" width="18" height="18" rx="3" fill="#F9A825"/>
+    <rect x="944" y="690" width="18" height="18" rx="3" fill="#F9A825"/>
+    <rect x="968" y="690" width="18" height="18" rx="3" fill="#F9A825"/>
+    <rect x="896" y="714" width="18" height="18" rx="3" fill="#F9A825"/>
+    <rect x="920" y="714" width="18" height="18" rx="3" fill="#F9A825"/>
+    <rect x="944" y="714" width="18" height="18" rx="3" fill="#F9A825"/>
+    <rect x="968" y="714" width="18" height="18" rx="3" fill="#F9A825"/>
+  </g>
+  <!-- diagonal highlights -->
+  <rect x="896" y="714" width="18" height="18" rx="3" fill="#E65100" opacity="0.9"/>
+  <rect x="920" y="690" width="18" height="18" rx="3" fill="#E65100" opacity="0.9"/>
+  <rect x="944" y="666" width="18" height="18" rx="3" fill="#E65100" opacity="0.9"/>
+  <rect x="968" y="642" width="18" height="18" rx="3" fill="#E65100" opacity="0.9"/>
+  <text x="886" y="762" fill="#4E342E" font-family="Inter,Arial,sans-serif" font-size="15">Local continuity</text>
+
+  <!-- CRA bar -->
+  <rect x="670" y="800" width="422" height="100" rx="16" fill="#FFFFFF" stroke="#FFD54F"/>
+  <text x="696" y="838" fill="#4E342E" font-family="Inter,Arial,sans-serif" font-size="20" font-weight="700">CRA — accuracy guardrail</text>
+  <rect x="696" y="852" width="370" height="18" rx="9" fill="#FFE0B2"/>
+  <rect x="696" y="852" width="278" height="18" rx="9" fill="#E65100"/>
+  <text x="984" y="866" fill="#555" font-family="Inter,Arial,sans-serif" font-size="14">100%</text>
+  <text x="696" y="890" fill="#4E342E" font-family="Inter,Arial,sans-serif" font-size="17">Min retained attention mass per query</text>
+
+  <text x="670" y="954" fill="#4E342E" font-family="Inter,Arial,sans-serif" font-size="20">Adapts sparsity per head and prompt at</text>
+  <text x="670" y="982" fill="#4E342E" font-family="Inter,Arial,sans-serif" font-size="20">runtime. No offline profile required.</text>
+
+  <text x="670" y="1002" fill="#555" font-family="Inter,Arial,sans-serif" font-size="18" font-weight="600">Result: up to 2.42× TTFT vs FlashAttention.</text>
+
+  <!-- bottom bar -->
+  <rect x="0" y="1438" width="1200" height="62" fill="#F5F5F5"/>
+  <text x="60" y="1477" fill="#888888" font-family="Inter,Arial,sans-serif" font-size="20">Slide 1 of 4</text>
+  <text x="870" y="1477" fill="#888888" font-family="Inter,Arial,sans-serif" font-size="20">zhanyl-tech.github.io</text>
 </svg>
