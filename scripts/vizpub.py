@@ -45,8 +45,10 @@ except ImportError:
 HUGO_ROOT = Path(__file__).parent.parent
 CONTENT_DIR = HUGO_ROOT / "content"
 STATIC_DIR = HUGO_ROOT / "static" / "images" / "vizpub"
+SLIDES_DIR = HUGO_ROOT / "static" / "images" / "slides"
+SLIDES_HTML_DIR = HUGO_ROOT / "static" / "slides"
 DRAFTS_DIR = HUGO_ROOT / "cope-drafts"
-MODEL = "claude-sonnet-4-20250514"
+MODEL = "claude-opus-4-5"
 DEFAULT_SITE_URL = "https://zhanyl-tech.github.io"
 SECTION_ALIASES = {
     "blog": "blog",
@@ -307,17 +309,26 @@ def generate_content_package(
 
     system = dedent(
         f"""\
-        You are the publishing partner for a senior HPC / ML infrastructure engineer.
-        Write in a clear, technically rigorous, high-signal voice.
+        You are a senior HPC / ML infrastructure engineer writing for other senior engineers.
+        You are NOT an AI assistant summarizing papers. You are a practitioner sharing what you learned.
 
-        The audience should feel:
-        - this person understands the topic deeply
-        - this explanation is unusually clear
-        - the writer sounds like an intelligent research engineer
+        Voice rules — write as a human practitioner, not an AI:
+        - Write short, direct sentences. Vary sentence length. Use plain words.
+        - First-person is fine ("my take", "I've seen this", "the part that surprised me").
+        - Start sections with the concrete point, not a meta-statement about what you're going to explain.
+        - Use "you" to speak directly to the reader.
+        - Never hedge with "it's worth noting", "it is important to understand", "let's explore".
+        - End sections with a clear implication or opinion, not a neutral summary.
 
-        Do NOT write like a learner diary.
-        Do NOT say "I'm still learning", "I just learned", or anything that lowers authority.
-        The writing should help the author learn by teaching, but the public output must feel composed and confident.
+        BANNED words and phrases (do NOT use any of these):
+        dive into, delve into, it's worth noting, crucial, leverage, utilize, robust, seamless,
+        comprehensive, groundbreaking, fascinating, paradigm, at its core, needless to say,
+        as we can see, in conclusion, furthermore, moreover, essentially, basically, cutting-edge,
+        state-of-the-art, the world of, a testament to, in this post we will, let's explore,
+        it becomes clear, it is important to note, the key insight is, this allows us to.
+
+        Do NOT write like a learner diary. Do NOT lower authority.
+        The writing should feel composed, experienced, and opinionated.
 
         The post type is a {section_name}.
         Target length: {section_word_target}.
@@ -336,37 +347,34 @@ def generate_content_package(
         - hn_title
         - hn_text
 
-        Mermaid rules:
-        - ByteByteGo-style clarity
-        - 6-12 nodes
+        Mermaid rules (used as fallback diagram):
+        - 6-12 nodes max
         - flowchart TD or LR
-        - use short labels
-        - prioritize conceptual clarity over completeness
+        - short labels, clear flow
+        - prioritize one concept per diagram
 
-        Writing rules:
-        - Break down hard concepts so they are easy to understand quickly.
-        - Use concrete explanation, not fluff.
-        - Start with why the topic matters.
-        - Then explain the mechanism.
-        - Then explain what most people miss.
-        - End with practical implications.
-        - Avoid hype and generic AI commentary.
+        Writing structure:
+        - Open with the problem or the tension (one short paragraph, no preamble).
+        - Cover the mechanism clearly — what it does, why that design choice.
+        - Point out the thing most people miss or get wrong.
+        - Close with practical implications for someone building real systems.
 
         LinkedIn rules:
-        - No external links in body
-        - 3-6 short paragraphs / bullets
-        - clear hook
-        - crisp insight bullets using →
+        - No external links in body text
+        - 3-6 short paragraphs or bullet groups
+        - Hook: one punchy line that makes engineers want to keep reading
+        - Use → for bullets, not •
+        - First comment holds the link
 
         X rules:
         - 4-6 tweets
-        - Tweet 1 hook + thread marker
-        - concise and punchy
+        - Tweet 1: hook + 🧵 marker
+        - Each tweet: one clean idea, under 280 chars
+        - Last tweet: link
 
         HN rules:
-        - factual, not clickbait
-        - title under 80 chars
-        - intro should explain why this is useful to technical readers
+        - factual title under 80 chars
+        - intro: one paragraph, why this is useful to infra/ML engineers
 
         If a promotion target is not requested, still return the key with an empty string or empty array.
         """
@@ -412,6 +420,167 @@ def normalize_payload(payload: dict[str, Any], targets: list[str]) -> dict[str, 
         payload["hn_title"] = ""
         payload["hn_text"] = ""
     return payload
+
+
+def call_claude_text(system_prompt: str, user_prompt: str, max_tokens: int = 8000) -> str:
+    client = anthropic.Anthropic()
+    message = client.messages.create(
+        model=MODEL,
+        max_tokens=max_tokens,
+        system=system_prompt,
+        messages=[{"role": "user", "content": user_prompt}],
+    )
+    return message.content[0].text.strip()
+
+
+SVG_STYLE_GUIDE = """\
+ByteByteGo-style SVG rules (follow precisely):
+- Canvas: white background (#FFFFFF)
+- Header band: dark navy (#1A2B6D or similar) with white text, full width, ~88–140px tall
+- Section cards: colored rectangle with matching darker header bar, rounded corners (rx="20")
+- Color palette per card: blue (#4285F4 / #E8F0FE), amber (#F9A825 / #FFF8E1),
+  green (#43A047 / #E8F5E9), purple (#9C27B0 / #F3E5F5)
+- Flow arrows: thick (stroke-width="5–6"), stroke-linecap="round"
+- Typography: font-family="Inter,Arial,sans-serif"; headers bold, body regular
+- Visual elements OVER text: use actual rectangles for grids/blocks/pages,
+  use filled polygons for triangles/attention shapes, use bars for metrics
+- Minimal text per element; let shapes carry the meaning
+- Bottom footer bar: light grey (#F5F5F5), 38–62px, slide number + site URL
+- NO external images, NO filters, NO blur — clean flat shapes only
+"""
+
+
+def generate_overview_svg(brief: dict[str, Any], payload: dict[str, Any], references: str) -> str:
+    system = f"""\
+You are a technical SVG infographic creator producing ByteByteGo-style explainer graphics.
+{SVG_STYLE_GUIDE}
+Return ONLY the raw SVG code. No markdown, no explanation, no code fences.
+Canvas size: 1400x800 viewBox.
+The graphic should be a two-panel overview (left panel + right panel) showing the key concepts.
+Use real visual shapes — grids, bars, flow arrows — not just text boxes.
+"""
+    user = f"""\
+Topic: {brief.get("refined_topic", "")}
+Why it matters: {brief.get("why_this_matters", "")}
+Key questions answered: {json.dumps(brief.get("key_questions", []))}
+
+Post title: {payload.get("title", "")}
+Post body (first 800 chars): {payload.get("post_body", "")[:800]}
+
+References:
+{references or "(none)"}
+
+Generate a two-panel 1400x800 SVG overview infographic in ByteByteGo style.
+"""
+    return call_claude_text(system, user, max_tokens=6000)
+
+
+def generate_slide_svgs(brief: dict[str, Any], payload: dict[str, Any], references: str) -> list[str]:
+    system = f"""\
+You are a technical SVG slide creator producing ByteByteGo-style explainer slides.
+{SVG_STYLE_GUIDE}
+Canvas size per slide: 1200x1500 viewBox.
+Each slide must cover ONE concept clearly with visual shapes (grids, bars, diagrams).
+Return a JSON array of exactly 4 SVG strings: [{{"svg": "<svg>...</svg>"}}, ...]
+No extra keys. Each svg value is raw SVG text.
+"""
+    user = f"""\
+Topic: {brief.get("refined_topic", "")}
+Key questions: {json.dumps(brief.get("key_questions", []))}
+Post body (first 1200 chars): {payload.get("post_body", "")[:1200]}
+
+Generate 4 slides covering:
+1. Overview / big picture (what are the two papers and what problem they solve)
+2. First paper / mechanism A in detail (with visual diagram)
+3. Second paper / mechanism B in detail (with visual diagram)
+4. Key takeaways + accuracy/quality signal (with visual)
+
+Each slide: dark navy header, colored section cards, real SVG shapes for diagrams.
+"""
+    raw = call_claude_text(system, user, max_tokens=10000)
+    # strip markdown fences if present
+    raw = re.sub(r"^```(?:json)?\s*", "", raw)
+    raw = re.sub(r"\s*```$", "", raw)
+    try:
+        items = json.loads(raw)
+        return [item["svg"] for item in items]
+    except Exception as exc:
+        print(f"Warning: could not parse slide SVGs from Claude response: {exc}")
+        return []
+
+
+def write_slides_html(slug: str, num_slides: int) -> Path:
+    SLIDES_HTML_DIR.mkdir(parents=True, exist_ok=True)
+    slide_figures = "\n".join(
+        f'  <figure class="slide"><img src="../images/slides/{slug}-0{i+1}.svg" alt="Slide {i+1}"></figure>'
+        for i in range(num_slides)
+    )
+    html = f"""\
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>{slug} slides</title>
+  <style>
+    body {{ font-family: Inter, sans-serif; background: #f5f5f5; margin: 0; padding: 40px 60px; }}
+    h1 {{ font-size: 28px; margin-bottom: 8px; }}
+    .meta {{ font-size: 14px; color: #555; margin-bottom: 32px; }}
+    .slide {{ margin: 0 0 40px; page-break-after: always; }}
+    .slide img {{ width: 100%; max-width: 900px; display: block; border: 1px solid #ddd; border-radius: 8px; }}
+    @media print {{ body {{ padding: 0; }} .slide {{ margin: 0; }} }}
+  </style>
+</head>
+<body>
+  <h1>{slug} — slide deck</h1>
+  <p class="meta">
+    PDF: <a href="./{slug}.pdf">./{slug}.pdf</a> ·
+    Post: <a href="../../blog/{slug}/">blog/{slug}/</a>
+  </p>
+  <div class="slides">
+{slide_figures}
+  </div>
+</body>
+</html>
+"""
+    path = SLIDES_HTML_DIR / f"{slug}.html"
+    path.write_text(html)
+    return path
+
+
+def generate_pdf_from_html(html_path: Path) -> Path | None:
+    pdf_path = html_path.with_suffix(".pdf")
+    chrome_candidates = [
+        "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+        "/usr/bin/google-chrome",
+        "/usr/bin/chromium-browser",
+        shutil.which("google-chrome") or "",
+        shutil.which("chromium") or "",
+    ]
+    chrome = next((c for c in chrome_candidates if c and Path(c).exists()), None)
+    if not chrome:
+        print("Warning: Chrome not found. Skipping PDF generation.")
+        return None
+    try:
+        result = subprocess.run(
+            [
+                chrome,
+                "--headless",
+                "--disable-gpu",
+                f"--print-to-pdf={pdf_path}",
+                "--print-to-pdf-no-header",
+                "--no-margins",
+                f"file://{html_path.resolve()}",
+            ],
+            capture_output=True,
+            text=True,
+            timeout=60,
+        )
+        if result.returncode == 0:
+            return pdf_path
+        print(f"Warning: PDF generation failed: {result.stderr}")
+    except Exception as exc:
+        print(f"Warning: PDF generation failed: {exc}")
+    return None
 
 
 def render_mermaid(mermaid_code: str, output_path: Path) -> bool:
@@ -721,11 +890,47 @@ def main() -> None:
     payload = generate_content_package(brief, section, config["targets"], references)
     payload = normalize_payload(payload, config["targets"])
 
+    # ── Visual assets ──────────────────────────────────────────────
+    print("🎨 Generating ByteByteGo-style SVG overview...")
+    STATIC_DIR.mkdir(parents=True, exist_ok=True)
+    overview_svg_path = STATIC_DIR / f"{slug}.svg"
+    try:
+        overview_svg = generate_overview_svg(brief, payload, references)
+        overview_svg_path.write_text(overview_svg)
+        print(f"   ✅ Overview SVG: {overview_svg_path}")
+    except Exception as exc:
+        print(f"   ⚠️  Overview SVG failed: {exc}")
+
+    print("🎨 Generating ByteByteGo-style slide deck (4 slides)...")
+    SLIDES_DIR.mkdir(parents=True, exist_ok=True)
+    slide_svgs: list[str] = []
+    try:
+        slide_svgs = generate_slide_svgs(brief, payload, references)
+        for i, svg_code in enumerate(slide_svgs):
+            slide_path = SLIDES_DIR / f"{slug}-0{i+1}.svg"
+            slide_path.write_text(svg_code)
+        print(f"   ✅ {len(slide_svgs)} slides written to {SLIDES_DIR}")
+    except Exception as exc:
+        print(f"   ⚠️  Slide SVGs failed: {exc}")
+
+    # HTML wrapper + PDF
+    slides_html_path: Path | None = None
+    slides_pdf_path: Path | None = None
+    if slide_svgs:
+        slides_html_path = write_slides_html(slug, len(slide_svgs))
+        print(f"   ✅ Slides HTML: {slides_html_path}")
+        print("   📄 Generating PDF...")
+        slides_pdf_path = generate_pdf_from_html(slides_html_path)
+        if slides_pdf_path:
+            print(f"   ✅ PDF: {slides_pdf_path}")
+
+    # ── Mermaid fallback diagram ────────────────────────────────────
     mermaid_source_path = STATIC_DIR / f"{slug}.mmd"
     diagram_path = STATIC_DIR / f"{slug}.png"
     mermaid_source_path.write_text(payload["mermaid"])
     diagram_rendered = render_mermaid(payload["mermaid"], diagram_path)
 
+    # ── Post and social drafts ─────────────────────────────────────
     post_path = write_post(payload, slug, section, diagram_rendered, config["papers"])
     learning_path = write_learning_summary(payload, brief, slug)
 
@@ -736,6 +941,11 @@ def main() -> None:
         outputs["X thread"] = write_x_draft(payload, slug, post_url)
     if "hn" in config["targets"]:
         outputs["HN draft"] = write_hn_draft(payload, slug, post_url)
+
+    if slides_html_path:
+        outputs["Slides HTML"] = slides_html_path
+    if slides_pdf_path:
+        outputs["Slides PDF"] = slides_pdf_path
 
     print_summary(post_path, diagram_path, diagram_rendered, learning_path, outputs)
 
