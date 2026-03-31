@@ -1,42 +1,130 @@
 <svg width="1200" height="1500" viewBox="0 0 1200 1500" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="1200" height="1500" fill="#FBFAFF"/>
-  <text x="72" y="112" fill="#111111" font-family="Inter, Arial, sans-serif" font-size="58" font-weight="700">SampleAttention: The Sparse</text>
-  <text x="72" y="178" fill="#111111" font-family="Inter, Arial, sans-serif" font-size="58" font-weight="700">Patterns That Matter Most</text>
-  <text x="72" y="244" fill="#5F6672" font-family="Inter, Arial, sans-serif" font-size="28">Its key contribution is not just sparsity. It is runtime-adaptive sparsity with an accuracy proxy.</text>
+  <rect width="1200" height="1500" fill="#FFFFFF"/>
 
-  <rect x="72" y="316" width="500" height="520" rx="34" fill="#FFF8F1" stroke="#F0D8BC"/>
-  <text x="108" y="374" fill="#BA6814" font-family="Inter, Arial, sans-serif" font-size="34" font-weight="700">Column pattern</text>
-  <text x="108" y="416" fill="#8B6B47" font-family="Inter, Arial, sans-serif" font-size="22">Global anchors and attention sinks</text>
-  <rect x="108" y="454" width="428" height="212" rx="24" fill="#FFFFFF" stroke="#F3E3D0"/>
-  <rect x="138" y="486" width="368" height="148" rx="18" fill="#FFF6EA"/>
-  <line x1="222" y1="504" x2="222" y2="616" stroke="#E0882F" stroke-width="18" stroke-linecap="round"/>
-  <line x1="306" y1="504" x2="306" y2="616" stroke="#E0882F" stroke-width="18" stroke-linecap="round"/>
-  <line x1="390" y1="504" x2="390" y2="616" stroke="#F3CF9F" stroke-width="18" stroke-linecap="round"/>
-  <text x="108" y="714" fill="#6D6257" font-family="Inter, Arial, sans-serif" font-size="22">Many queries still need the same important key positions.</text>
-  <text x="108" y="748" fill="#6D6257" font-family="Inter, Arial, sans-serif" font-size="22">That is why a few columns can carry a lot of useful mass.</text>
+  <!-- header band -->
+  <rect width="1200" height="140" fill="#1B5E20"/>
+  <text x="60" y="72" fill="#FFFFFF" font-family="Inter,Arial,sans-serif" font-size="22" font-weight="700" letter-spacing="3">LSERVE · DECODE PHASE</text>
+  <text x="60" y="112" fill="#FFFFFF" font-family="Inter,Arial,sans-serif" font-size="50" font-weight="700">Hierarchical KV-Page Selection</text>
 
-  <rect x="628" y="316" width="500" height="520" rx="34" fill="#FFF8F1" stroke="#F0D8BC"/>
-  <text x="664" y="374" fill="#BA6814" font-family="Inter, Arial, sans-serif" font-size="34" font-weight="700">Slash pattern</text>
-  <text x="664" y="416" fill="#8B6B47" font-family="Inter, Arial, sans-serif" font-size="22">Local continuity and recent context</text>
-  <rect x="664" y="454" width="428" height="212" rx="24" fill="#FFFFFF" stroke="#F3E3D0"/>
-  <rect x="694" y="486" width="368" height="148" rx="18" fill="#FFF6EA"/>
-  <line x1="742" y1="612" x2="854" y2="516" stroke="#E0882F" stroke-width="18" stroke-linecap="round"/>
-  <line x1="826" y1="612" x2="938" y2="516" stroke="#E0882F" stroke-width="18" stroke-linecap="round"/>
-  <line x1="910" y1="612" x2="1022" y2="516" stroke="#F3CF9F" stroke-width="18" stroke-linecap="round"/>
-  <text x="664" y="714" fill="#6D6257" font-family="Inter, Arial, sans-serif" font-size="22">Queries often attend along relative-position bands.</text>
-  <text x="664" y="748" fill="#6D6257" font-family="Inter, Arial, sans-serif" font-size="22">That is why slash-like structure preserves local behavior.</text>
+  <text x="60" y="184" fill="#333333" font-family="Inter,Arial,sans-serif" font-size="26">Goal: read fewer KV pages per decode step without missing important history.</text>
 
-  <rect x="72" y="888" width="1056" height="404" rx="34" fill="#F4F8FF" stroke="#D5E3FF"/>
-  <text x="108" y="948" fill="#2345B8" font-family="Inter, Arial, sans-serif" font-size="34" font-weight="700">CRA = Cumulative Residual Attention</text>
-  <text x="108" y="1000" fill="#1E1E1E" font-family="Inter, Arial, sans-serif" font-size="30">Defined as the minimum remaining attention probability mass</text>
-  <text x="108" y="1042" fill="#1E1E1E" font-family="Inter, Arial, sans-serif" font-size="30">per query after sparsification.</text>
-  <rect x="108" y="1086" width="984" height="144" rx="24" fill="#FFFFFF" stroke="#DCE7FF"/>
-  <rect x="140" y="1138" width="360" height="18" rx="9" fill="#E5EDFF"/>
-  <rect x="140" y="1138" width="270" height="18" rx="9" fill="#3B6BF2"/>
-  <text x="526" y="1154" fill="#607088" font-family="Inter, Arial, sans-serif" font-size="20">higher retained mass</text>
-  <text x="140" y="1206" fill="#44506A" font-family="Inter, Arial, sans-serif" font-size="22">Why it matters: CRA is a runtime proxy for whether the sparse mask kept enough useful attention.</text>
-  <text x="140" y="1240" fill="#44506A" font-family="Inter, Arial, sans-serif" font-size="22">SampleAttention approximates it with chunked query sampling, then picks top-k column and slash blocks.</text>
+  <!-- Why decode is hard -->
+  <rect x="60" y="218" width="1080" height="130" rx="20" fill="#FCE4EC" stroke="#E91E63" stroke-width="2"/>
+  <text x="100" y="260" fill="#880E4F" font-family="Inter,Arial,sans-serif" font-size="24" font-weight="700">The decode bottleneck is memory bandwidth, not compute</text>
+  <text x="100" y="296" fill="#880E4F" font-family="Inter,Arial,sans-serif" font-size="20">One token generated per step → attention over entire KV cache each step → GPU memory reads dominate</text>
+  <text x="100" y="326" fill="#880E4F" font-family="Inter,Arial,sans-serif" font-size="20">KV-cache can be 10s of GB. You read most of it every single decode step.</text>
 
-  <text x="72" y="1412" fill="#6A6A6A" font-family="Inter, Arial, sans-serif" font-size="22">Slide 3 of 4</text>
-  <text x="930" y="1412" fill="#6A6A6A" font-family="Inter, Arial, sans-serif" font-size="22">zhanyl-tech.github.io</text>
+  <!-- KV page visualization -->
+  <text x="60" y="400" fill="#111111" font-family="Inter,Arial,sans-serif" font-size="30" font-weight="700">KV Cache as Physical Pages</text>
+
+  <!-- 40 page grid representing KV cache -->
+  <text x="60" y="450" fill="#555555" font-family="Inter,Arial,sans-serif" font-size="20">Context = 40 KV pages stored in GPU memory</text>
+
+  <!-- Row 1 of pages -->
+  <g>
+    <!-- row 1 -->
+    <rect x="60" y="460" width="48" height="36" rx="6" fill="#A5D6A7"/>
+    <rect x="114" y="460" width="48" height="36" rx="6" fill="#A5D6A7"/>
+    <rect x="168" y="460" width="48" height="36" rx="6" fill="#66BB6A"/>
+    <rect x="222" y="460" width="48" height="36" rx="6" fill="#A5D6A7"/>
+    <rect x="276" y="460" width="48" height="36" rx="6" fill="#DCEDC8"/>
+    <rect x="330" y="460" width="48" height="36" rx="6" fill="#DCEDC8"/>
+    <rect x="384" y="460" width="48" height="36" rx="6" fill="#66BB6A"/>
+    <rect x="438" y="460" width="48" height="36" rx="6" fill="#DCEDC8"/>
+    <rect x="492" y="460" width="48" height="36" rx="6" fill="#A5D6A7"/>
+    <rect x="546" y="460" width="48" height="36" rx="6" fill="#DCEDC8"/>
+    <!-- row 2 -->
+    <rect x="60" y="502" width="48" height="36" rx="6" fill="#DCEDC8"/>
+    <rect x="114" y="502" width="48" height="36" rx="6" fill="#66BB6A"/>
+    <rect x="168" y="502" width="48" height="36" rx="6" fill="#DCEDC8"/>
+    <rect x="222" y="502" width="48" height="36" rx="6" fill="#A5D6A7"/>
+    <rect x="276" y="502" width="48" height="36" rx="6" fill="#DCEDC8"/>
+    <rect x="330" y="502" width="48" height="36" rx="6" fill="#DCEDC8"/>
+    <rect x="384" y="502" width="48" height="36" rx="6" fill="#A5D6A7"/>
+    <rect x="438" y="502" width="48" height="36" rx="6" fill="#DCEDC8"/>
+    <rect x="492" y="502" width="48" height="36" rx="6" fill="#66BB6A"/>
+    <rect x="546" y="502" width="48" height="36" rx="6" fill="#DCEDC8"/>
+    <!-- row 3 -->
+    <rect x="60" y="544" width="48" height="36" rx="6" fill="#DCEDC8"/>
+    <rect x="114" y="544" width="48" height="36" rx="6" fill="#DCEDC8"/>
+    <rect x="168" y="544" width="48" height="36" rx="6" fill="#A5D6A7"/>
+    <rect x="222" y="544" width="48" height="36" rx="6" fill="#DCEDC8"/>
+    <rect x="276" y="544" width="48" height="36" rx="6" fill="#DCEDC8"/>
+    <rect x="330" y="544" width="48" height="36" rx="6" fill="#66BB6A"/>
+    <rect x="384" y="544" width="48" height="36" rx="6" fill="#DCEDC8"/>
+    <rect x="438" y="544" width="48" height="36" rx="6" fill="#A5D6A7"/>
+    <rect x="492" y="544" width="48" height="36" rx="6" fill="#DCEDC8"/>
+    <rect x="546" y="544" width="48" height="36" rx="6" fill="#DCEDC8"/>
+    <!-- row 4 -->
+    <rect x="60" y="586" width="48" height="36" rx="6" fill="#66BB6A"/>
+    <rect x="114" y="586" width="48" height="36" rx="6" fill="#DCEDC8"/>
+    <rect x="168" y="586" width="48" height="36" rx="6" fill="#DCEDC8"/>
+    <rect x="222" y="586" width="48" height="36" rx="6" fill="#DCEDC8"/>
+    <rect x="276" y="586" width="48" height="36" rx="6" fill="#A5D6A7"/>
+    <rect x="330" y="586" width="48" height="36" rx="6" fill="#DCEDC8"/>
+    <rect x="384" y="586" width="48" height="36" rx="6" fill="#DCEDC8"/>
+    <rect x="438" y="586" width="48" height="36" rx="6" fill="#66BB6A"/>
+    <rect x="492" y="586" width="48" height="36" rx="6" fill="#DCEDC8"/>
+    <rect x="546" y="586" width="48" height="36" rx="6" fill="#A5D6A7"/>
+  </g>
+
+  <!-- legend -->
+  <rect x="640" y="490" width="24" height="24" rx="4" fill="#66BB6A"/>
+  <text x="672" y="508" fill="#333" font-family="Inter,Arial,sans-serif" font-size="18">High importance</text>
+  <rect x="640" y="522" width="24" height="24" rx="4" fill="#A5D6A7"/>
+  <text x="672" y="540" fill="#333" font-family="Inter,Arial,sans-serif" font-size="18">Mid importance</text>
+  <rect x="640" y="554" width="24" height="24" rx="4" fill="#DCEDC8"/>
+  <text x="672" y="572" fill="#333" font-family="Inter,Arial,sans-serif" font-size="18">Low / skipped</text>
+
+  <!-- 2-level hierarchy -->
+  <text x="60" y="680" fill="#111111" font-family="Inter,Arial,sans-serif" font-size="30" font-weight="700">2-Level Hierarchical Selection</text>
+
+  <!-- Level 1 box -->
+  <rect x="60" y="710" width="480" height="280" rx="20" fill="#E8F5E9" stroke="#43A047" stroke-width="2"/>
+  <rect x="60" y="710" width="480" height="56" rx="20" fill="#43A047"/>
+  <rect x="60" y="742" width="480" height="24" fill="#43A047"/>
+  <text x="100" y="748" fill="#FFFFFF" font-family="Inter,Arial,sans-serif" font-size="24" font-weight="700">Level 1: Coarse (Constant-time)</text>
+
+  <text x="100" y="810" fill="#1B5E20" font-family="Inter,Arial,sans-serif" font-size="22">Use a tiny summary vector per page.</text>
+  <text x="100" y="842" fill="#1B5E20" font-family="Inter,Arial,sans-serif" font-size="22">Compare query against summaries.</text>
+  <text x="100" y="874" fill="#1B5E20" font-family="Inter,Arial,sans-serif" font-size="22">O(n/page_size) — cheap.</text>
+  <!-- mini visual -->
+  <rect x="100" y="896" width="60" height="28" rx="6" fill="#43A047"/>
+  <rect x="168" y="896" width="60" height="28" rx="6" fill="#A5D6A7"/>
+  <rect x="236" y="896" width="60" height="28" rx="6" fill="#43A047"/>
+  <rect x="304" y="896" width="60" height="28" rx="6" fill="#A5D6A7"/>
+  <rect x="372" y="896" width="60" height="28" rx="6" fill="#A5D6A7"/>
+  <text x="100" y="952" fill="#1B5E20" font-family="Inter,Arial,sans-serif" font-size="18">Top pages selected → sent to Level 2</text>
+
+  <!-- arrow between levels -->
+  <path d="M564 848H664" stroke="#333333" stroke-width="6" stroke-linecap="round"/>
+  <path d="M648 832L674 848L648 864" stroke="#333333" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Level 2 box -->
+  <rect x="680" y="710" width="460" height="280" rx="20" fill="#F9FBE7" stroke="#C0CA33" stroke-width="2"/>
+  <rect x="680" y="710" width="460" height="56" rx="20" fill="#C0CA33"/>
+  <rect x="680" y="742" width="460" height="24" fill="#C0CA33"/>
+  <text x="718" y="748" fill="#FFFFFF" font-family="Inter,Arial,sans-serif" font-size="24" font-weight="700">Level 2: Fine (Token-level)</text>
+
+  <text x="718" y="810" fill="#33691E" font-family="Inter,Arial,sans-serif" font-size="22">Within selected pages only:</text>
+  <text x="718" y="842" fill="#33691E" font-family="Inter,Arial,sans-serif" font-size="22">run full attention per token.</text>
+  <text x="718" y="874" fill="#33691E" font-family="Inter,Arial,sans-serif" font-size="22">Discard low-score tokens.</text>
+  <!-- smaller grid representing fine selection -->
+  <rect x="718" y="896" width="22" height="22" rx="4" fill="#C0CA33"/>
+  <rect x="746" y="896" width="22" height="22" rx="4" fill="#F0F4C3"/>
+  <rect x="774" y="896" width="22" height="22" rx="4" fill="#C0CA33"/>
+  <rect x="802" y="896" width="22" height="22" rx="4" fill="#F0F4C3"/>
+  <rect x="830" y="896" width="22" height="22" rx="4" fill="#C0CA33"/>
+  <rect x="858" y="896" width="22" height="22" rx="4" fill="#F0F4C3"/>
+  <text x="718" y="952" fill="#33691E" font-family="Inter,Arial,sans-serif" font-size="18">Only important tokens hit GPU HBM</text>
+
+  <!-- gain panel -->
+  <rect x="60" y="1016" width="1080" height="120" rx="20" fill="#E3F2FD" stroke="#1976D2" stroke-width="2"/>
+  <text x="100" y="1064" fill="#0D47A1" font-family="Inter,Arial,sans-serif" font-size="24" font-weight="700">Result: 1.3–2.1× decode throughput vs vLLM</text>
+  <text x="100" y="1100" fill="#1565C0" font-family="Inter,Arial,sans-serif" font-size="20">KV quantization (INT4 keys) stacks on top → combined bandwidth reduction of ~4-8×</text>
+
+  <!-- bottom bar -->
+  <rect x="0" y="1438" width="1200" height="62" fill="#F5F5F5"/>
+  <text x="60" y="1477" fill="#888888" font-family="Inter,Arial,sans-serif" font-size="20">Slide 3 of 4</text>
+  <text x="870" y="1477" fill="#888888" font-family="Inter,Arial,sans-serif" font-size="20">zhanyl-tech.github.io</text>
 </svg>
