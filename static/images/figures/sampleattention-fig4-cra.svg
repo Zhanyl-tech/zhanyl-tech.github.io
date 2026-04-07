@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 320" width="760" height="320">
+  <style type="text/css"><![CDATA[
+    .lab { font-family: system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif; fill: #111; }
+    .sub { font-family: system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif; fill: #444; font-size: 12px; }
+    .mono { font-family: ui-monospace, "JetBrains Mono", "Cascadia Code", monospace; fill: #111; font-size: 13px; }
+  ]]></style>
+  <rect width="760" height="320" fill="#ffffff"/>
+  <text x="24" y="26" class="lab" font-size="14" font-weight="700">Figure 4</text>
+  <text x="24" y="44" class="sub">CRA (Cumulative Residual Attention): retained softmax mass after masking, used as a runtime quality floor (see text).</text>
+
+  <text x="40" y="92" class="lab" font-size="12" font-weight="600">Per-query retained mass</text>
+  <text x="40" y="110" class="sub">Let alpha_q be dense attention for query q; S the kept index set.</text>
+
+  <rect x="40" y="124" width="520" height="22" rx="11" fill="#eee" stroke="#999"/>
+  <rect x="40" y="124" width="468" height="22" rx="11" fill="#b8c9e0" stroke="#222"/>
+  <text x="570" y="140" class="sub" font-size="11">approx 0.92</text>
+  <text x="40" y="158" class="sub" font-size="11">query q_1</text>
+
+  <rect x="40" y="176" width="520" height="22" rx="11" fill="#eee" stroke="#999"/>
+  <rect x="40" y="176" width="390" height="22" rx="11" fill="#a8b8d0" stroke="#222"/>
+  <text x="570" y="192" class="sub" font-size="11">approx 0.78</text>
+  <text x="40" y="210" class="sub" font-size="11">query q_2 (min over queries)</text>
+
+  <text x="40" y="242" class="mono">CRA := min_q  sum_{i in S}  alpha_q(i)  &gt;=  tau</text>
+  <text x="40" y="264" class="sub">Threshold tau is a worst-query guarantee; sampling estimates set column/band budgets without dense attention.</text>
+
+  <rect x="600" y="118" width="120" height="120" rx="4" fill="#fafafa" stroke="#222"/>
+  <text x="660" y="148" text-anchor="middle" class="lab" font-size="11" font-weight="700">Control</text>
+  <text x="660" y="170" text-anchor="middle" class="sub" font-size="10">fix tau, not</text>
+  <text x="660" y="186" text-anchor="middle" class="sub" font-size="10">a fixed</text>
+  <text x="660" y="202" text-anchor="middle" class="sub" font-size="10">token count</text>
+</svg>

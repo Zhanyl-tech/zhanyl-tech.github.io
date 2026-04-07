@@ -1,25 +1,23 @@
 ---
 title: "LServe and SampleAttention: What Sparse Attention Actually Changes in Prefill and Decode"
 date: 2026-01-30
-description: "A practitioner's read on two papers that make structured sparsity production-viable: LServe builds the full serving system, SampleAttention maps out which sparse patterns dominate real attention maps and why CRA is a cheap accuracy guardrail."
+description: "Structured sparsity aligned with GPU attention kernels: LServe’s unified serving stack for prefill and decode, and SampleAttention’s empirical patterns plus CRA as a runtime quality floor."
 tags: [sparse-attention, llm-serving, prefill, decoding, kv-cache, lserve, sampleattention, gpu-inference]
 summary: "How LServe and SampleAttention use structured sparsity differently for prefill vs decode, and why CRA is the accuracy proxy you actually want."
 ShowToc: true
 draft: false
 ---
 
-Sparse attention is easy to talk about and hard to ship. The question that actually matters isn't "is attention sparse?" — it's *which structure can you exploit cheaply enough that the win survives contact with a GPU kernel*.
+Sparse attention is easy to talk about and hard to ship. The question that actually matters isn't "is attention sparse?" — it's *which structure you can exploit cheaply enough that the win survives contact with a GPU kernel*.
 
 Two papers attack this from opposite directions:
 
 - **LServe** starts from the serving system and asks: what sparse mechanisms can I plug in at prefill and at decode that give real throughput?
 - **SampleAttention** starts from the attention map and asks: what sparse patterns actually show up in real models, and how do I select them without running dense attention first?
 
-**Visual summary:** [4-slide deck](/slides/lserve-sampleattention.html) · [PDF for LinkedIn](/slides/lserve-sampleattention.pdf)
+The figures below follow the usual **paper-style schematic**: minimal decoration, explicit labels, and placement next to the claims they support (cf. NeurIPS / ICML figure guidelines: vector line art, legible fonts at print size, one idea per panel).
 
-![LServe and SampleAttention sparse attention overview](/images/vizpub/lserve-sampleattention-overview.svg)
-
-Read together they fit: SampleAttention gives you the map of where sparsity lives, LServe gives you the system that exploits it.
+Read together they fit: SampleAttention gives you the map of where sparsity lives; LServe gives you the system that exploits it.
 
 ## TL;DR
 
@@ -49,6 +47,11 @@ So prefill is doing two things simultaneously:
 
 Both still go through unified kernels, not separate code paths.
 
+<figure class="blog-figure">
+<img src="/images/figures/lserve-fig1-prefill.svg" alt="Figure 1: LServe prefill schematics for block-sparse tiling and streaming Lambda-mask." width="900" height="340" loading="lazy" />
+<figcaption><strong>Figure 1.</strong> LServe prefill: (a) block-sparse attention — entire KV blocks are either computed or skipped at kernel tile granularity; (b) streaming head with a Λ-shaped support (sink tokens plus a local window, middle of the sequence not materialized).</figcaption>
+</figure>
+
 ## LServe — Decode Phase
 
 Decode is a different problem. Each step is one query token attending to the full KV cache. There's no quadratic cost, but there's a serious bandwidth cost: loading the KV cache from HBM every single step. At 128K context, that's a lot of data movement per generated token.
@@ -60,6 +63,11 @@ The mechanism: a **hierarchical page selector** scores all pages cheaply using a
 Combined with **INT4 KV quantization**, the gains stack: sparsity cuts the number of pages you touch; quantization cuts the byte cost of each page you do touch.
 
 Prefill and decode are genuinely different optimization problems. LServe treats them that way.
+
+<figure class="blog-figure">
+<img src="/images/figures/lserve-fig2-decode.svg" alt="Figure 2: Hierarchical KV page selection pipeline for decode." width="900" height="300" loading="lazy" />
+<figcaption><strong>Figure 2.</strong> Decode: coarse per-page scoring, top-k subset, then token-level attention only inside selected pages. Constant-ish <em>k</em> vs sequence length is the intended scaling behavior; INT4 KV further reduces bytes per read.</figcaption>
+</figure>
 
 ## SampleAttention — What Sparse Patterns Are Real
 
@@ -77,6 +85,11 @@ Query tokens tend to attend to keys near them in the sequence — diagonal or ne
 
 Columns + slashes together cover a surprisingly large fraction of the attention mass in real models. The paper doesn't need a long catalog of special cases — just these two.
 
+<figure class="blog-figure">
+<img src="/images/figures/sampleattention-fig3-patterns.svg" alt="Figure 3: Schematic attention map with column and diagonal band patterns." width="820" height="360" loading="lazy" />
+<figcaption><strong>Figure 3.</strong> Schematic causal attention map: column-heavy keys (global anchors) and mass concentrated near the diagonal (local continuity). The actual heatmaps are head- and layer-dependent; the figure isolates the two recurring structures discussed in the paper.</figcaption>
+</figure>
+
 ## CRA — The Accuracy Proxy
 
 Most sparse attention papers tune for a fixed sparsity ratio. SampleAttention uses a different control knob: **Cumulative Residual Attention (CRA)**.
@@ -88,6 +101,11 @@ That last part matters. It's not asking whether the average query kept enough. I
 The practical benefit: CRA lets you set a quality floor instead of a sparsity budget. You say "no query should lose more than 10% of its attention mass" rather than "always keep 20% of tokens." On hard prompts where attention is concentrated, the mask expands. On easy prompts, it shrinks. You get adaptivity for free.
 
 **How it's computed without dense attention:** SampleAttention samples a few query blocks spread across the sequence. From those sampled queries it accumulates approximate column and slash scores cheaply. It then picks the minimum column/slash budget that hits the CRA threshold, and merges those into the final mask. No offline profiling needed; it adapts per-head, per-layer, per-prompt at runtime.
+
+<figure class="blog-figure">
+<img src="/images/figures/sampleattention-fig4-cra.svg" alt="Figure 4: CRA as minimum retained mass per query with threshold." width="760" height="320" loading="lazy" />
+<figcaption><strong>Figure 4.</strong> CRA aggregates per-query retained softmax mass under the sparse mask and takes a minimum across queries (worst-query control). The method compares a threshold <em>τ</em> to that aggregate rather than fixing a static token count; see the paper for the exact estimator and sampling schedule.</figcaption>
+</figure>
 
 ## How They Fit Together
 
