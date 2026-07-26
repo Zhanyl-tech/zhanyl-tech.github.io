@@ -41,5 +41,7 @@ Outside of engineering, I play chess and poker — both sharpen the strategic an
 
 ## Contact
 
-- [GitHub](https://github.com/zhanyl-tech)
+- [GitHub](https://github.com/Zhanyl-tech)
+- [LinkedIn](https://www.linkedin.com/in/za-engineering/)
+- [X / Twitter](https://x.com/ZhanylAbd)
 - Resume: [Download PDF](/resume.pdf)

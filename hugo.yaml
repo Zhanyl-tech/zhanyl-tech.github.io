@@ -66,19 +66,18 @@ params:
 
   socialIcons:
     - name: github
-      url: "https://github.com/zhanyl-tech"
+      url: "https://github.com/Zhanyl-tech"
+    - name: linkedin
+      url: "https://www.linkedin.com/in/za-engineering/"
+    - name: x
+      url: "https://x.com/ZhanylAbd"
     - name: rss
       url: "/index.xml"
-    # Add once you're ready to link them publicly — they also appear in the footer:
-    # - name: linkedin
-    #   url: "https://linkedin.com/in/YOUR_HANDLE"
-    # - name: x
-    #   url: "https://x.com/YOUR_HANDLE"
 
-  # Populating `twitter` here adds twitter:site / twitter:creator to every page,
-  # which attributes shared links back to your account.
-  # social:
-  #   twitter: "YOUR_HANDLE"
+  # Adds twitter:site / twitter:creator to every page, so shared links are
+  # attributed back to the account.
+  social:
+    twitter: "ZhanylAbd"
 
   # Search
   fuseOpts:
