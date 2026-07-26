@@ -1,0 +1,113 @@
+name: Weekly drop
+
+# The cadence engine. Every Saturday morning this opens an issue with the
+# week's checklist, and closes the previous one. GitHub is the system of
+# record, so the prompt to publish lives next to the thing being published.
+#
+# It also reports how long it has been since the last post — an honest number
+# is more motivating than a reminder that pretends nothing has slipped.
+
+on:
+  schedule:
+    - cron: "0 13 * * 6" # Saturday 09:00 ET (13:00 UTC)
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  open-issue:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Measure days since last post
+        id: cadence
+        run: |
+          LAST=$(git log -1 --format=%ct -- content/blog content/experiments content/notes || echo 0)
+          if [ "$LAST" = "0" ]; then
+            echo "days=unknown" >> "$GITHUB_OUTPUT"
+          else
+            echo "days=$(( ( $(date +%s) - LAST ) / 86400 ))" >> "$GITHUB_OUTPUT"
+          fi
+          echo "week=$(date +'%Y-W%V')" >> "$GITHUB_OUTPUT"
+
+      - name: Open this week's issue
+        uses: actions/github-script@v7
+        env:
+          DAYS: ${{ steps.cadence.outputs.days }}
+          WEEK: ${{ steps.cadence.outputs.week }}
+        with:
+          script: |
+            const { DAYS, WEEK } = process.env;
+            const title = `Weekly drop — ${WEEK}`;
+
+            const body = [
+              `**${DAYS} days** since the last post.`,
+              '',
+              'Pick one. A lab note that ships beats a deep dive that does not.',
+              '',
+              '| Type | Where | Length |',
+              '| --- | --- | --- |',
+              '| Deep dive | `content/blog/` | 2000-4000 words |',
+              '| Lab note | `content/experiments/` | 500-1500 words |',
+              '| Note | `content/notes/` | 100-500 words |',
+              '',
+              '### Ship it',
+              '```bash',
+              'hugo new experiments/$(date +%F)-slug.md   # write it, keep draft: true',
+              './scripts/weekly.sh                        # card, build, push, drafts',
+              '```',
+              '',
+              '`weekly.sh` renders the social card, verifies the build, pushes to',
+              'GitHub Pages, and writes LinkedIn/X drafts from the post itself.',
+              '',
+              '### Then',
+              '- [ ] Post published (site live)',
+              '- [ ] LinkedIn — Tue-Thu 8-10 AM ET, native image, link in first comment',
+              '- [ ] X thread — Wed 8-10 AM ET, card on tweet 1',
+              '- [ ] HN — deep dives only',
+              '',
+              '---',
+              '<sub>Opened automatically by `.github/workflows/weekly-drop.yml`.</sub>',
+            ].join('\n');
+
+            const open = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'weekly-drop',
+            });
+
+            if (open.data.some(i => i.title === title)) {
+              core.info(`${title} already open — nothing to do.`);
+              return;
+            }
+
+            // Close last week's before opening this week's, so the list stays at one.
+            for (const issue of open.data) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: 'Superseded by this week&apos;s drop.',
+              });
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                state: 'closed',
+              });
+            }
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title,
+              body,
+              labels: ['weekly-drop'],
+            });

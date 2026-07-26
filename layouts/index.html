@@ -2,9 +2,17 @@
 
 {{- $blog        := where (where .Site.RegularPages "Section" "blog") "Draft" false }}
 {{- $experiments := where (where .Site.RegularPages "Section" "experiments") "Draft" false }}
+{{- $notes       := where (where .Site.RegularPages "Section" "notes") "Draft" false }}
 {{- $projects    := where .Site.RegularPages "Section" "projects" }}
-{{- $latestBlog  := first 1 (sort $blog "Date" "desc") }}
+
+{{- $latestBlog  := first 2 (sort $blog "Date" "desc") }}
 {{- $latestExp   := first 4 (sort $experiments "Date" "desc") }}
+{{- $latestNotes := first 4 (sort $notes "Date" "desc") }}
+
+{{/* Most recent publication date across every writing section — drives the cadence line. */}}
+{{- $written := sort (union (union $blog $experiments) $notes) "Date" "desc" }}
+{{- $lastPublished := "" }}
+{{- with first 1 $written }}{{ range . }}{{ $lastPublished = .Date }}{{ end }}{{ end }}
 
 <div class="home-wrap">
 
@@ -28,8 +36,21 @@
       <a href="https://github.com/zhanyl-tech">GitHub</a>
       <a href="/resume.pdf">Resume</a>
       <a href="/about/">About</a>
+      <a href="/index.xml">RSS</a>
     </p>
   </section>
+
+  {{/* Only claim an active cadence when the archive actually backs it up —
+       a stale "posts weekly!" badge is worse than no badge. */}}
+  {{- with $lastPublished }}
+  {{- $daysSince := div (sub now.Unix .Unix) 86400 }}
+  {{- $active := le $daysSince 21 }}
+  <p class="cadence">
+    <span class="cadence-dot{{ if not $active }} cadence-dot-idle{{ end }}" aria-hidden="true"></span>
+    {{ if $active }}New writing most weeks · last published{{ else }}Last published{{ end }}
+    {{ .Format "January 2, 2006" }}
+  </p>
+  {{- end }}
 
   <section class="home-grid">
     <div class="home-primary">
@@ -38,13 +59,14 @@
         <h2 class="home-heading">Featured Writing</h2>
         {{- range $latestBlog }}
         <article class="feature-story">
-          <p class="feature-meta">{{ .Date.Format "January 2006" }} · blog</p>
+          <p class="feature-meta">{{ .Date.Format "January 2006" }} · blog · {{ .ReadingTime }} min read</p>
           <h3><a href="{{ .Permalink }}">{{ .Title }}</a></h3>
           {{- with .Description }}
           <p>{{ . }}</p>
           {{- end }}
         </article>
         {{- end }}
+        <p class="section-more"><a href="/blog/">All deep dives →</a></p>
       </section>
       {{- end }}
 
@@ -59,6 +81,22 @@
           </li>
           {{- end }}
         </ul>
+        <p class="section-more"><a href="/experiments/">All lab notes →</a></p>
+      </section>
+      {{- end }}
+
+      {{- if $latestNotes }}
+      <section class="home-section">
+        <h2 class="home-heading">Notes</h2>
+        <ul class="post-list post-list-compact">
+          {{- range $latestNotes }}
+          <li>
+            <a href="{{ .Permalink }}">{{ .Title }}</a>
+            <span class="post-meta-inline">{{ .Date.Format "Jan 2006" }}</span>
+          </li>
+          {{- end }}
+        </ul>
+        <p class="section-more"><a href="/notes/">All notes →</a></p>
       </section>
       {{- end }}
     </div>
@@ -72,12 +110,11 @@
           <li>
             <a href="{{ .Permalink }}">{{ .Title }}</a>
             <span class="post-meta-inline">{{ .Params.status | default "In Progress" }}</span>
-            {{- with .Summary }}
-            <p class="project-oneliner">{{ . }}</p>
-            {{- else }}
             {{- with .Description }}
             <p class="project-oneliner">{{ . }}</p>
             {{- end }}
+            {{- with .Params.repo }}
+            <p class="project-repo"><a href="{{ . }}">Source →</a></p>
             {{- end }}
           </li>
           {{- end }}

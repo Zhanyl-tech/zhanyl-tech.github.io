@@ -69,6 +69,16 @@ params:
       url: "https://github.com/zhanyl-tech"
     - name: rss
       url: "/index.xml"
+    # Add once you're ready to link them publicly — they also appear in the footer:
+    # - name: linkedin
+    #   url: "https://linkedin.com/in/YOUR_HANDLE"
+    # - name: x
+    #   url: "https://x.com/YOUR_HANDLE"
+
+  # Populating `twitter` here adds twitter:site / twitter:creator to every page,
+  # which attributes shared links back to your account.
+  # social:
+  #   twitter: "YOUR_HANDLE"
 
   # Search
   fuseOpts:
@@ -106,18 +116,26 @@ menu:
       name: Lab Notes
       url: /experiments/
       weight: 20
+    - identifier: notes
+      name: Notes
+      url: /notes/
+      weight: 25
     - identifier: projects
       name: Projects
       url: /projects/
       weight: 30
+    - identifier: reading
+      name: Reading
+      url: /reading/
+      weight: 40
     - identifier: about
       name: About
       url: /about/
-      weight: 40
+      weight: 50
     - identifier: search
       name: Search
       url: /search/
-      weight: 50
+      weight: 60
 
 taxonomies:
   category: categories
