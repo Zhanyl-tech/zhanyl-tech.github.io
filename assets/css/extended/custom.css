@@ -58,6 +58,23 @@ html, body {
   color: var(--ink);
 }
 
+/* Faint engineering grid. Sits under everything at ~1.5% opacity — you should
+   register it as texture rather than notice it as lines. Fades out down the
+   page so long-form reading is never competing with a backdrop. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(88, 166, 255, .028) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(88, 166, 255, .028) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: linear-gradient(180deg, #000 0%, #000 38%, transparent 92%);
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 38%, transparent 92%);
+}
+
 body {
   font-family: var(--font-sans);
   font-size: 16.5px;
@@ -152,6 +169,14 @@ a:hover { color: var(--accent-2); }
   margin: 0 0 20px;
 }
 
+/* The kicker reads as a shell prompt. This is the first place the two registers
+   meet: a command line introducing a serif headline. */
+.hero-kicker::before {
+  content: "$ ";
+  color: var(--green);
+  font-weight: 500;
+}
+
 .hero-title {
   font-family: var(--font-serif);
   font-size: clamp(40px, 6.4vw, 68px);
@@ -168,6 +193,26 @@ a:hover { color: var(--accent-2); }
 .hero-title em {
   font-style: italic;
   color: var(--accent);
+}
+
+/* Cursor parked at the end of the headline. Blinks twelve times and stops —
+   a permanently blinking cursor is a distraction on a page you want people to
+   read, but the first few seconds establish the register. */
+.hero-title::after {
+  content: "";
+  display: inline-block;
+  width: 0.44em;
+  height: 0.78em;
+  margin-left: 0.14em;
+  vertical-align: -0.04em;
+  background: var(--green);
+  animation: cursor-blink 1.05s steps(2) 12;
+}
+
+@keyframes cursor-blink { 50% { opacity: 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-title::after { animation: none; opacity: .85; }
 }
 
 .hero-copy { max-width: 62ch; }
@@ -225,14 +270,23 @@ a:hover { color: var(--accent-2); }
   margin: 0 0 7px;
 }
 
+/* Machine-readable content gets the machine typeface. This is the block that
+   most directly carries A's key/value register. */
 .fact-value {
-  font-size: 13.5px;
+  font-family: var(--font-mono);
+  font-size: 12px;
   color: var(--ink);
-  line-height: 1.45;
+  line-height: 1.55;
   margin: 0;
+  letter-spacing: -0.1px;
 }
 
 .fact-value .dim { color: var(--ink-3); }
+
+.fact-label::before {
+  content: "▸ ";
+  color: var(--green);
+}
 
 /* ── Cadence ──────────────────────────────────────────────────── */
 .cadence {
@@ -270,16 +324,26 @@ a:hover { color: var(--accent-2); }
 
 .home-primary, .home-secondary { min-width: 0; }
 
+/* Section headings are commands. `$ ls ./writing` rather than "WRITING" —
+   the label still reads as a label, but the page announces what it is. */
 .home-heading {
   font-family: var(--font-mono);
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 500;
-  letter-spacing: 0.17em;
-  text-transform: uppercase;
-  color: var(--ink-4);
+  letter-spacing: 0.07em;
+  color: var(--ink-3);
   margin: 0 0 20px;
   padding-bottom: 13px;
   border-bottom: 1px solid var(--rule);
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+}
+
+.home-heading::before {
+  content: "$";
+  color: var(--green);
+  font-weight: 600;
 }
 
 .home-section { margin-bottom: 52px; }
@@ -412,14 +476,39 @@ a:hover { color: var(--accent-2); }
   margin: 0;
 }
 
-.project-repo {
+/* Tag chips. The stack is the fastest signal a reader gets about whether a
+   project is relevant to them, and it belongs in the machine typeface. */
+.project-tags {
   margin: 10px 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.project-tags .tag {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.06em;
+  color: var(--ink-4);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  padding: 1px 6px;
+  transition: border-color .12s, color .12s;
+}
+
+.project-list-simple li:hover .tag {
+  border-color: var(--rule-2);
+  color: var(--ink-3);
+}
+
+.project-repo {
+  margin: 9px 0 0;
   font-family: var(--font-mono);
   font-size: 11px;
 }
 
-.project-repo a { color: var(--ink-4); }
-.project-repo a:hover { color: var(--accent); }
+.project-repo a { color: var(--green); opacity: .8; }
+.project-repo a:hover { opacity: 1; }
 
 /* ── List pages ───────────────────────────────────────────────── */
 .list-wrap, .page-header, .post-header {
