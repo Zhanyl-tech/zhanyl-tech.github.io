@@ -589,8 +589,67 @@ pre code {
 }
 #searchbox:focus { border-color: var(--link); }
 
+/* ── Cadence strip ──
+   A dated "still alive" signal under the hero. A personal site with no visible
+   rhythm reads as abandoned, however good the writing is. */
+.cadence {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  letter-spacing: 0.2px;
+  color: var(--text-3);
+  margin: 0 0 42px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.cadence-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #16a34a;
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.16);
+  flex-shrink: 0;
+}
+
+/* Nothing published recently — show the date, drop the claim. */
+.cadence-dot-idle {
+  background: var(--text-3);
+  box-shadow: 0 0 0 3px rgba(142, 142, 149, 0.14);
+}
+
+/* "All deep dives →" links closing each homepage section */
+.section-more {
+  margin: 14px 0 0;
+  font-size: 14px;
+}
+
+.section-more a {
+  color: var(--text-2);
+  border-bottom: 1px solid transparent;
+  transition: color 0.1s, border-color 0.1s;
+}
+
+.section-more a:hover {
+  color: var(--link);
+  border-bottom-color: var(--link);
+}
+
+/* Source link on project cards */
+.project-repo {
+  margin: 6px 0 0;
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.project-repo a { color: var(--text-3); }
+.project-repo a:hover { color: var(--link); }
+
 /* Mobile */
 @media (max-width: 640px) {
+  .cadence { font-size: 11.5px; margin-bottom: 32px; }
   body { font-size: 16px; }
   .home-wrap, .list-wrap { padding: 36px 16px 64px; }
   .hero { margin-bottom: 42px; }

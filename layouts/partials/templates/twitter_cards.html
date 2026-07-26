@@ -1,0 +1,63 @@
+{{/*
+  Overrides PaperMod's twitter_cards partial.
+
+  The theme default falls back to `summary` (a small, text-only card) whenever a
+  post has no cover image — which was every post here. Social cards are generated
+  per-slug by scripts/ogimage.py, so we always have a large image to point at.
+
+  Resolution order:  post cover.image  ->  /images/og/<slug>.png  ->  default.png
+*/}}
+{{- $ogImage := "" }}
+
+{{- with .Params.cover.image }}
+  {{- if (ne $.Params.cover.relative true) }}
+    {{- $ogImage = . | absURL }}
+  {{- else }}
+    {{- $ogImage = (path.Join $.RelPermalink .) | absURL }}
+  {{- end }}
+{{- end }}
+
+{{- if not $ogImage }}
+  {{- with .File }}
+    {{- $candidate := printf "static/images/og/%s.png" .BaseFileName }}
+    {{- if os.FileExists $candidate }}
+      {{- $ogImage = (printf "/images/og/%s.png" .BaseFileName) | absURL }}
+    {{- end }}
+  {{- end }}
+{{- end }}
+
+{{- if not $ogImage }}
+  {{- if os.FileExists "static/images/og/default.png" }}
+    {{- $ogImage = "/images/og/default.png" | absURL }}
+  {{- end }}
+{{- end }}
+
+{{- if $ogImage }}
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="{{ $ogImage }}">
+<meta property="og:image" content="{{ $ogImage }}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="{{ (or .Title site.Title) | plainify }} — Zhanyl Abdybaeva">
+{{- else }}
+<meta name="twitter:card" content="summary">
+{{- end }}
+
+{{- with or .Title site.Title site.Params.title | plainify }}
+<meta name="twitter:title" content="{{ . }}">
+{{- end }}
+
+{{- with or .Description .Summary site.Params.description | plainify | htmlUnescape }}
+<meta name="twitter:description" content="{{ trim . "\n\r\t " }}">
+{{- end }}
+
+{{- with site.Params.social }}
+  {{- if reflect.IsMap . }}
+    {{- with .twitter }}
+      {{- $handle := . }}
+      {{- if not (strings.HasPrefix . "@") }}{{ $handle = printf "@%v" . }}{{ end }}
+<meta name="twitter:site" content="{{ $handle }}">
+<meta name="twitter:creator" content="{{ $handle }}">
+    {{- end }}
+  {{- end }}
+{{- end }}
