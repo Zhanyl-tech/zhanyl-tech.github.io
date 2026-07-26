@@ -1,140 +1,174 @@
 ---
-title: "Reading the Slurm 25.11 Release Notes as an Operator"
+title: "I Was Planning a Slurm 25.11 Upgrade. Then 26.05 Shipped."
 date: 2026-07-26
-description: "One rename will break your slurm.conf, slurmctld speaks Prometheus natively now, and expedited requeue changes how you think about node failure."
+description: "Three versions, two config renames that break on restart, and one cgroup change that quietly breaks every job-attribution tool you own."
 tags: [slurm, hpc, upgrade, prometheus, cluster-operations]
-summary: "One rename will break your slurm.conf, slurmctld speaks Prometheus natively now, and expedited requeue changes how you think about node failure."
+summary: "Three versions, two config renames that break on restart, and one cgroup change that quietly breaks every job-attribution tool you own."
 ShowToc: false
 draft: false
 ---
 
-Slurm 25.11 is out, and it upgrades directly from 25.05, 24.11, and 24.05. I'm
-planning a 25.05 → 25.11 move on a cluster with one head node and 250 compute
-nodes, so I read the release notes the way you read them when you own the
-pager: what breaks, what I have to schedule downtime for, and what I get to
-delete afterwards.
+I had a plan. Move a 250-node cluster from 25.05 to 25.11, write it up, ship it.
 
-Three things stood out.
+Then I checked the release list and found 26.05 had gone out on July 14, along
+with 25.11.7. Twelve days ago. And 26.05 upgrades **directly** from 25.05 —
+which means the version I was carefully planning to land on is not the only
+option, and possibly not the right one.
 
-## The rename that will break your config
+So this is the comparison I actually needed: three versions, what breaks between
+them, and which one a cluster with one head node and 250 compute nodes should
+be aiming at.
 
-`JobContainerType` is now `NamespaceType`.
+## The short version
 
-The `job_container` plugin interface has been renamed to `namespace`, and a new
-`namespace/linux` plugin replaces it with support for filesystem, PID, and user
-namespaces. If your `slurm.conf` carries `JobContainerType=job_container/tmpfs`
-— and if you do per-job private `/tmp`, it does — that line does not survive the
-upgrade.
+| | 25.05 | 25.11 | 26.05 |
+| --- | --- | --- | --- |
+| Status | current on my cluster | stable, .7 out | **latest**, .2 out |
+| Direct upgrade from | — | 25.05, 24.11, 24.05 | 25.11, 25.05, 24.11 |
+| Config renames | — | `JobContainerType` | `ExclusiveUser`, `ExclusiveTopo` |
+| Prometheus | none | basic openmetrics | **+ GPU allocation stats** |
+| cgroup layout | JobId | JobId | **SLUID** |
+| REST | v0.0.41 deprecated | v0.0.41 → removed | v0.0.42 deprecated |
 
-This is the one to grep for first:
+Both 25.11 and 26.05 are reachable in one hop from 25.05. That is the whole
+decision: one change window or two.
+
+## The renames that fail on restart
+
+Two of them, one per version, and both are the same class of problem — your
+config parses fine today and does not parse after the daemon restarts.
+
+**25.11 renamed `JobContainerType` to `NamespaceType`.** The `job_container`
+plugin interface became `namespace`, with a new `namespace/linux` plugin that
+handles filesystem, PID, and user namespaces. If you do per-job private `/tmp` —
+and if you have users, you do — this line is in your config.
+
+**26.05 collapsed `ExclusiveUser` and `ExclusiveTopo`** into a single
+`Exclusive=[NO|NODE|USER|TOPO]`.
+
+Neither is hard. Both are a `grep`:
 
 ```bash
-grep -rn 'JobContainerType' /etc/slurm/
+grep -rnE 'JobContainerType|ExclusiveUser|ExclusiveTopo' /etc/slurm/
 ```
 
-It's a mechanical fix, but it's a config-parse failure on a control daemon
-restart, which is the worst time to discover it. On a 250-node cluster the
-`slurm.conf` has to be consistent everywhere, so this lands in the same change
-window as the daemon upgrade rather than after it.
+The reason to care is *when* you find out. A config-parse failure surfaces when
+`slurmctld` restarts, which on a planned upgrade is the exact moment you have a
+change window open, 250 nodes drained, and a room full of people waiting. Find
+it on a Tuesday instead.
 
-While you're in there, `SlurmdParameters=conmgr_threads` has a new default of
-6. If you tuned that for a large node count, your explicit value still wins, but
-the new default is worth knowing when you're reading someone else's config.
+## The one that will break your tooling
 
-## slurmctld exports Prometheus directly now
+This is the change I would have missed, and it is the expensive one:
 
-25.11 adds native OpenMetrics export from `slurmctld`.
+> cgroup/v2 directory structures are now keyed off of SLUID and not the JobId.
 
-I have opinions about this one, because I've been building the opposite thing.
-The usual setup is a sidecar exporter that shells out to `sinfo`/`squeue`,
-parses the text, and re-exports it — which is fragile in exactly the way
-text-scraping always is, and adds a process per cluster you have to monitor in
-order to monitor the cluster.
+Read that again if you own any monitoring that walks cgroups.
 
-Native export removes that layer for the metrics `slurmctld` already knows:
-queue depth, job states, node states, scheduler cycle timing.
+The standard way to attribute a process — or a GPU, or an InfiniBand counter —
+back to a Slurm job is to walk `/sys/fs/cgroup/.../slurm/uid_*/job_*/` and match
+PIDs. Every job-aware exporter I know of does some version of this. In 26.05 that
+path is keyed by SLUID, not JobId, so anything parsing a job ID out of the
+directory name gets a value that is not a job ID.
 
-What it does *not* give you is correlation with anything below the scheduler.
-`slurmctld` knows a job is running on 8 nodes; it does not know that those nodes
-are burning retries on `mlx5_0` and that's why the all-reduce is slow. That
-still needs a node-local exporter reading cgroups and matching PIDs against
-InfiniBand counters. So this narrows what a custom exporter should do rather
-than eliminating it — which is useful, because the narrower version is the part
-that was actually load-bearing.
+It will not error. It will return the wrong number, or nothing, and your
+dashboards will go quietly flat.
 
-If you're running a scrape sidecar today, 25.11 is a good moment to check how
-much of it is now redundant.
+I have a direct stake in this one: I have been building a GPU-waste reaper whose
+next milestone is exactly this cgroup walk, and the note above means the
+implementation I sketched is already obsolete for anyone on 26.05. Better to
+learn that from a release note than from a silent regression six months in.
 
-## Expedited requeue
+The API changed underneath it too — `slurm_step_id_t` replaces bare `job_id` in
+calls, so the API can be queried by SLUID. There is a `SLURM_BACKWARD_COMPAT`
+define if you compile against the C API, which is a kindness, but it is a
+deprecation runway rather than a permanent fix.
 
-New `--requeue=expedite` mode for batch jobs. Jobs marked this way automatically
-requeue on node failure, or when the batch script exits non-zero *and* one or
-more Epilog scripts fail. On requeue they're treated as the highest priority job
-in the system, and their previously allocated nodes are prevented from launching
-other work.
+## The good part
 
-That last clause is the interesting one. It's not just a priority boost — it's a
-soft reservation on the nodes the job was already on, which is what you want for
-a long training run that died at hour 40 and would otherwise have to re-queue
-behind everything that accumulated while it ran.
+26.05 expands the openmetrics endpoints with **GPU allocation statistics**.
 
-The Epilog condition is the part I'd read twice before enabling it broadly. A
-failing Epilog is often how you find out a node is sick. Coupling "Epilog
-failed" to "requeue at top priority, and hold those nodes" means a genuinely bad
-node can hold an expedited job in a loop. If you enable this, the node health
-check in your Epilog needs to drain decisively rather than just exit non-zero.
+25.11 added native Prometheus export from `slurmctld` — queue depth, job states,
+node states, scheduler cycle timing. Useful, and it kills the fragile
+shell-out-to-`sinfo`-and-parse sidecar that a lot of sites still run.
 
-## The rest of the list
+26.05 adds GPU allocation to that. Which matters more than it sounds, because
+"how many GPUs are allocated" and "how many GPUs are doing work" are different
+questions and the gap between them is where cluster money goes. Native export
+answers the first for free. The second still needs someone reading NVML, but
+having the denominator without deploying anything is a real improvement.
 
-Worth knowing, less likely to change your plan:
+Also in 26.05: `srun --async`, which queues step processes through stepmgr
+instead of requiring you to keep hundreds of backgrounded `srun` processes
+alive. If you have ever watched a workflow tool fork a thousand `srun`s and then
+watched the login node fall over, this is for you. Plus dynamic memory resizing
+— a running job can hand memory back via `scontrol update`, with
+`sbatch --mem-update=<margin>@<delay>` to automate it — and new `topology/ring`
+and `topology/torus3d` plugins.
 
-| Change | Why it matters |
-| --- | --- |
-| Hierarchical Resources Mode 3 | Sums usage from lower levels automatically |
-| `SlurmctldParameters=enable_async_reply` | Experimental; offloads RPC replies to the kernel to free worker threads |
-| Reservation `AllowQOS` / `AllowPartition` | Finer reservation access control |
-| `JobCompPassScript`, `StoragePassScript` | Password rotation without a config edit |
-| `MaxPurgeLimit`, `DisableArchiveCommands` in `slurmdbd.conf` | Bounds purge blast radius |
-| `squeue --running-over` / `--running-under` | Time filters — useful for finding stuck jobs |
-| `--consolidate-segments` / `--spread-segments` | Segment placement control on salloc/sbatch/srun |
-| `node_features/knl_generic` | **Removed.** Only matters if you still run Knights Landing |
-| v0.0.41 REST endpoints | **Deprecated**, removal planned for 26.05 |
+25.11's headline was **expedited requeue**: `--requeue=expedite` puts a job that
+died to node failure straight back at the top of the queue, and holds its
+previous nodes so nothing else grabs them. For a training run that fell over at
+hour 40, that is the difference between restarting now and restarting behind
+everything that queued up while it ran.
 
-That last row is the one with a clock on it. If anything you own talks to the
-Slurm REST API — a dashboard, a submission portal, a CI integration — check
-which version it pins. Deprecated in 25.11, gone in 26.05, and 26.05 is the
-release after next.
+One caution on it. Expedited requeue also triggers when the batch script exits
+non-zero *and* an Epilog fails. But a failing Epilog is frequently how you learn
+a node is sick. Wire "Epilog failed" to "requeue at top priority and hold those
+nodes" and a genuinely bad node can pin an expedited job in a loop. If you turn
+this on, your Epilog health check needs to drain decisively, not just exit
+non-zero.
 
-## What I'm actually doing with this
+## Which one
 
-Upgrade order for a single-controller cluster is unchanged: `slurmdbd` first,
-then `slurmctld`, then `slurmd` across the fleet, and never a compute node ahead
-of the controller. With 250 nodes the `slurmd` roll is the long pole, and it's
-the part that tolerates being done in batches.
+For this cluster, 26.05.
 
-My plan, in the order I'll do it:
+The upgrade path is the same length either way — one hop from 25.05 — and taking
+25.11 means doing the whole exercise again in a few months to get to a release
+that is already out. The 250-node `slurmd` roll is the expensive part, and it
+costs the same whichever target you pick. Paying it twice for no reason is the
+easiest mistake to avoid here.
 
-1. `grep` the config for `JobContainerType` and every removed parameter.
-2. Audit anything speaking REST for a v0.0.41 pin.
-3. Back up `slurmdbd` before touching it. The database migration is the step
-   with no easy undo.
-4. Upgrade `slurmdbd`, verify, then `slurmctld`.
-5. Roll `slurmd` in batches, draining ahead of each.
-6. Only then look at native OpenMetrics and expedited requeue — new features go
-   in after the version move is stable, not during it.
+The argument against is real, though: 25.11 has had eight point releases and
+26.05 has had two. If your cluster is the one people ship from and you cannot
+tolerate being an early adopter of a `.2`, take 25.11 now and 26.05 in six
+months. That is a legitimate risk call, not a cop-out — it just costs you two
+change windows.
 
-I'm writing that plan up properly, with the node-batching and rollback
-triggers, as a separate repo.
+What I would not do is default to 25.11 because it was the plan before I looked.
 
-## Caveat
+## Order of operations
 
-This is a reading of the release notes and an upgrade plan, not a report from
-the other side of one. I have not yet run 25.05 → 25.11 on the 250-node cluster.
-When I do, the interesting content will be the difference between this plan and
-what actually happened — which is usually where the real post is.
+Nothing exotic, and unchanged across both versions:
 
-If you've already made this move, I'd like to know what bit you.
+1. `grep` the config for `JobContainerType`, `ExclusiveUser`, `ExclusiveTopo`.
+2. Audit anything talking REST for a pinned API version. v0.0.41 is gone in
+   26.05; v0.0.42 is deprecated there and goes in 26.11.
+3. **Audit anything walking cgroups.** This is the new one, and it is the one
+   that fails silently.
+4. Back up `slurmdbd`. The database migration is the step with no easy undo, and
+   it is the step people skip because it has always worked before.
+5. `slurmdbd` → verify → `slurmctld` → verify.
+6. Roll `slurmd` in batches, draining ahead of each. Never a compute node ahead
+   of the controller.
+7. New features *after* the version move is stable. Expedited requeue and the
+   GPU metrics endpoints are not part of the upgrade; they are the next change.
 
-**Sources:** [Slurm 25.11.0 announcement](https://www.schedmd.com/slurm-version-25-11-0-is-now-available/) ·
-[RELEASE_NOTES.md at slurm-25.11](https://github.com/SchedMD/slurm/blob/slurm-25.11/RELEASE_NOTES.md) ·
+I am writing that up properly — node batching, rollback triggers, the actual
+runbook — as its own repo.
+
+## What this is and isn't
+
+This is release notes plus a decision, not a war story. I have not run 25.05 →
+26.05 on 250 nodes yet. When I do, the useful post is the delta between this
+plan and what actually happened, because that gap is where the real content
+always is.
+
+If you have already made either hop, I would like to know what bit you —
+particularly whether the cgroup change broke anything you did not expect.
+
+**Sources:** [Slurm 26.05 release notes](https://slurm.schedmd.com/release_notes.html) ·
+[26.05 RELEASE_NOTES.md](https://github.com/SchedMD/slurm/blob/slurm-26.05/RELEASE_NOTES.md) ·
+[25.11 RELEASE_NOTES.md](https://github.com/SchedMD/slurm/blob/slurm-25.11/RELEASE_NOTES.md) ·
+[26.05.2 / 25.11.7 announcement](https://lists.schedmd.com/mailman3/hyperkitty/list/slurm-users@lists.schedmd.com/message/RBO6LEZNM754W22473U3XW643OEPPVS6/) ·
 [Upgrade guide](https://slurm.schedmd.com/upgrades.html)

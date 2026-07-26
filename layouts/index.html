@@ -68,7 +68,7 @@
     <div class="home-primary">
       {{- if $latestBlog }}
       <section class="home-section">
-        <h2 class="home-heading">Featured Writing</h2>
+        <h2 class="home-heading">ls ./writing --featured</h2>
         {{- range $latestBlog }}
         <article class="feature-story">
           <p class="feature-meta">{{ .Date.Format "January 2006" }} · blog · {{ .ReadingTime }} min read</p>
@@ -84,7 +84,7 @@
 
       {{- if $latestExp }}
       <section class="home-section">
-        <h2 class="home-heading">Recent Lab Notes</h2>
+        <h2 class="home-heading">tail ./lab-notes</h2>
         <ul class="post-list post-list-compact">
           {{- range $latestExp }}
           <li>
@@ -99,7 +99,7 @@
 
       {{- if $latestNotes }}
       <section class="home-section">
-        <h2 class="home-heading">Notes</h2>
+        <h2 class="home-heading">cat ./notes</h2>
         <ul class="post-list post-list-compact">
           {{- range $latestNotes }}
           <li>
@@ -116,7 +116,7 @@
     {{- if $projects }}
     <aside class="home-secondary">
       <section class="home-section">
-        <h2 class="home-heading">Projects</h2>
+        <h2 class="home-heading">ls ./projects</h2>
         <ul class="project-list-simple">
           {{- range sort $projects "Weight" }}
           <li>
@@ -124,6 +124,11 @@
             <span class="post-meta-inline">{{ .Params.status | default "In Progress" }}</span>
             {{- with .Description }}
             <p class="project-oneliner">{{ . }}</p>
+            {{- end }}
+            {{- with .Params.tags }}
+            <p class="project-tags">
+              {{- range first 4 . }}<span class="tag">{{ . }}</span>{{ end }}
+            </p>
             {{- end }}
             {{- with .Params.repo }}
             <p class="project-repo"><a href="{{ . }}">Source →</a></p>
