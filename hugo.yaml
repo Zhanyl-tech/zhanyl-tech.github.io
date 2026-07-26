@@ -49,8 +49,8 @@ params:
 
   label:
     text: "Zhanyl Abdybaeva"
-    icon: /favicon.ico
-    iconHeight: 35
+    icon: /images/logo.svg
+    iconHeight: 30
 
   # Profile mode — used by custom index.html for avatar + bio
   profileMode:

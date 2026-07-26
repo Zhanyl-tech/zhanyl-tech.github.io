@@ -14,6 +14,26 @@
 {{- $lastPublished := "" }}
 {{- with first 1 $written }}{{ range . }}{{ $lastPublished = .Date }}{{ end }}{{ end }}
 
+{{/* Scattered notation behind the homepage. Each glyph is one this work
+     actually runs on — σ volatility, Σ covariance, ∂ the Greeks, ∇ gradient,
+     dW the Brownian increment. Purely decorative, so aria-hidden; sizes and
+     hues vary per glyph and the whole layer sits at very low opacity behind
+     the content. Homepage only. */}}
+<div class="glyph-field" aria-hidden="true">
+  <span style="--x:  4%; --y:  8%; --s: 190px; --c: var(--gl-amber);  --r: -8deg">∞</span>
+  <span style="--x: 88%; --y:  5%; --s: 120px; --c: var(--gl-blue);   --r: 12deg">σ</span>
+  <span style="--x: 72%; --y: 22%; --s:  74px; --c: var(--gl-violet); --r: -5deg">Σ</span>
+  <span style="--x: 13%; --y: 34%; --s:  96px; --c: var(--gl-cyan);   --r: 7deg">∂</span>
+  <span style="--x: 92%; --y: 46%; --s: 150px; --c: var(--gl-green);  --r: -10deg">∇</span>
+  <span style="--x: 34%; --y: 58%; --s:  62px; --c: var(--gl-amber);  --r: 4deg">dW</span>
+  <span style="--x:  6%; --y: 66%; --s: 128px; --c: var(--gl-violet); --r: -14deg">λ</span>
+  <span style="--x: 79%; --y: 71%; --s:  88px; --c: var(--gl-blue);   --r: 9deg">∫</span>
+  <span style="--x: 50%; --y: 84%; --s: 104px; --c: var(--gl-cyan);   --r: -6deg">Δ</span>
+  <span style="--x: 21%; --y: 92%; --s:  70px; --c: var(--gl-green);  --r: 11deg">μ</span>
+  <span style="--x: 63%; --y: 96%; --s: 116px; --c: var(--gl-amber);  --r: -9deg">ρ</span>
+  <span style="--x: 41%; --y: 15%; --s:  58px; --c: var(--gl-violet); --r: 15deg">θ</span>
+</div>
+
 <div class="home-wrap">
 
   <section class="hero">
