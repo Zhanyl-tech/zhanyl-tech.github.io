@@ -12,17 +12,20 @@
   --font-sans:  'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono:  'JetBrains Mono', 'SF Mono', Menlo, monospace;
 
-  --bg:        #0d1117;
-  --bg-raised: #11171f;
-  --bg-code:   #0b0f14;
+  /* Lifted off near-black. #0d1117 read as a void on large displays; this
+     keeps the dark register but gives the page a surface. Rules and code
+     surfaces move with it so the contrast steps stay even. */
+  --bg:        #141a23;
+  --bg-raised: #1a212b;
+  --bg-code:   #0f151d;
 
-  --ink:       #e6edf3;
-  --ink-2:     #a8b3bf;
-  --ink-3:     #7d8590;
-  --ink-4:     #56606b;
+  --ink:       #e9eff5;
+  --ink-2:     #adb8c4;
+  --ink-3:     #828c98;
+  --ink-4:     #7d8894;
 
-  --rule:      #21262d;
-  --rule-2:    #30363d;
+  --rule:      #262d38;
+  --rule-2:    #363e4a;
 
   --accent:    #58a6ff;
   --accent-2:  #79c0ff;
@@ -39,15 +42,15 @@
    declaration loses; setting the variable it reads is what actually holds.
    Same reasoning for the theme surface variables below. */
 :root, .dark, html.dark, body.dark {
-  --code-block-bg: #0b0f14;
-  --code-bg: rgba(110, 118, 129, .22);
-  --theme: #0d1117;
-  --entry: #11171f;
-  --primary: #e6edf3;
-  --secondary: #a8b3bf;
-  --tertiary: #21262d;
-  --content: #a8b3bf;
-  --border: #21262d;
+  --code-block-bg: #0f151d;
+  --code-bg: rgba(125, 133, 146, .20);
+  --theme: #141a23;
+  --entry: #1a212b;
+  --primary: #e9eff5;
+  --secondary: #adb8c4;
+  --tertiary: #262d38;
+  --content: #adb8c4;
+  --border: #262d38;
   --radius: 5px;
 }
 
@@ -97,7 +100,7 @@ a:hover { color: var(--accent-2); }
 
 /* ── Header ───────────────────────────────────────────────────── */
 .header {
-  background: rgba(13, 17, 23, 0.86);
+  background: rgba(20, 26, 35, 0.88);
   backdrop-filter: saturate(150%) blur(12px);
   -webkit-backdrop-filter: saturate(150%) blur(12px);
   border-bottom: 1px solid var(--rule);
