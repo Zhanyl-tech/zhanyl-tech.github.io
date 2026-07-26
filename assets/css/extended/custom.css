@@ -1,70 +1,88 @@
 /* ================================================================
-   DESIGN — zhanyl-tech.github.io
-   Principle: content is the design. Everything else gets out of the way.
+   zhanyl-tech.github.io
+
+   Editorial base, systems detailing. Serif display and Inter prose so
+   3000-word pieces stay readable; monospace reserved for the things that
+   are literally machine output — metadata, project listings, metrics,
+   code. The mono is a signal, not the substrate.
    ================================================================ */
 
 :root {
-  --font-serif: 'Lora', Georgia, serif;
+  --font-serif: 'Instrument Serif', 'Lora', Georgia, serif;
   --font-sans:  'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-mono:  'JetBrains Mono', 'Fira Code', monospace;
+  --font-mono:  'JetBrains Mono', 'SF Mono', Menlo, monospace;
 
-  --page-bg:    #e8e0e6;
-  --theme:      var(--page-bg);
-  --bg:         #fcfcfb;
-  --bg-code:    #f5f5f3;
-  --text:       #111114;
-  --text-2:     #57575c;
-  --text-3:     #8e8e95;
-  --link:       #1d4ed8;
-  --link-h:     #1e40af;
-  --rule:       #e7e7eb;
-  --rule-light: #f0f1f4;
-  --accent:     #dde7ff;
-  --w:          760px;
+  --bg:        #0d1117;
+  --bg-raised: #11171f;
+  --bg-code:   #0b0f14;
+
+  --ink:       #e6edf3;
+  --ink-2:     #a8b3bf;
+  --ink-3:     #7d8590;
+  --ink-4:     #56606b;
+
+  --rule:      #21262d;
+  --rule-2:    #30363d;
+
+  --accent:    #58a6ff;
+  --accent-2:  #79c0ff;
+  --accent-dim: rgba(88, 166, 255, 0.11);
+  --green:     #3fb950;
+
+  --w:         min(760px, 100% - 44px);
+  --w-wide:    min(1080px, 100% - 44px);
 }
 
-/* ── Base ── */
+/* PaperMod paints code blocks via
+   `.post-content .highlight:not(table) { background: var(--code-block-bg) !important }`.
+   That selector outranks a plain `.post-content .highlight`, so overriding the
+   declaration loses; setting the variable it reads is what actually holds.
+   Same reasoning for the theme surface variables below. */
+:root, .dark, html.dark, body.dark {
+  --code-block-bg: #0b0f14;
+  --code-bg: rgba(110, 118, 129, .22);
+  --theme: #0d1117;
+  --entry: #11171f;
+  --primary: #e6edf3;
+  --secondary: #a8b3bf;
+  --tertiary: #21262d;
+  --content: #a8b3bf;
+  --border: #21262d;
+  --radius: 5px;
+}
+
+/* PaperMod ships a light theme and hardcodes a lot of it. Neutralise the
+   surfaces first, then build on top. */
 html, body {
-  background: #e7ebf8 !important;
+  background: var(--bg) !important;
+  color: var(--ink);
 }
 
 body {
   font-family: var(--font-sans);
-  font-size: 17px;
-  line-height: 1.7;
-  color: var(--text);
+  font-size: 16.5px;
+  line-height: 1.72;
+  font-weight: 400;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Kill every PaperMod white-background override */
-.list,
-.main,
-.post-entry,
-.post-single,
-article,
-.paginav,
-.toc,
-footer,
-.footer,
-.page-header,
-#page-header {
+.list, .main, .post-entry, .post-single, article, .paginav,
+.toc, footer, .footer, .page-header, #page-header, .entry-content {
   background: transparent !important;
+  color: inherit;
 }
 
-/* Content area — warm white card so text is readable on the tinted bg */
-.post-single .post-content,
-.post-entry {
-  background: rgba(255,255,255,0.70) !important;
-  border-radius: 12px;
-  padding: 28px 32px;
-}
+::selection { background: var(--accent-dim); color: var(--accent-2); }
 
-a { color: var(--link); text-decoration: none; }
-a:hover { color: var(--link-h); }
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: var(--accent-2); }
 
-/* ── Nav ── */
+/* ── Header ───────────────────────────────────────────────────── */
 .header {
-  background: #ffffff;
+  background: rgba(13, 17, 23, 0.86);
+  backdrop-filter: saturate(150%) blur(12px);
+  -webkit-backdrop-filter: saturate(150%) blur(12px);
   border-bottom: 1px solid var(--rule);
   position: sticky;
   top: 0;
@@ -72,595 +90,716 @@ a:hover { color: var(--link-h); }
 }
 
 .nav {
-  max-width: var(--w);
+  max-width: var(--w-wide);
   margin: 0 auto;
-  padding: 14px 24px;
+  padding: 15px 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 24px;
 }
 
 .nav .logo, .nav .logo a {
-  font-family: var(--font-serif);
-  font-size: 15px;
+  font-family: var(--font-sans);
+  font-size: 13px;
   font-weight: 600;
-  color: var(--text) !important;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink) !important;
   text-decoration: none !important;
-  letter-spacing: -0.15px;
 }
 
 #menu {
   display: flex;
-  gap: 4px;
+  gap: 2px;
   list-style: none;
   margin: 0;
   padding: 0;
+  flex-wrap: wrap;
 }
 
 #menu li a {
-  font-size: 14px;
+  font-size: 13.5px;
   font-weight: 400;
-  color: var(--text-2);
-  padding: 4px 8px;
-  border-radius: 4px;
-  transition: color 0.1s;
+  color: var(--ink-3);
+  padding: 5px 10px;
+  border-radius: 5px;
+  transition: color .12s, background .12s;
 }
 
-#menu li a:hover { color: var(--text); }
+#menu li a:hover { color: var(--ink); background: rgba(255,255,255,.045); }
+#menu .active { color: var(--ink) !important; }
 
 #theme-toggle { display: none; }
 
-/* ── Homepage ── */
+/* ── Homepage ─────────────────────────────────────────────────── */
 .home-wrap {
-  max-width: var(--w);
+  max-width: var(--w-wide);
   margin: 0 auto;
-  padding: 72px 24px 88px;
+  padding: 78px 0 92px;
 }
 
-/* Hero */
-.hero {
-  margin-bottom: 58px;
-  max-width: 700px;
-}
+.hero { margin-bottom: 42px; }
 
 .hero-kicker,
 .list-kicker {
   font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 500;
+  letter-spacing: 0.19em;
   text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: var(--text-3);
-  margin: 0 0 12px;
+  color: var(--ink-4);
+  margin: 0 0 20px;
 }
 
 .hero-title {
   font-family: var(--font-serif);
-  font-size: 42px;
-  line-height: 1.12;
-  letter-spacing: -0.7px;
-  margin: 0 0 20px;
-  color: var(--text);
-  max-width: 12ch;
+  font-size: clamp(40px, 6.4vw, 68px);
+  font-weight: 400;
+  line-height: 1.04;
+  letter-spacing: -0.021em;
+  color: var(--ink);
+  max-width: 15ch;
+  margin: 0 0 26px;
 }
 
-.hero-copy {
-  max-width: 660px;
+/* The one italic accent word. Restraint is what makes it read as editorial
+   rather than decorative. */
+.hero-title em {
+  font-style: italic;
+  color: var(--accent);
 }
+
+.hero-copy { max-width: 62ch; }
 
 .hero-copy p {
   font-size: 17px;
-  line-height: 1.78;
-  color: var(--text);
-  margin: 0 0 14px;
+  line-height: 1.68;
+  color: var(--ink-2);
+  font-weight: 300;
+  margin: 0 0 15px;
 }
 
-.hero-copy a { border-bottom: 1px solid var(--rule); }
-.hero-copy a:hover { border-bottom-color: var(--link); }
+.hero-copy strong { color: var(--ink); font-weight: 600; }
 
 .hero-links {
-  margin: 18px 0 0;
-  font-size: 14px;
-  color: var(--text-2);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 22px;
+  margin: 30px 0 0;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
 }
 
 .hero-links a {
-  color: var(--text-2);
-  margin-right: 16px;
-  font-weight: 500;
+  color: var(--ink-3);
+  border-bottom: 1px solid transparent;
+  padding-bottom: 2px;
+  transition: color .12s, border-color .12s;
 }
 
-.hero-links a:hover { color: var(--link); }
+.hero-links a:hover { color: var(--accent); border-bottom-color: var(--accent); }
 
-.home-grid {
+/* ── Facts strip ──────────────────────────────────────────────── */
+/* Deliberately qualitative rather than vanity metrics — nothing here is a
+   number I would have to defend in an interview. */
+.facts {
   display: grid;
-  grid-template-columns: minmax(0, 1.55fr) minmax(280px, 1fr);
-  gap: 56px;
-  align-items: start;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  margin: 0 0 54px;
+  overflow: hidden;
 }
 
-.home-primary,
-.home-secondary {
-  min-width: 0;
-}
+.fact { background: var(--bg); padding: 17px 19px; }
 
-/* Section heading */
-.home-heading {
-  font-family: var(--font-serif);
-  font-size: 20px;
-  font-weight: 600;
-  color: var(--text);
-  margin: 0 0 14px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--rule);
-  letter-spacing: -0.2px;
-}
-
-/* Home section spacing */
-.home-section { margin-bottom: 48px; }
-
-/* ── Post list (homepage + list pages) ── */
-.post-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.post-list li {
-  padding: 10px 0;
-  border-bottom: 1px solid var(--rule-light);
-}
-
-.post-list li:last-child { border-bottom: none; }
-
-.post-list li > a {
-  font-size: 16px;
-  font-weight: 500;
-  color: var(--text);
-  border: none;
-  transition: color 0.1s;
-}
-
-.post-list li > a:hover { color: var(--link); }
-
-.post-meta-inline {
-  font-size: 13px;
-  color: var(--text-3);
-  margin-left: 8px;
-}
-
-.post-summary {
-  font-size: 14px;
-  color: var(--text-2);
-  line-height: 1.55;
-  margin: 6px 0 0;
-}
-
-.post-list-compact li {
-  padding: 9px 0;
-}
-
-/* ── Project list (homepage) ── */
-.project-list-simple {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.project-list-simple li {
-  padding: 12px 0;
-  border-bottom: 1px solid var(--rule-light);
-}
-
-.project-list-simple li:last-child { border-bottom: none; }
-
-.project-list-simple li > a {
-  font-size: 15.5px;
-  font-weight: 500;
-  color: var(--text);
-  border: none;
-  transition: color 0.1s;
-}
-
-.project-list-simple li > a:hover { color: var(--link); }
-
-.project-oneliner {
-  font-size: 14px;
-  color: var(--text-2);
-  line-height: 1.55;
-  margin: 6px 0 0;
-  max-width: 100%;
-}
-
-.feature-story {
-  padding: 4px 0 2px;
-}
-
-.feature-meta {
+.fact-label {
   font-family: var(--font-mono);
-  font-size: 11.5px;
+  font-size: 10px;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--text-3);
-  margin: 0 0 10px;
+  color: var(--ink-4);
+  margin: 0 0 7px;
 }
 
-.feature-story h3 {
-  font-family: var(--font-serif);
-  font-size: 30px;
-  line-height: 1.22;
-  letter-spacing: -0.45px;
-  margin: 0 0 12px;
-}
-
-.feature-story h3 a {
-  color: var(--text);
-}
-
-.feature-story h3 a:hover {
-  color: var(--link);
-}
-
-.feature-story p:last-child {
-  font-size: 16px;
-  color: var(--text-2);
-  line-height: 1.7;
+.fact-value {
+  font-size: 13.5px;
+  color: var(--ink);
+  line-height: 1.45;
   margin: 0;
 }
 
-/* ── List pages ── */
-.list-wrap {
-  max-width: var(--w);
-  margin: 0 auto;
-  padding: 52px 24px 80px;
-}
+.fact-value .dim { color: var(--ink-3); }
 
-.list-header { margin-bottom: 36px; }
-
-.list-header h1 {
-  font-family: var(--font-serif);
-  font-size: 34px;
-  font-weight: 600;
-  color: var(--text);
-  margin: 0 0 8px;
-  letter-spacing: -0.45px;
-}
-
-.list-desc {
-  font-size: 15px;
-  color: var(--text-2);
-  margin: 0;
-  line-height: 1.6;
-}
-
-.empty {
-  color: var(--text-3);
-  font-style: italic;
-  font-size: 15px;
-}
-
-/* ── Article ── */
-article.post-single { max-width: var(--w); }
-
-.post-header {
-  margin-bottom: 36px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid var(--rule);
-}
-
-.post-title {
-  font-family: var(--font-serif);
-  font-size: 36px;
-  font-weight: 600;
-  line-height: 1.3;
-  color: var(--text);
-  letter-spacing: -0.45px;
-  margin: 0 0 12px;
-}
-
-.post-meta {
-  font-family: var(--font-mono);
-  font-size: 13px;
-  color: var(--text-3);
-}
-
-.post-meta .post-author { display: none; }
-
-.post-content {
-  font-size: 17px;
-  line-height: 1.8;
-}
-
-.post-content h2 {
-  font-family: var(--font-serif);
-  font-size: 24px;
-  font-weight: 600;
-  margin: 2em 0 0.7em;
-  letter-spacing: -0.28px;
-}
-
-.post-content h3 {
-  font-family: var(--font-sans);
-  font-size: 18px;
-  font-weight: 600;
-  margin: 1.8em 0 0.5em;
-}
-
-.post-content h4 {
-  font-size: 15px;
-  font-weight: 600;
-  margin: 1.6em 0 0.5em;
-}
-
-.post-content a {
-  color: var(--link);
-  border-bottom: 1px solid var(--rule);
-  transition: border-color 0.1s;
-}
-
-.post-content a:hover { border-bottom-color: var(--link); }
-
-.post-content blockquote {
-  margin: 24px 0;
-  padding: 0 0 0 16px;
-  border-left: 3px solid var(--rule);
-  color: var(--text-2);
-  font-style: italic;
-}
-
-.post-content blockquote p { margin: 0; }
-
-.post-content ul, .post-content ol { padding-left: 1.4em; }
-.post-content li { margin-bottom: 0.25em; }
-
-/* Tables */
-.post-content table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 14.5px;
-  margin: 24px 0;
-}
-
-.post-content th {
-  text-align: left;
-  font-weight: 600;
-  padding: 8px 12px;
-  border-bottom: 2px solid var(--rule);
-  font-size: 13px;
-  color: var(--text-2);
-}
-
-.post-content td {
-  padding: 8px 12px;
-  border-bottom: 1px solid var(--rule-light);
-  vertical-align: top;
-}
-
-/* Code */
-code {
-  font-family: var(--font-mono);
-  font-size: 0.88em;
-  background: var(--bg-code);
-  padding: 2px 5px;
-  border-radius: 3px;
-}
-
-pre {
-  font-family: var(--font-mono) !important;
-  font-size: 13.5px !important;
-  background: var(--bg-code) !important;
-  border: 1px solid var(--rule) !important;
-  border-radius: 6px !important;
-  padding: 18px 20px !important;
-  overflow-x: auto;
-  line-height: 1.6 !important;
-  margin: 24px 0 !important;
-}
-
-pre code {
-  background: none !important;
-  padding: 0 !important;
-  border: none !important;
-}
-
-.copy-code {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  background: var(--bg);
-  border: 1px solid var(--rule);
-  color: var(--text-3);
-  border-radius: 3px;
-  padding: 2px 7px;
-  cursor: pointer;
-}
-
-.copy-code:hover { color: var(--text-2); }
-
-/* TOC */
-.toc {
-  font-size: 14px;
-  border: 1px solid var(--rule);
-  border-radius: 6px;
-  padding: 14px 18px;
-  background: var(--bg-code);
-  margin: 0 0 32px;
-}
-
-.toc details summary {
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  color: var(--text-2);
-  list-style: none;
-}
-
-.toc ul { margin: 8px 0 0; padding-left: 16px; }
-.toc li { margin: 4px 0; }
-.toc a { color: var(--text-2); font-size: 13.5px; }
-.toc a:hover { color: var(--link); }
-
-/* Tags */
-.post-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 6px;
-}
-
-.post-tags a {
-  font-size: 12px;
-  color: var(--text-3);
-  background: var(--bg-code);
-  padding: 2px 8px;
-  border-radius: 3px;
-  border: none;
-}
-
-.post-tags a:hover { color: var(--link); }
-
-/* Breadcrumbs */
-.breadcrumbs {
-  font-size: 13px;
-  color: var(--text-3);
-  margin-bottom: 16px;
-}
-
-.breadcrumbs a { color: var(--text-3); }
-.breadcrumbs a:hover { color: var(--text-2); }
-
-/* Post nav */
-.paginav {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  margin-top: 48px;
-  padding-top: 20px;
-  border-top: 1px solid var(--rule);
-}
-
-.paginav a { font-size: 14px; color: var(--text-2); max-width: 48%; }
-.paginav a:hover { color: var(--link); }
-.paginav .title { font-weight: 600; color: var(--text); font-size: 14.5px; display: block; }
-
-/* Cover image */
-.post-cover img {
-  width: 100%;
-  border-radius: 6px;
-  margin-bottom: 24px;
-  border: 1px solid var(--rule-light);
-}
-
-/* Footer */
-.footer {
-  border-top: 1px solid var(--rule);
-  padding: 20px 24px;
-  text-align: center;
-  font-size: 12.5px;
-  color: var(--text-3);
-  background: transparent;
-}
-
-.footer a { color: var(--text-3); margin: 0 6px; }
-.footer a:hover { color: var(--text-2); }
-
-/* Kill PaperMod card chrome */
-.post-entry {
-  border: none !important;
-  border-radius: 0 !important;
-  border-bottom: 1px solid var(--rule-light) !important;
-  box-shadow: none !important;
-  padding: 10px 0 !important;
-  margin: 0 !important;
-  background: transparent !important;
-}
-.post-entry:hover { box-shadow: none !important; background: transparent !important; }
-
-/* Search */
-#searchbox {
-  width: 100%;
-  padding: 10px 14px;
-  font-size: 16px;
-  border: 1px solid var(--rule);
-  border-radius: 6px;
-  background: var(--bg);
-  color: var(--text);
-  outline: none;
-  margin-bottom: 24px;
-}
-#searchbox:focus { border-color: var(--link); }
-
-/* ── Cadence strip ──
-   A dated "still alive" signal under the hero. A personal site with no visible
-   rhythm reads as abandoned, however good the writing is. */
+/* ── Cadence ──────────────────────────────────────────────────── */
 .cadence {
   display: flex;
   align-items: center;
   gap: 9px;
   font-family: var(--font-mono);
-  font-size: 12.5px;
-  letter-spacing: 0.2px;
-  color: var(--text-3);
-  margin: 0 0 42px;
-  padding-bottom: 22px;
-  border-bottom: 1px solid var(--rule);
+  font-size: 11.5px;
+  letter-spacing: 0.05em;
+  color: var(--ink-4);
+  margin: 0 0 34px;
 }
 
 .cadence-dot {
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
-  background: #16a34a;
-  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.16);
+  background: var(--green);
+  box-shadow: 0 0 0 3px rgba(63, 185, 80, .14);
   flex-shrink: 0;
 }
 
-/* Nothing published recently — show the date, drop the claim. */
 .cadence-dot-idle {
-  background: var(--text-3);
-  box-shadow: 0 0 0 3px rgba(142, 142, 149, 0.14);
+  background: var(--ink-4);
+  box-shadow: 0 0 0 3px rgba(86, 96, 107, .16);
 }
 
-/* "All deep dives →" links closing each homepage section */
-.section-more {
-  margin: 14px 0 0;
-  font-size: 14px;
+/* ── Layout grid ──────────────────────────────────────────────── */
+.home-grid {
+  display: grid;
+  grid-template-columns: 1.62fr 1fr;
+  gap: 62px;
+  align-items: start;
 }
+
+.home-primary, .home-secondary { min-width: 0; }
+
+.home-heading {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.17em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  margin: 0 0 20px;
+  padding-bottom: 13px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.home-section { margin-bottom: 52px; }
+
+/* ── Featured article ─────────────────────────────────────────── */
+.feature-story {
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 24px;
+  margin-bottom: 24px;
+}
+
+.feature-story:last-of-type { border-bottom: none; }
+
+.feature-meta,
+.post-meta-inline {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 10px;
+}
+
+.feature-story h3 {
+  font-family: var(--font-serif);
+  font-size: 27px;
+  font-weight: 400;
+  line-height: 1.22;
+  letter-spacing: -0.012em;
+  margin: 0 0 10px;
+}
+
+.feature-story h3 a { color: var(--ink); }
+.feature-story h3 a:hover { color: var(--accent); }
+
+.feature-story p {
+  font-size: 14.5px;
+  color: var(--ink-3);
+  line-height: 1.62;
+  margin: 0;
+}
+
+/* ── Compact lists ────────────────────────────────────────────── */
+.post-list { list-style: none; margin: 0; padding: 0; }
+
+.post-list li {
+  padding: 11px 0;
+  border-bottom: 1px solid var(--rule);
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+}
+
+.post-list li:last-child { border-bottom: none; }
+
+.post-list li > a {
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--ink-2);
+  border: none;
+  transition: color .12s;
+}
+
+.post-list li > a:hover { color: var(--accent); }
+
+.post-meta-inline {
+  margin: 0;
+  flex-shrink: 0;
+  color: var(--ink-4);
+  text-transform: none;
+  letter-spacing: 0.06em;
+}
+
+.section-more { margin: 16px 0 0; }
 
 .section-more a {
-  color: var(--text-2);
-  border-bottom: 1px solid transparent;
-  transition: color 0.1s, border-color 0.1s;
-}
-
-.section-more a:hover {
-  color: var(--link);
-  border-bottom-color: var(--link);
-}
-
-/* Source link on project cards */
-.project-repo {
-  margin: 6px 0 0;
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 11.5px;
+  color: var(--ink-3);
+  letter-spacing: 0.05em;
 }
 
-.project-repo a { color: var(--text-3); }
-.project-repo a:hover { color: var(--link); }
+.section-more a:hover { color: var(--accent); }
 
-/* Mobile */
+/* ── Project cards ────────────────────────────────────────────── */
+/* The one place the terminal register takes over completely. */
+.project-list-simple { list-style: none; margin: 0; padding: 0; }
+
+.project-list-simple li {
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 16px 17px;
+  margin-bottom: 11px;
+  transition: border-color .14s, background .14s;
+}
+
+.project-list-simple li:hover {
+  border-color: var(--rule-2);
+  background: rgba(88, 166, 255, .022);
+}
+
+.project-list-simple li > a {
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--ink);
+  display: block;
+  margin-bottom: 4px;
+}
+
+.project-list-simple li > a:hover { color: var(--accent); }
+
+.project-list-simple .post-meta-inline {
+  display: inline-block;
+  font-size: 9.5px;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  border: 1px solid var(--rule-2);
+  border-radius: 2px;
+  padding: 1px 6px;
+  margin-bottom: 9px;
+}
+
+.project-oneliner {
+  font-size: 13px;
+  color: var(--ink-3);
+  line-height: 1.58;
+  margin: 0;
+}
+
+.project-repo {
+  margin: 10px 0 0;
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.project-repo a { color: var(--ink-4); }
+.project-repo a:hover { color: var(--accent); }
+
+/* ── List pages ───────────────────────────────────────────────── */
+.list-wrap, .page-header, .post-header {
+  max-width: var(--w);
+  margin: 0 auto;
+}
+
+.list-wrap { padding: 66px 0 84px; }
+
+.page-header, .post-header { padding-top: 58px; }
+
+.page-header h1, .list-header h1 {
+  font-family: var(--font-serif);
+  font-size: 40px;
+  font-weight: 400;
+  letter-spacing: -0.018em;
+  color: var(--ink);
+  margin: 0 0 12px;
+}
+
+.page-header .post-description {
+  font-size: 15.5px;
+  color: var(--ink-3);
+  line-height: 1.66;
+  font-weight: 300;
+  max-width: 62ch;
+}
+
+/* PaperMod's own list entries, for sections rendered by the theme. */
+.post-entry {
+  border-bottom: 1px solid var(--rule);
+  border-radius: 0;
+  padding: 24px 0 !important;
+  transition: none;
+}
+
+.post-entry:hover { transform: none; }
+.post-entry .entry-header h2 {
+  font-family: var(--font-serif);
+  font-size: 25px;
+  font-weight: 400;
+  line-height: 1.25;
+  color: var(--ink);
+}
+.post-entry:hover .entry-header h2 { color: var(--accent); }
+.post-entry .entry-content {
+  font-size: 14.5px;
+  color: var(--ink-3);
+  line-height: 1.62;
+}
+.post-entry .entry-footer {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+}
+
+/* ── Single post ──────────────────────────────────────────────── */
+.post-single { max-width: var(--w); margin: 0 auto; }
+
+.post-title {
+  font-family: var(--font-serif);
+  font-size: clamp(32px, 5vw, 46px);
+  font-weight: 400;
+  line-height: 1.13;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  margin: 0 0 16px;
+}
+
+.post-description {
+  font-size: 17px;
+  color: var(--ink-2);
+  font-weight: 300;
+  line-height: 1.62;
+  margin-bottom: 18px;
+}
+
+.post-meta, .breadcrumbs {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+}
+
+.post-meta a, .breadcrumbs a { color: var(--ink-4); }
+
+.post-single .post-content {
+  background: transparent !important;
+  padding: 0;
+  border-radius: 0;
+  margin-top: 38px;
+  font-size: 16.5px;
+  color: var(--ink-2);
+}
+
+.post-content p { margin: 0 0 21px; line-height: 1.78; }
+.post-content strong { color: var(--ink); font-weight: 600; }
+.post-content em { color: var(--ink-2); }
+
+.post-content h2 {
+  font-family: var(--font-serif);
+  font-size: 29px;
+  font-weight: 400;
+  letter-spacing: -0.014em;
+  color: var(--ink);
+  margin: 48px 0 16px;
+  padding-top: 8px;
+}
+
+.post-content h3 {
+  font-size: 17.5px;
+  font-weight: 600;
+  color: var(--ink);
+  margin: 34px 0 12px;
+  letter-spacing: -0.005em;
+}
+
+.post-content h4 {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 28px 0 10px;
+}
+
+.post-content a {
+  color: var(--accent);
+  border-bottom: 1px solid rgba(88, 166, 255, .3);
+  transition: border-color .12s;
+}
+.post-content a:hover { border-bottom-color: var(--accent); }
+
+.post-content ul, .post-content ol { margin: 0 0 21px; padding-left: 22px; }
+.post-content li { margin-bottom: 8px; line-height: 1.74; }
+.post-content li::marker { color: var(--ink-4); }
+
+.post-content blockquote {
+  border-left: 2px solid var(--accent);
+  background: rgba(88, 166, 255, .04);
+  margin: 26px 0;
+  padding: 4px 22px;
+  font-style: normal;
+  color: var(--ink-2);
+}
+
+.post-content hr {
+  border: none;
+  border-top: 1px solid var(--rule);
+  margin: 42px 0;
+}
+
+/* Tables — used heavily in the benchmark posts, so they get real attention. */
+.post-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 26px 0;
+  font-size: 14px;
+  display: block;
+  overflow-x: auto;
+}
+
+.post-content thead th {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  text-align: left;
+  padding: 9px 13px;
+  border-bottom: 1px solid var(--rule-2);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.post-content tbody td {
+  padding: 10px 13px;
+  border-bottom: 1px solid var(--rule);
+  color: var(--ink-2);
+}
+
+.post-content tbody tr:hover { background: rgba(255,255,255,.018); }
+
+/* ── Code ─────────────────────────────────────────────────────── */
+.post-content code {
+  font-family: var(--font-mono);
+  font-size: 0.855em;
+  background: rgba(110, 118, 129, .22);
+  color: var(--accent-2);
+  padding: 1.5px 5px;
+  border-radius: 3px;
+}
+
+.post-content pre {
+  background: var(--bg-code) !important;
+  border: 1px solid var(--rule);
+  border-radius: 5px;
+  padding: 17px 19px !important;
+  overflow-x: auto;
+  margin: 24px 0;
+  font-size: 13px !important;
+  line-height: 1.62;
+}
+
+.post-content pre code {
+  background: transparent;
+  color: #c9d1d9;
+  padding: 0;
+  font-size: 13px;
+}
+
+/* Chroma (Hugo's highlighter) paints its own background from the chosen
+   style, which sits on top of the <pre> and reads as a lighter grey slab.
+   Neutralise every surface it owns so the block matches the page. */
+.post-content .highlight,
+.post-content .highlight pre,
+.post-content .chroma,
+.post-content div.highlight > div,
+.post-content .chroma .lntable,
+.post-content .chroma .lntd {
+  background: transparent !important;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.post-content .highlight {
+  background: var(--bg-code) !important;
+  border: 1px solid var(--rule);
+  border-radius: 5px;
+  margin: 24px 0;
+  overflow-x: auto;
+}
+
+.post-content .highlight pre { padding: 16px 18px !important; }
+
+/* Code-copy button, shown by ShowCodeCopyButtons */
+.post-content .highlight .copy-code {
+  background: rgba(110, 118, 129, .18);
+  color: var(--ink-3);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: .08em;
+  border-radius: 3px;
+}
+.post-content .highlight:hover .copy-code { color: var(--ink); }
+
+.post-content figure.blog-figure img {
+  border: 1px solid var(--rule);
+  background: #fff;
+  border-radius: 4px;
+}
+
+.post-content figure.blog-figure figcaption {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--ink-4);
+  line-height: 1.55;
+  margin-top: 11px;
+}
+
+/* ── TOC ──────────────────────────────────────────────────────── */
+.toc {
+  border: 1px solid var(--rule) !important;
+  border-radius: 4px;
+  background: var(--bg-raised) !important;
+  margin: 28px 0;
+  padding: 6px 4px;
+}
+
+.toc details summary {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  padding: 8px 14px;
+  cursor: pointer;
+}
+
+.toc .inner { font-size: 14px; padding: 0 14px 10px; }
+.toc a { color: var(--ink-3); }
+.toc a:hover { color: var(--accent); }
+
+/* ── Footer ───────────────────────────────────────────────────── */
+.footer {
+  max-width: var(--w-wide);
+  margin: 0 auto;
+  padding: 34px 0 46px;
+  border-top: 1px solid var(--rule);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--ink-4);
+  letter-spacing: 0.04em;
+}
+
+.footer div { display: flex; flex-wrap: wrap; gap: 20px; align-items: center; }
+.footer a { color: var(--ink-4); }
+.footer a:hover { color: var(--accent); }
+
+/* ── Pagination / nav links ───────────────────────────────────── */
+.paginav, .post-navigation {
+  border-top: 1px solid var(--rule);
+  margin-top: 44px;
+  padding-top: 20px;
+}
+
+.paginav a, .post-navigation a { color: var(--ink-3); }
+.paginav a:hover, .post-navigation a:hover { color: var(--accent); }
+
+.paginav .title {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+}
+
+/* ── Tags ─────────────────────────────────────────────────────── */
+.post-tags a, .terms-tags a {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  background: transparent;
+  border: 1px solid var(--rule-2);
+  border-radius: 3px;
+  color: var(--ink-3);
+  padding: 3px 9px;
+  transition: border-color .12s, color .12s;
+}
+
+.post-tags a:hover, .terms-tags a:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: transparent;
+}
+
+/* ── Search ───────────────────────────────────────────────────── */
+#searchbox {
+  width: 100%;
+  padding: 11px 14px;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  border: 1px solid var(--rule-2);
+  border-radius: 4px;
+  background: var(--bg-raised);
+  color: var(--ink);
+  outline: none;
+  margin-bottom: 24px;
+}
+
+#searchbox::placeholder { color: var(--ink-4); }
+#searchbox:focus { border-color: var(--accent); }
+
+#searchResults li { border: 1px solid var(--rule); background: var(--bg-raised); }
+#searchResults li:hover, #searchResults .focus { border-color: var(--accent); }
+
+/* ── Mobile ───────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .home-grid { grid-template-columns: 1fr; gap: 42px; }
+  .facts { grid-template-columns: repeat(2, 1fr); }
+}
+
 @media (max-width: 640px) {
-  .cadence { font-size: 11.5px; margin-bottom: 32px; }
   body { font-size: 16px; }
-  .home-wrap, .list-wrap { padding: 36px 16px 64px; }
-  .hero { margin-bottom: 42px; }
-  .hero-title { font-size: 30px; max-width: none; }
+  .home-wrap { padding: 46px 0 64px; }
+  .list-wrap { padding: 40px 0 60px; }
+  .hero { margin-bottom: 32px; }
+  .hero-title { font-size: 34px; max-width: none; }
   .hero-copy p { font-size: 16px; }
-  .home-grid { grid-template-columns: 1fr; gap: 38px; }
-  .feature-story h3 { font-size: 24px; }
-  .post-title { font-size: 28px; }
-  .list-header h1 { font-size: 28px; }
-  .nav { padding: 12px 16px; }
-  #menu li a { font-size: 13px; padding: 4px 6px; }
-  pre { padding: 14px 16px !important; font-size: 12.5px !important; }
-  .post-meta-inline { display: block; margin-left: 0; margin-top: 2px; }
+  .facts { grid-template-columns: 1fr; margin-bottom: 40px; }
+  .feature-story h3 { font-size: 23px; }
+  .post-title { font-size: 30px; }
+  .post-content h2 { font-size: 25px; margin-top: 38px; }
+  .cadence { font-size: 10.5px; }
+  .nav { padding: 12px 0; gap: 12px; }
+  #menu li a { font-size: 12.5px; padding: 4px 7px; }
+  .post-content pre { padding: 13px 15px !important; font-size: 12px !important; }
+  .post-list li { flex-direction: column; gap: 3px; }
 }

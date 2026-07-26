@@ -20,7 +20,7 @@ params:
   keywords: [ML Infrastructure, HPC, GPU Inference, Quantitative Finance, Distributed Training, CUDA]
   author: "Zhanyl Abdybaeva"
   DateFormat: "January 2, 2006"
-  defaultTheme: light
+  defaultTheme: dark
   disableThemeToggle: true
 
   ShowReadingTime: true
@@ -63,6 +63,18 @@ params:
     imageTitle: "Zhanyl Abdybaeva"
 
   subtitle: "Senior HPC & ML Infrastructure Engineer"
+
+  # Homepage facts strip. These appear publicly — edit the wording here rather
+  # than in the template. Kept qualitative on purpose: no invented metrics.
+  facts:
+    - label: "Role"
+      value: 'Infrastructure engineering at a <span class="dim">quantitative trading firm</span>'
+    - label: "Focus"
+      value: 'GPU clusters · inference · <span class="dim">Slurm at scale</span>'
+    - label: "Studying"
+      value: 'MS CS — ML @ Georgia Tech<br><span class="dim">CQF</span>'
+    - label: "Writing"
+      value: 'Deep dives &amp; lab notes<br><span class="dim">most weeks</span>'
 
   socialIcons:
     - name: github
@@ -147,8 +159,8 @@ markup:
       unsafe: true
   highlight:
     noClasses: false
-    anchorLineNos: true
+    anchorLineNos: false
     codeFences: true
     guessSyntax: true
-    lineNos: true
-    style: monokai
+    lineNos: false
+    style: github-dark

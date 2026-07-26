@@ -32,15 +32,15 @@ OG_DIR = ROOT / "static" / "images" / "og"
 WIDTH, HEIGHT = 1200, 630
 
 # Matches the site palette in assets/css/extended/custom.css
-BG = "#e7ebf8"
-CARD = "#fcfcfb"
-INK = "#111114"
-INK_2 = "#57575c"
-INK_3 = "#8e8e95"
-RULE = "#e7e7eb"
-ACCENT = "#1d4ed8"
+BG = "#080b10"
+CARD = "#0d1117"
+INK = "#e6edf3"
+INK_2 = "#a8b3bf"
+INK_3 = "#7d8590"
+RULE = "#21262d"
+ACCENT = "#58a6ff"
 
-SERIF = "Lora, Georgia, 'Times New Roman', serif"
+SERIF = "Instrument Serif, Lora, Georgia, 'Times New Roman', serif"
 SANS = "Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif"
 MONO = "'JetBrains Mono', 'SF Mono', Menlo, monospace"
 
