@@ -96,4 +96,4 @@ Each reasoning step has a time budget. If tool calls exceed it, the agent needs 
 
 ---
 
-*[GitHub: Available August 2026](https://github.com/zhanyl-tech)*
+*[GitHub: Available August 2026](https://github.com/Zhanyl-tech)*
