@@ -32,6 +32,18 @@
   --accent-dim: rgba(88, 166, 255, 0.11);
   --green:     #3fb950;
 
+  /* Brand mark. Amber is the one hue on the page not already carrying meaning
+     (blue = links, green = shell prompt), so it reads as identity. */
+  --mark:      #f5b544;
+
+  /* Palette for the scattered notation layer. Alpha lives in the colour rather
+     than on the element so each glyph can be tuned independently. */
+  --gl-amber:  rgba(245, 181, 68, .090);
+  --gl-blue:   rgba(88, 166, 255, .085);
+  --gl-violet: rgba(167, 139, 250, .080);
+  --gl-cyan:   rgba(34, 211, 238, .072);
+  --gl-green:  rgba(63, 185, 80, .068);
+
   --w:         min(760px, 100% - 44px);
   --w-wide:    min(1080px, 100% - 44px);
 }
@@ -87,6 +99,44 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* ── Scattered notation (homepage) ────────────────────────────── */
+/* Absolute inside a full-page layer rather than fixed, so the glyphs scroll
+   with the content and read as part of the page instead of a parallax gimmick.
+   Sits below everything and never intercepts a click. */
+.glyph-field {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  /* Fades before the footer so the densest text never fights the texture. */
+  mask-image: linear-gradient(180deg, #000 0%, #000 72%, transparent 97%);
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 72%, transparent 97%);
+}
+
+.glyph-field span {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  font-family: var(--font-serif);
+  font-size: var(--s);
+  line-height: 1;
+  color: var(--c);
+  transform: translate(-50%, -50%) rotate(var(--r, 0deg));
+  user-select: none;
+  white-space: nowrap;
+}
+
+/* Content sits above the field. Without this the glyphs would paint over the
+   text rather than behind it. */
+.home-wrap { position: relative; z-index: 1; }
+
+/* Below the two-column breakpoint the layout is narrow enough that the glyphs
+   crowd the text, so drop the ones nearest the reading column. */
+@media (max-width: 900px) {
+  .glyph-field span { opacity: .55; }
+}
+
 .list, .main, .post-entry, .post-single, article, .paginav,
 .toc, footer, .footer, .page-header, #page-header, .entry-content {
   background: transparent !important;
@@ -117,6 +167,12 @@ a:hover { color: var(--accent-2); }
   align-items: center;
   justify-content: space-between;
   gap: 24px;
+}
+
+.nav .logo img {
+  height: 30px;
+  width: auto;
+  margin-right: 2px;
 }
 
 .nav .logo, .nav .logo a {
