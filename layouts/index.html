@@ -18,27 +18,39 @@
 
   <section class="hero">
     <p class="hero-kicker">ML Infrastructure · Quantitative Finance</p>
-    <h1 class="hero-title">Building systems for models, markets, and scale.</h1>
+    <h1 class="hero-title">Systems for models, <em>markets</em>, and scale.</h1>
     <div class="hero-copy">
       <p>
         I'm <strong>Zhanyl Abdybaeva</strong>, an ML infrastructure and quantitative finance engineer
         working at a quantitative trading firm. My work spans GPU clusters, inference systems,
-        distributed training, and the infrastructure behind production AI.
+        distributed training, and the schedulers that decide what runs when.
       </p>
       <p>
-        I'm pursuing an <a href="https://omscs.gatech.edu/">MS in CS</a> with an ML specialization
-        at Georgia Tech and the <a href="https://www.cqfinstitute.org/">CQF</a>.
         This site is where I publish long-form technical writing, shorter field notes, and
         project pages for the systems I'm building.
       </p>
     </div>
     <p class="hero-links">
       <a href="https://github.com/Zhanyl-tech">GitHub</a>
-      <a href="/resume.pdf">Resume</a>
+      <a href="https://www.linkedin.com/in/za-engineering/">LinkedIn</a>
+      <a href="/resume.pdf">Résumé</a>
       <a href="/about/">About</a>
       <a href="/index.xml">RSS</a>
     </p>
   </section>
+
+  {{/* Qualitative rather than vanity metrics — nothing here is a number that
+       would need defending in an interview. Edit in hugo.yaml → params.facts. */}}
+  {{- with .Site.Params.facts }}
+  <div class="facts">
+    {{- range . }}
+    <div class="fact">
+      <p class="fact-label">{{ .label }}</p>
+      <p class="fact-value">{{ .value | safeHTML }}</p>
+    </div>
+    {{- end }}
+  </div>
+  {{- end }}
 
   {{/* Only claim an active cadence when the archive actually backs it up —
        a stale "posts weekly!" badge is worse than no badge. */}}
