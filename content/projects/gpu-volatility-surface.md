@@ -111,4 +111,4 @@ This builds directly on my CQF projects:
 
 ---
 
-*[GitHub: Available November 2026](https://github.com/zhanyl-tech)*
+*[GitHub: Available November 2026](https://github.com/Zhanyl-tech)*

@@ -104,4 +104,4 @@ At 128 GPUs, hardware failures are a matter of when, not if. Building:
 
 ---
 
-*[GitHub: Available August 2026](https://github.com/zhanyl-tech)*
+*[GitHub: Available August 2026](https://github.com/Zhanyl-tech)*
