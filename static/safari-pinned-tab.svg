@@ -1,5 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
-  <text x="256" y="256" text-anchor="middle" dominant-baseline="central"
-        font-family="Lora, Georgia, serif" font-size="380" font-weight="600"
-        fill="black">Z</text>
+  <text x="256" y="205" text-anchor="middle" dominant-baseline="central"
+        font-family="'JetBrains Mono', monospace" font-size="356" font-weight="600"
+        fill="black">∞</text>
+  <text x="256" y="358" text-anchor="middle" dominant-baseline="central"
+        font-family="'JetBrains Mono', monospace" font-size="174" font-weight="600"
+        fill="black">18</text>
 </svg>
