@@ -68,7 +68,7 @@ drain first, because running jobs are what a failed rotation destroys; keep the
 previous key so rollback is one command; verify end to end with a call that
 round-trips through the auth plugin; roll back automatically if that fails.
 
-## Three bugs I only found by running it
+## Four bugs I only found by running it
 
 **The auth secrets are immutable.** `kubectl patch` is rejected outright —
 `field is immutable when immutable is set`. The only path is delete-and-recreate,
@@ -83,7 +83,36 @@ just weakened. That's the one I'd have shipped without noticing — it's invisib
 unless you go looking. The flag is now captured before the delete and restored
 after, verified by rotating twice and re-checking.
 
-None of the three are things I'd have predicted from reading the docs.
+**The verification step verified nothing.** This is the one worth keeping.
+
+CI failed with the rotation printing a green tick on every step, then
+`Rotation complete`, and then:
+
+```
+srun: Required node not available (down, drained or reserved)
+```
+
+Rotation can only break one thing — the trust between `slurmctld` and `slurmd`,
+because that's what the rotated key authenticates. My check ran `sinfo` *inside
+the controller pod* and looked at the exit code. That never touches the
+relationship in question. `slurmctld` answers a local client whether or not a
+single compute node ever came back, so the check passed against an empty
+cluster.
+
+The signal that does cross the boundary is registration. A `slurmd` holding the
+wrong key can't register, and `slurmctld` flags it not-responding with a `*` on
+the state. *Every node losing its `*`* is the real end-to-end check.
+
+The resume was wrong for the same reason: it fired right after the rollout
+restart, against nodes that hadn't come back, and `scontrol update State=RESUME`
+doesn't repeat itself. The node registered a minute later, still drained, and
+stayed that way for the 43 minutes until the CI job was killed.
+
+The general form is worth more than the bug: **a check that doesn't cross the
+boundary you might have broken will pass no matter what you broke.** Green ticks
+on a dead cluster are worse than a red one, because they stop you looking.
+
+None of the four are things I'd have predicted from reading the docs.
 
 ## Honest scope
 
