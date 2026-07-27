@@ -94,25 +94,68 @@ srun: Required node not available (down, drained or reserved)
 
 Rotation can only break one thing — the trust between `slurmctld` and `slurmd`,
 because that's what the rotated key authenticates. My check ran `sinfo` *inside
-the controller pod* and looked at the exit code. That never touches the
-relationship in question. `slurmctld` answers a local client whether or not a
-single compute node ever came back, so the check passed against an empty
-cluster.
+the controller pod* and looked at the exit code, which never touches that
+relationship: `slurmctld` answers a local client whether or not a single compute
+node ever came back. It would have passed against a cluster with zero nodes.
 
-The signal that does cross the boundary is registration. A `slurmd` holding the
-wrong key can't register, and `slurmctld` flags it not-responding with a `*` on
-the state. *Every node losing its `*`* is the real end-to-end check.
+Pulling that thread found four defects, all the same bug — **a check that can't
+fail:**
 
-The resume was wrong for the same reason: it fired right after the rollout
-restart, against nodes that hadn't come back, and `scontrol update State=RESUME`
-doesn't repeat itself. The node registered a minute later, still drained, and
-stayed that way for the 43 minutes until the CI job was killed.
+| Check | Why it passed anyway |
+| --- | --- |
+| `sinfo` exits 0 | Never leaves the controller pod |
+| No `*` on any node state | Raced the restart; passed 130 ms after it |
+| `grep -E '^(idle\|mix\|alloc)'` | Also matches `idle*` — a node that can't be reached, i.e. the failure itself |
+| Wait for replacement pods | No success flag, so a timeout fell through to a green tick |
 
-The general form is worth more than the bug: **a check that doesn't cross the
-boundary you might have broken will pass no matter what you broke.** Green ticks
-on a dead cluster are worse than a red one, because they stop you looking.
+And one defect in the deployment rather than my script:
 
-None of the four are things I'd have predicted from reading the docs.
+```
+$ kubectl get pod slurm-worker-slinky-0 -o jsonpath='{.metadata.ownerReferences[*].kind}'
+NodeSet
+```
+
+`kubectl rollout restart` only understands built-in workload kinds. `NodeSet` is
+a CRD, so the command I trusted to cycle every daemon silently skipped the one
+on the far side of the boundary I was rotating. The controller took the new key
+in seconds; slurmd kept the old one.
+
+## The part I couldn't fix
+
+With all of that corrected, the rotation still fails — and now says so. On a
+clean cluster, with the Secret holding a new key and stable for five minutes, a
+slurmd pod deleted and recreated from scratch came up mounting the **previous**
+key:
+
+```
+secret                        c5016281…
+slurmd pod created 02:28:25   8cbda076…   ← pre-rotation key
+slurmctld                     c5016281…   ← correct
+```
+
+Slinky ships the auth Secret `immutable: true`, so its data can't be patched and
+delete-and-recreate is the only route — after which the node's kubelet keeps
+serving its cached copy to *newly created* pods. What I ruled out, because being
+precise about the boundary of what I know is the whole point:
+
+- **Not the operator rewriting it** — one value, `resourceVersion` unchanged, for 90s.
+- **Not immutability** — recreating the replacement as mutable behaves identically.
+- **Not universal** — the same delete-and-recreate against a Secret that node had never cached propagates instantly. That control test made me dismiss the whole thing too early, until I realised it didn't reproduce the one condition that matters: a pod holding the Secret continuously across the swap.
+
+I can reproduce it on demand and I can't attribute it to a specific kubelet code
+path, so the repo doesn't claim one.
+
+What the tool does about it is the actual deliverable: it hashes `slurm.key`
+inside every slurmd pod, compares it to the Secret, and **rolls back and exits
+non-zero on mismatch**. CI asserts that safety property rather than a success it
+can't have — `make rotate` must fail, and the cluster must still run a job
+afterwards.
+
+The general form is worth more than any single bug: **a check that doesn't cross
+the boundary you might have broken will pass no matter what you broke.** Green
+ticks on a dead cluster are worse than a red one, because they stop you looking.
+
+None of this is something I'd have predicted from reading the docs.
 
 ## Honest scope
 

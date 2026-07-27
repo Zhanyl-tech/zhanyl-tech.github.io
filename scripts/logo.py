@@ -36,43 +36,64 @@ MONO = "'JetBrains Mono', 'SF Mono', Menlo, monospace"
 # needs 303/148 = 2.047x. Re-derive with scripts/measure_glyphs.py if the
 # typeface ever changes.
 INFINITY_SCALE = 2.047
-INFINITY_DY = 0.0
+# Matching the ink *height* does not centre it. Rendered on a shared baseline
+# with dominant-baseline="central", both glyphs come out 46.8 units tall — the
+# scale above is exact — but the ∞ ink sits 16.5 units higher than the digits',
+# because the two glyphs are placed differently inside their em boxes. Nudge it
+# back down by that measured amount, as a fraction of the mark's height.
+INFINITY_DY = 16.5 / 160
 
 
 def mark_svg(color: str, w: int = 210, h: int = 160, bg: str | None = None) -> str:
-    """The horizontal ∞18 lockup that sits beside the name.
+    """The horizontal 18∞ lockup that sits beside the name.
 
     The box is deliberately taller than the visible ink. At the scale needed to
     match the digits, the ∞ em-box exceeds the box sized to those digits and the
     glyph is silently cropped — which is exactly what made the first attempts
     look wrong even with the correct scale factor.
+
+    Both x positions are measured, not chosen. Rendered at a text x of 20:
+
+        18   fs 62.0    ink 26.0 .. 90.5   (left side bearing 6.0)
+        ∞    fs 126.9   ink 22.5 .. 93.5   (left side bearing 2.5)
+
+    The two side bearings differ, so setting the glyphs flush is not a matter of
+    advancing by the digits' width — do that and a 3.5px gap opens up. For
+    digits at DIGIT_X the ∞ belongs at DIGIT_X + 68, which puts the start of its
+    ink exactly where theirs ends. DIGIT_X is then chosen so the leftmost ink
+    stays at 22.5, where it sat when the ∞ led, leaving the framing unchanged by
+    the swap.
     """
     fs = 62
     cy = h / 2
-    # x=88 is measured, not chosen: the ∞ ink ends at x≈93.5 and the digits
-    # carry a left side bearing, so this sets them flush with no visible gap.
+    digit_x = 16.5
+    inf_x = digit_x + 68
     plate = f'<rect width="{w}" height="{h}" rx="{h*0.2}" fill="{bg}"/>' if bg else ""
     return f"""<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{h}" viewBox="0 0 {w} {h}">
   {plate}
-  <text x="20" y="{cy + h*INFINITY_DY}" dominant-baseline="central"
-        font-family="{MONO}" font-size="{fs*INFINITY_SCALE:.1f}" font-weight="500"
-        fill="{color}">∞</text>
-  <text x="88" y="{cy}" dominant-baseline="central"
+  <text x="{digit_x}" y="{cy}" dominant-baseline="central"
         font-family="{MONO}" font-size="{fs}" font-weight="500"
         fill="{color}">18</text>
+  <text x="{inf_x}" y="{cy + h*INFINITY_DY}" dominant-baseline="central"
+        font-family="{MONO}" font-size="{fs*INFINITY_SCALE:.1f}" font-weight="500"
+        fill="{color}">∞</text>
 </svg>"""
 
 
 def icon_svg(color: str, size: int = 512, plate: str = "#141a23") -> str:
-    """Square icon. Stacked, because ∞18 side by side is illegible at 32px."""
+    """Square icon. Stacked, because 18∞ side by side is illegible at 32px.
+
+    Reading order follows the lockup: 18 first, so the icon and the wordmark
+    are not two different marks.
+    """
     return f"""<svg xmlns="http://www.w3.org/2000/svg" width="{size}" height="{size}" viewBox="0 0 {size} {size}">
   <rect width="{size}" height="{size}" rx="{size*0.22}" fill="{plate}"/>
-  <text x="{size/2}" y="{size*0.40}" text-anchor="middle" dominant-baseline="central"
-        font-family="{MONO}" font-size="{size*0.34*INFINITY_SCALE:.0f}" font-weight="500"
-        fill="{color}">∞</text>
-  <text x="{size/2}" y="{size*0.70}" text-anchor="middle" dominant-baseline="central"
+  <text x="{size/2}" y="{size*0.36}" text-anchor="middle" dominant-baseline="central"
         font-family="{MONO}" font-size="{size*0.34:.0f}" font-weight="500"
         fill="{color}">18</text>
+  <text x="{size/2}" y="{size*0.66}" text-anchor="middle" dominant-baseline="central"
+        font-family="{MONO}" font-size="{size*0.34*INFINITY_SCALE:.0f}" font-weight="500"
+        fill="{color}">∞</text>
 </svg>"""
 
 
