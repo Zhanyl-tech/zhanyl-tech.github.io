@@ -39,7 +39,7 @@ INFINITY_SCALE = 2.047
 INFINITY_DY = 0.0
 
 
-def mark_svg(color: str, w: int = 300, h: int = 160, bg: str | None = None) -> str:
+def mark_svg(color: str, w: int = 210, h: int = 160, bg: str | None = None) -> str:
     """The horizontal ∞18 lockup that sits beside the name.
 
     The box is deliberately taller than the visible ink. At the scale needed to
@@ -49,13 +49,15 @@ def mark_svg(color: str, w: int = 300, h: int = 160, bg: str | None = None) -> s
     """
     fs = 62
     cy = h / 2
+    # x=88 is measured, not chosen: the ∞ ink ends at x≈93.5 and the digits
+    # carry a left side bearing, so this sets them flush with no visible gap.
     plate = f'<rect width="{w}" height="{h}" rx="{h*0.2}" fill="{bg}"/>' if bg else ""
     return f"""<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{h}" viewBox="0 0 {w} {h}">
   {plate}
   <text x="20" y="{cy + h*INFINITY_DY}" dominant-baseline="central"
         font-family="{MONO}" font-size="{fs*INFINITY_SCALE:.1f}" font-weight="500"
         fill="{color}">∞</text>
-  <text x="{w*0.52}" y="{cy}" dominant-baseline="central"
+  <text x="88" y="{cy}" dominant-baseline="central"
         font-family="{MONO}" font-size="{fs}" font-weight="500"
         fill="{color}">18</text>
 </svg>"""
