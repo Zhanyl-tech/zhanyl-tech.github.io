@@ -36,12 +36,18 @@ MONO = "'JetBrains Mono', 'SF Mono', Menlo, monospace"
 # needs 303/148 = 2.047x. Re-derive with scripts/measure_glyphs.py if the
 # typeface ever changes.
 INFINITY_SCALE = 2.047
-# Matching the ink *height* does not centre it. Rendered on a shared baseline
-# with dominant-baseline="central", both glyphs come out 46.8 units tall — the
-# scale above is exact — but the ∞ ink sits 16.5 units higher than the digits',
-# because the two glyphs are placed differently inside their em boxes. Nudge it
-# back down by that measured amount, as a fraction of the mark's height.
-INFINITY_DY = 16.5 / 160
+# The ∞ rides high on purpose: the mark reads 18^∞, eighteen to the infinite.
+#
+# Set on a shared baseline with dominant-baseline="central", both glyphs render
+# 46.8 units tall — the scale above is exact — but the ∞ ink lands 16.5 units
+# above the digits', because the two sit differently inside their em boxes.
+# That offset is what makes it read as an exponent rather than as two
+# characters side by side, so it is kept, not corrected. A previous version
+# "fixed" it to a shared centre line and lost the whole idea.
+#
+# 0.0 leaves the glyph where the typeface puts it. Lower this (negative) to
+# raise the ∞ further; raise it toward 16.5/160 to flatten the mark out again.
+INFINITY_DY = 0.0
 
 
 def mark_svg(color: str, w: int = 210, h: int = 160, bg: str | None = None) -> str:
