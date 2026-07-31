@@ -1,9 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="210" height="160" viewBox="0 0 210 160">
   
-  <text x="16.5" y="80.0" dominant-baseline="central"
-        font-family="'JetBrains Mono', 'SF Mono', Menlo, monospace" font-size="62" font-weight="500"
+  <text x="21.50" y="112.34" dominant-baseline="central"
+        font-family="'JetBrains Mono', 'SF Mono', Menlo, monospace" font-size="88.0" font-weight="500"
         fill="#f5b544">18</text>
-  <text x="84.5" y="80.0" dominant-baseline="central"
-        font-family="'JetBrains Mono', 'SF Mono', Menlo, monospace" font-size="126.9" font-weight="500"
+  <text x="119.30" y="98.33" dominant-baseline="central"
+        font-family="'JetBrains Mono', 'SF Mono', Menlo, monospace" font-size="104.1" font-weight="500"
         fill="#f5b544">∞</text>
 </svg>

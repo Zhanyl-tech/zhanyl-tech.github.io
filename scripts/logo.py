@@ -33,55 +33,82 @@ MONO = "'JetBrains Mono', 'SF Mono', Menlo, monospace"
 
 # Measured, not guessed. At a common font-size the ∞ glyph's ink is 148px tall
 # against 303px for "18" in JetBrains Mono, so matching their apparent size
-# needs 303/148 = 2.047x. Re-derive with scripts/measure_glyphs.py if the
-# typeface ever changes.
+# needs 303/148 = 2.047x. Used by the stacked icon, where the two glyphs sit at
+# equal weight. Re-derive with scripts/measure_glyphs.py if the typeface changes.
 INFINITY_SCALE = 2.047
-# The ∞ rides high on purpose: the mark reads 18^∞, eighteen to the infinite.
+
+# ── Glyph metrics ───────────────────────────────────────────────────────────
 #
-# Set on a shared baseline with dominant-baseline="central", both glyphs render
-# 46.8 units tall — the scale above is exact — but the ∞ ink lands 16.5 units
-# above the digits', because the two sit differently inside their em boxes.
-# That offset is what makes it read as an exponent rather than as two
-# characters side by side, so it is kept, not corrected. A previous version
-# "fixed" it to a shared centre line and lost the whole idea.
+# Ink bounds as fractions of font-size, measured from the text anchor with
+# dominant-baseline="central". These are font metrics, so they hold at any size
+# and let the lockup be *derived* rather than nudged into place by eye:
 #
-# 0.0 leaves the glyph where the typeface puts it. Lower this (negative) to
-# raise the ∞ further; raise it toward 16.5/160 to flatten the mark out again.
-INFINITY_DY = 0.0
+#          ink left   ink right   ink top   ink bottom   height
+#   18       +0.100      +1.135    -0.745       +0.010    0.755
+#   ∞        +0.020      +0.580    -0.495       -0.125    0.370
+#
+# Re-derive with scripts/measure_glyphs.py if the typeface ever changes.
+M_DIGITS = {"left": 0.100, "right": 1.135, "top": -0.745, "bottom": 0.010, "h": 0.755}
+M_INF = {"left": 0.020, "right": 0.580, "top": -0.495, "bottom": -0.125, "h": 0.370}
+
+# The mark reads 18^∞ — eighteen to the infinite — so the ∞ is a true exponent:
+# smaller than the digits and lifted to sit against their cap line, not a second
+# character of equal weight parked alongside them.
+#
+# 0.58 is the ∞ ink height as a fraction of the digits' ink height, which is
+# where typographic superscripts sit. Raise it toward 1.0 to flatten the mark
+# back into two equal glyphs; drop it to make the exponent more delicate.
+EXPONENT_RATIO = 0.58
+
+# Font-size of the digits, in viewBox units. Everything else is derived from it.
+DIGIT_FS = 88
 
 
 def mark_svg(color: str, w: int = 210, h: int = 160, bg: str | None = None) -> str:
-    """The horizontal 18∞ lockup that sits beside the name.
+    """The horizontal 18^∞ lockup that sits beside the name.
 
-    The box is deliberately taller than the visible ink. At the scale needed to
-    match the digits, the ∞ em-box exceeds the box sized to those digits and the
-    glyph is silently cropped — which is exactly what made the first attempts
-    look wrong even with the correct scale factor.
+    Both glyph positions are solved from M_DIGITS / M_INF rather than nudged by
+    eye, because eyeballing this went wrong three separate ways: a gap opened
+    when the glyphs were advanced by the digits' width (their side bearings
+    differ), the ∞ was once "centred" onto the digits' midline and stopped
+    reading as an exponent at all, and before that it was scaled by a factor
+    guessed from the em box rather than the ink.
 
-    Both x positions are measured, not chosen. Rendered at a text x of 20:
+    Two constraints define the layout:
 
-        18   fs 62.0    ink 26.0 .. 90.5   (left side bearing 6.0)
-        ∞    fs 126.9   ink 22.5 .. 93.5   (left side bearing 2.5)
+      horizontal   the ∞ ink starts exactly where the digits' ink ends, so the
+                   two are flush with no visible space between them
+      vertical     the ∞ ink top aligns with the digits' ink top, which is what
+                   makes it sit as a power rather than as a second character
 
-    The two side bearings differ, so setting the glyphs flush is not a matter of
-    advancing by the digits' width — do that and a 3.5px gap opens up. For
-    digits at DIGIT_X the ∞ belongs at DIGIT_X + 68, which puts the start of its
-    ink exactly where theirs ends. DIGIT_X is then chosen so the leftmost ink
-    stays at 22.5, where it sat when the ∞ led, leaving the framing unchanged by
-    the swap.
+    The result is then centred on its true ink bounds, so the box's padding is
+    even no matter what DIGIT_FS or EXPONENT_RATIO are set to.
     """
-    fs = 62
-    cy = h / 2
-    digit_x = 16.5
-    inf_x = digit_x + 68
+    d_fs = DIGIT_FS
+    # Ink height ratio, converted to a font-size ratio via the two glyph heights.
+    i_fs = d_fs * EXPONENT_RATIO * M_DIGITS["h"] / M_INF["h"]
+
+    # Solve positions relative to an arbitrary origin, then translate to centre.
+    d_x, d_y = 0.0, 0.0
+    i_x = d_x + M_DIGITS["right"] * d_fs - M_INF["left"] * i_fs        # flush
+    i_y = d_y + M_DIGITS["top"] * d_fs - M_INF["top"] * i_fs           # tops align
+
+    ink_l = d_x + M_DIGITS["left"] * d_fs
+    ink_r = i_x + M_INF["right"] * i_fs
+    ink_t = d_y + M_DIGITS["top"] * d_fs
+    ink_b = d_y + M_DIGITS["bottom"] * d_fs        # digits sit lowest
+
+    dx = (w - (ink_r - ink_l)) / 2 - ink_l
+    dy = (h - (ink_b - ink_t)) / 2 - ink_t
+
     plate = f'<rect width="{w}" height="{h}" rx="{h*0.2}" fill="{bg}"/>' if bg else ""
     return f"""<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{h}" viewBox="0 0 {w} {h}">
   {plate}
-  <text x="{digit_x}" y="{cy}" dominant-baseline="central"
-        font-family="{MONO}" font-size="{fs}" font-weight="500"
+  <text x="{d_x + dx:.2f}" y="{d_y + dy:.2f}" dominant-baseline="central"
+        font-family="{MONO}" font-size="{d_fs:.1f}" font-weight="500"
         fill="{color}">18</text>
-  <text x="{inf_x}" y="{cy + h*INFINITY_DY}" dominant-baseline="central"
-        font-family="{MONO}" font-size="{fs*INFINITY_SCALE:.1f}" font-weight="500"
+  <text x="{i_x + dx:.2f}" y="{i_y + dy:.2f}" dominant-baseline="central"
+        font-family="{MONO}" font-size="{i_fs:.1f}" font-weight="500"
         fill="{color}">∞</text>
 </svg>"""
 
