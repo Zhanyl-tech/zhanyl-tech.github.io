@@ -30,6 +30,8 @@ Slurm does not look at GPUs. It looks at allocations. That gap is 16 GPUs ×
 44 hours — **704 GPU-hours** of a contended resource, consumed by a process
 doing nothing.
 
+![Scheduler and telemetry feed a policy engine that emits a finding, then a four step escalation ladder gated by mode](/images/diagrams/gpu-reaper-escalation.svg)
+
 ## Why it will not kill your job
 
 The whole design follows from an asymmetry: killing a healthy job is far worse

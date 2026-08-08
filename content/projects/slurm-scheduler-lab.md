@@ -17,6 +17,8 @@ experiment: the feedback loop is days long, the blast radius is everyone's
 queue, and the only rollback signal is people complaining. This runs the same
 policy against a workload in about a second.
 
+![Four node timeline showing a reservation at shadow time, one job backfilled into a gap, and one rejected for crossing the reservation](/images/diagrams/backfill.svg)
+
 ## What it models
 
 **Multifactor priority** — the real formula from `priority/multifactor`, with
