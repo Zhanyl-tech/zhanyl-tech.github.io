@@ -15,9 +15,9 @@
   /* Lifted off near-black. #0d1117 read as a void on large displays; this
      keeps the dark register but gives the page a surface. Rules and code
      surfaces move with it so the contrast steps stay even. */
-  --bg:        #141a23;
-  --bg-raised: #1a212b;
-  --bg-code:   #0f151d;
+  --bg:        #1f1820;
+  --bg-raised: #271e29;
+  --bg-code:   #150f17;
 
   --ink:       #e9eff5;
   --ink-2:     #adb8c4;
@@ -54,10 +54,10 @@
    declaration loses; setting the variable it reads is what actually holds.
    Same reasoning for the theme surface variables below. */
 :root, .dark, html.dark, body.dark {
-  --code-block-bg: #0f151d;
+  --code-block-bg: #150f17;
   --code-bg: rgba(125, 133, 146, .20);
-  --theme: #141a23;
-  --entry: #1a212b;
+  --theme: #1f1820;
+  --entry: #271e29;
   --primary: #e9eff5;
   --secondary: #adb8c4;
   --tertiary: #262d38;

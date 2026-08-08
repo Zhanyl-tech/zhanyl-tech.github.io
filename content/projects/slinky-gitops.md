@@ -56,6 +56,8 @@ every tutorial are wrong. The secrets are `slurm-auth-slurm` (`slurm.key`) and
 Building from the brief instead of from the running cluster would have produced
 a polished tool for a component that isn't there.
 
+![Rotating auth/slurm on Slinky: the Secret holds the new key, slurmctld adopts it, and the kubelet serves slurmd a stale cached copy, so the controller-to-slurmd trust boundary breaks and the rotation rolls back](/images/diagrams/slinky-auth-rotation.svg)
+
 ## Rotation, done carefully
 
 There's no atomic moment. Between writing the new key and every daemon reloading
