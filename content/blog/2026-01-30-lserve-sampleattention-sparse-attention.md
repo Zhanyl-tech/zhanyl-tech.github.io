@@ -15,7 +15,6 @@ Two papers attack this from opposite directions:
 - **LServe** starts from the serving system and asks: what sparse mechanisms can I plug in at prefill and at decode that give real throughput?
 - **SampleAttention** starts from the attention map and asks: what sparse patterns actually show up in real models, and how do I select them without running dense attention first?
 
-The figures below follow the usual **paper-style schematic**: minimal decoration, explicit labels, and placement next to the claims they support (cf. NeurIPS / ICML figure guidelines: vector line art, legible fonts at print size, one idea per panel).
 
 Read together they fit: SampleAttention gives you the map of where sparsity lives; LServe gives you the system that exploits it.
 
