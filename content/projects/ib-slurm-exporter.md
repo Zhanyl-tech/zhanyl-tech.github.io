@@ -31,6 +31,8 @@ stalling the all-reduce and idling every GPU behind it.
 Fabric monitoring can see that counter. It just cannot tell you *which job* owns
 it, because nothing connects a Slurm job ID to a network device.
 
+![Five hop chain from a Slurm cgroup through a PID and an open uverbs file descriptor to the per-port hardware counter](/images/diagrams/ib-join-chain.svg)
+
 ## The join
 
 Neither Slurm nor the HCA knows about the other. The bridge turns out to be a
