@@ -40,6 +40,8 @@ Nothing in Slurm looks at GPU health between jobs. Epilog is the hook that
 could — it runs on every completion, on the node, as root, while nothing else is
 touching the hardware.
 
+![Decision tree: a failed GPU query exits zero and keeps the node in service, while persistent hardware faults exit non-zero and drain](/images/diagrams/epilog-severity.svg)
+
 ## Why it's a dangerous tool to write
 
 **Slurm drains the node when Epilog exits non-zero.**
