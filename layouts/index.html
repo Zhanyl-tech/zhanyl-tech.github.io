@@ -59,6 +59,18 @@
     </p>
   </section>
 
+  {{/* The system diagram, directly under the hero. It does in one image what
+       the project list does in eight rows, and it carries the measured
+       refutation on its face — which is the most differentiated thing here.
+       Same asset as the GitHub profile banner, so the two read as one identity. */}}
+  <figure class="system-map">
+    <img src="/images/architecture.svg" width="1200" height="600" loading="lazy" decoding="async"
+         alt="Agentic operations over the Slurm control plane: slurm-rca-bench scores
+              cluster-sre-agent, which diagnoses a chain of shared filesystem, accounting
+              database, slurmdbd, slurmctld and scheduling. Underneath, five open-source
+              tools cover the lifecycle of a GPU allocation.">
+  </figure>
+
   {{/* Qualitative rather than vanity metrics — nothing here is a number that
        would need defending in an interview. Edit in hugo.yaml → params.facts. */}}
   {{- with .Site.Params.facts }}

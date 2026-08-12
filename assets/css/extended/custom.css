@@ -951,3 +951,18 @@ a:hover { color: var(--accent-2); }
   .post-content pre { padding: 13px 15px !important; font-size: 12px !important; }
   .post-list li { flex-direction: column; gap: 3px; }
 }
+
+/* System map — the architecture diagram under the hero.
+   The SVG is a self-contained dark card, so it needs no theme handling of its
+   own; the border and radius here just seat it against the page in light mode,
+   where a floating dark rectangle would otherwise read as a foreign object. */
+.system-map {
+  margin: 2.6rem 0 3rem;
+}
+.system-map img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 14px;
+  border: 1px solid var(--border, #243040);
+}
