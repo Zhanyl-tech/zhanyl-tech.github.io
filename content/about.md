@@ -2,46 +2,56 @@
 title: "About"
 layout: "single"
 url: "/about/"
-summary: "About me"
+summary: "I build the systems that allocate scarce, expensive, heterogeneous compute — and the benchmarks that prove whether they actually work."
 ShowToc: false
 ---
 
-## Who I Am
+I build the systems that allocate scarce, expensive, heterogeneous compute —
+and the benchmarks that prove whether they actually work.
 
-I'm a senior HPC and cluster infrastructure engineer at a quantitative trading firm with 8+ years building and operating large-scale distributed systems — Kubernetes, SLURM, GPU clusters, and cloud platforms.
+That sentence is deliberate. The tools change: Slurm today, Kubernetes next,
+rack-scale disaggregated hardware after that. The problem doesn't. Somebody has
+to decide which job gets which accelerator, prove the decision was right, and
+diagnose it when the answer stops being obvious.
 
-I'm pursuing an MS in Computer Science with an ML specialization at Georgia Tech, alongside the Certificate in Quantitative Finance (CQF). This gives me production infrastructure expertise, ML systems depth, and the mathematical foundations for derivatives pricing and risk modeling.
+I'm a senior cluster engineer in platform engineering at a quantitative hedge
+fund, working on the GPU compute platform behind machine-learning research.
+Scheduling and fairshare policy, GPU lifecycle, distributed storage, and the
+telemetry that turns "the cluster feels slow" into a number.
 
-## What I Build
+## What I actually work on
 
-I work on the infrastructure that makes ML systems run fast and reliably at scale: GPU cluster operations, inference optimization (vLLM, TensorRT-LLM), distributed training orchestration, and the emerging agentic AI infrastructure layer — deploying autonomous systems that reason, decide, and act on production workloads.
+**Scheduling and resource allocation.** Multifactor priority, backfill,
+fairshare decay, gang scheduling, preemption. I replay real job traces against
+policy changes before they reach a controller, because the alternative is
+finding out in production. The measured result that surprised me: backfill
+moved CPU utilization from 72.2% to 83.6% and cut mean job wait from 1,913
+minutes to 374, while the priority weights everyone tunes first barely
+mattered.
 
-## What I Write About
+**Measurement and honest evaluation.** Most infrastructure claims are folk
+knowledge. I build benchmarks to check them, and I publish the ones that come
+out negative — the first finding in my incident-diagnosis benchmark was that
+its own flagship scenario doesn't happen the way everyone says it does.
 
-This site has two main content streams:
+**Agentic operations, carefully.** Published LLM agents reach roughly 49% on
+the best root-cause-analysis benchmarks. That number should determine how much
+autonomy you grant, and mostly it doesn't. I'm interested in the guardrails and
+the calibration more than the agent.
 
-**[Blog](/blog/)** — Technical deep dives on ML infrastructure, GPU inference, distributed training, and the systems engineering behind quantitative platforms. Written from a practitioner's perspective.
+## Background
 
-**[Lab Notes](/experiments/)** — My public lab notebook. Shorter field reports on deploying new tools, running benchmarks, and documenting what I find before anyone else does.
+Ten years of production infrastructure in financial services — quantitative
+research computing, exchange platform engineering, Linux systems at fleet
+scale. MS in Computer Science (machine learning) at Georgia Tech, the
+Certificate in Quantitative Finance, and NVIDIA's NCP-AIO.
 
-I also maintain [project pages](/projects/) for my portfolio work, [notes](/notes/) for quick technical observations, and a [reading list](/reading/) of books I recommend.
+The combination is intentional. I want to build ML platforms for people doing
+quantitative research, which means understanding the systems, the agents that
+operate them, and the mathematics they run.
 
-## Current Focus
+---
 
-- **Production:** Expanding ML infrastructure scope — vLLM inference optimization, GPU cluster operations
-- **Academic:** MS in CS (ML specialization, Georgia Tech, May 2027) + CQF final project (July 2026)
-- **Portfolio:** Three projects at the intersection of HPC inference, distributed training, and quantitative finance
-- **Learning:** Agentic AI infrastructure (LangGraph, MCP, NemoClaw/OpenClaw), hardware-agnostic inference (vLLM, Ray, JAX)
-
-Outside of engineering, I play chess and poker — both sharpen the strategic and probabilistic thinking I apply to systems architecture and risk modeling.
-
-## Resume
-
-📄 [Download Resume (PDF)](/resume.pdf)
-
-## Contact
-
-- [GitHub](https://github.com/Zhanyl-tech)
-- [LinkedIn](https://www.linkedin.com/in/za-engineering/)
-- [X / Twitter](https://x.com/ZhanylAbd)
-- Resume: [Download PDF](/resume.pdf)
+**Elsewhere:** [GitHub](https://github.com/Zhanyl-tech) ·
+[LinkedIn](https://www.linkedin.com/in/za-engineering/) ·
+[X](https://x.com/ZhanylAbd) · [Now](/now/) · [RSS](/index.xml)

@@ -1,4 +1,5 @@
 ---
+draft: true  # Retired: absorbed into cluster-sre-agent, which is the same idea with a benchmark attached. Marked draft rather than deleted.
 title: "Agentic ML Inference Infrastructure"
 date: 2026-01-01
 description: "Production agentic AI infrastructure layer: autonomous systems that reason, decide, and act on real workloads using vLLM, LangGraph, and MCP."
