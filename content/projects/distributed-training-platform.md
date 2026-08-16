@@ -1,4 +1,5 @@
 ---
+draft: true  # Retired: the 128-GPU distributed training project was dropped. Kept in git history and marked draft rather than deleted, so it is off the public site without losing the writing.
 title: "128-GPU Distributed Training Platform"
 date: 2026-01-01
 description: "Distributed ML training infrastructure for large-scale models: FSDP, gradient checkpointing, mixed precision, and cost-optimized multi-node orchestration."
