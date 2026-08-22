@@ -8,6 +8,10 @@
     {{- end }}
   </header>
 
+  {{- with .Content }}
+  <div class="list-content post-content">{{ . }}</div>
+  {{- end }}
+
   {{- $pages := .Pages }}
   {{- if not $pages }}
   <p class="empty">Nothing here yet.</p>
