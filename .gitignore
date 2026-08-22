@@ -31,3 +31,4 @@ __pycache__/
 
 # Node (for mermaid-cli)
 node_modules/
+.claude/

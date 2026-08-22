@@ -3,9 +3,6 @@ title: "Projects"
 description: "Open-source infrastructure tooling. Each links to its repository; each has a runnable demo or a reproducible benchmark."
 ---
 
-Open-source infrastructure tooling. Each links to its repository; each has a
-runnable demo or a reproducible benchmark.
-
 ## Measurement & benchmarks
 
 **[slurm-rca-bench](https://github.com/Zhanyl-tech/slurm-rca-bench)** — the
@@ -28,6 +25,9 @@ replays `sacct` output. The measured result: enabling backfill moved CPU
 utilisation from 72.2% to 83.6% and mean wait from 1,913 to 374 minutes, while
 sweeping the priority weights barely moved either. The real lever was users'
 `--time` limits.
+
+Write-up: [Your Slurm priority weights matter less than your users' time
+limits](/experiments/2026-07-26-slurm-backfill-time-limits/)
 
 **k8s-gpu-scheduler-lab** — *in progress.* A controlled comparison of
 Kubernetes GPU schedulers (Kueue, Volcano, NVIDIA KAI) on the same workload
