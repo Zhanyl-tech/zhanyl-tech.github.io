@@ -52,6 +52,8 @@ operate them, and the mathematics they run.
 
 ---
 
+**Résumé:** [download as PDF](/resume.pdf)
+
 **Elsewhere:** [GitHub](https://github.com/Zhanyl-tech) ·
 [LinkedIn](https://www.linkedin.com/in/za-engineering/) ·
 [X](https://x.com/ZhanylAbd) · [Now](/now/) · [RSS](/index.xml)
