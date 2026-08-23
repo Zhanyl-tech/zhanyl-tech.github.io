@@ -14,10 +14,15 @@
 
   /* Lifted off near-black. #0d1117 read as a void on large displays; this
      keeps the dark register but gives the page a surface. Rules and code
-     surfaces move with it so the contrast steps stay even. */
-  --bg:        #1f1820;
-  --bg-raised: #271e29;
-  --bg-code:   #150f17;
+     surfaces move with it so the contrast steps stay even.
+
+     One cool family, deliberately. These were a warm plum (#1f1820) while the
+     sticky header was rgba(20,26,35,.88) and every rule and accent was
+     blue-grey — so the page read as two different backgrounds meeting at the
+     header edge. --bg is now that header colour, so the seam disappears. */
+  --bg:        #141a23;
+  --bg-raised: #1c2431;
+  --bg-code:   #0d1117;
 
   --ink:       #e9eff5;
   --ink-2:     #adb8c4;
@@ -54,10 +59,10 @@
    declaration loses; setting the variable it reads is what actually holds.
    Same reasoning for the theme surface variables below. */
 :root, .dark, html.dark, body.dark {
-  --code-block-bg: #150f17;
+  --code-block-bg: #0d1117;
   --code-bg: rgba(125, 133, 146, .20);
-  --theme: #1f1820;
-  --entry: #271e29;
+  --theme: #141a23;
+  --entry: #1c2431;
   --primary: #e9eff5;
   --secondary: #adb8c4;
   --tertiary: #262d38;
