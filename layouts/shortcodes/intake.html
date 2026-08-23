@@ -23,8 +23,17 @@
 {{- end }}
 
 <form class="intake-form" method="POST"
+      data-subject-prefix="{{ site.Params.formSubjectPrefix | default "INBOUND" }}"
       {{ with $endpoint }}action="{{ . }}"{{ end }}
       {{ if not $endpoint }}onsubmit="return false"{{ end }}>
+
+  {{/* Delivery metadata. `_subject` is rewritten on submit by the script at the
+       bottom so the inbox line is scannable; `_replyto` makes the mail client's
+       Reply button go to the sender rather than to the form provider. Both
+       names are the de-facto convention across Formspree, Web3Forms and Basin. */}}
+  <input type="hidden" name="_subject" value="{{ site.Params.formSubjectPrefix | default "INBOUND" }} — new submission">
+  <input type="hidden" name="_replyto" value="">
+  {{ with site.Params.formAccessKey }}<input type="hidden" name="access_key" value="{{ . }}">{{ end }}
 
   {{/* Honeypot. Bots fill it; people never see it. */}}
   <div class="intake-hp" aria-hidden="true">
@@ -156,5 +165,23 @@
     }
     radios.forEach(function (r) { r.addEventListener('change', sync); });
     sync();
+
+    // Rewrite the subject at submit time so the inbox line carries the topic,
+    // the organisation and the sender -- enough to triage without opening it.
+    var form = document.querySelector('.intake-form');
+    var prefix = form.getAttribute('data-subject-prefix') || 'INBOUND';
+    form.addEventListener('submit', function () {
+      var picked = document.querySelector('.intake-form input[name="topic"]:checked');
+      var topic = picked ? picked.value : 'other';
+      var label = {role: 'ROLE', collaboration: 'COLLAB', investment: 'INVEST', other: 'OTHER'}[topic] || 'OTHER';
+      var org = (form.querySelector('[name="organisation"]').value || '').trim();
+      var who = (form.querySelector('[name="name"]').value || '').trim();
+      var email = (form.querySelector('[name="email"]').value || '').trim();
+      var bits = [prefix, '[' + label + ']'];
+      if (org) bits.push(org);
+      if (who) bits.push('\u2014 ' + who);
+      form.querySelector('[name="_subject"]').value = bits.join(' ');
+      form.querySelector('[name="_replyto"]').value = email;
+    });
   })();
 </script>
