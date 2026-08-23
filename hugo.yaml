@@ -18,6 +18,11 @@ params:
   title: "Zhanyl Abdybaeva"
   description: "Senior HPC & ML Infrastructure Engineer | MS CS (GT) + CQF | Building production AI systems for quantitative trading"
   keywords: [ML Infrastructure, HPC, GPU Inference, Quantitative Finance, Distributed Training, CUDA]
+  # Endpoint for the /contact/ intake form. Any provider that accepts a POST
+  # of form fields works (Formspree, Web3Forms, Basin, a Worker). Left empty
+  # deliberately: the form renders disabled and says so rather than posting
+  # into a void. No email address appears anywhere on the site.
+  formEndpoint: ""
   author: "Zhanyl Abdybaeva"
   DateFormat: "January 2, 2006"
   defaultTheme: dark
@@ -143,6 +148,10 @@ menu:
       name: About
       url: /about/
       weight: 50
+    - identifier: contact
+      name: Work with me
+      url: /contact/
+      weight: 55
     - identifier: search
       name: Search
       url: /search/

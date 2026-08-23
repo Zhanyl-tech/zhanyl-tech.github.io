@@ -1,0 +1,160 @@
+{{/* Inbound intake form.
+
+     Deliberately provider-agnostic: set `params.formEndpoint` in hugo.yaml to
+     any endpoint that accepts a POST of form fields (Formspree, Web3Forms,
+     Basin, a Cloudflare Worker, whatever). Nothing here embeds an email
+     address, which is the entire point — the reply comes from Zhanyl's side,
+     after she has decided the message is worth answering.
+
+     With no endpoint configured the form renders disabled with an explanatory
+     notice rather than silently POSTing into a void, because a contact form
+     that quietly loses messages is worse than no contact form. */}}
+
+{{- $endpoint := site.Params.formEndpoint | default "" -}}
+
+<div class="intake">
+
+{{- if not $endpoint }}
+  <p class="intake-notice">
+    <strong>This form isn't connected yet.</strong> Set <code>formEndpoint</code>
+    in <code>hugo.yaml</code> to a form-handling endpoint and it will start
+    delivering. Until then nothing here submits anywhere.
+  </p>
+{{- end }}
+
+<form class="intake-form" method="POST"
+      {{ with $endpoint }}action="{{ . }}"{{ end }}
+      {{ if not $endpoint }}onsubmit="return false"{{ end }}>
+
+  {{/* Honeypot. Bots fill it; people never see it. */}}
+  <div class="intake-hp" aria-hidden="true">
+    <label>Leave this empty<input type="text" name="_gotcha" tabindex="-1" autocomplete="off"></label>
+  </div>
+
+  <fieldset>
+    <legend>Who you are</legend>
+
+    <label for="k-name">Your name <span class="req">required</span></label>
+    <input id="k-name" name="name" type="text" required autocomplete="name">
+
+    <label for="k-email">Your email <span class="req">required</span></label>
+    <input id="k-email" name="email" type="email" required autocomplete="email"
+           placeholder="where I should reply">
+
+    <label for="k-org">Company or organisation</label>
+    <input id="k-org" name="organisation" type="text" autocomplete="organization">
+
+    <label for="k-link">A link — company site, fund, repo, LinkedIn</label>
+    <input id="k-link" name="link" type="url" placeholder="https://">
+  </fieldset>
+
+  <fieldset>
+    <legend>What is this about?</legend>
+    <div class="intake-choices">
+      <label class="choice"><input type="radio" name="topic" value="role" checked data-panel="p-role">
+        <span><strong>A role</strong><em>Full-time, contract, or fractional</em></span></label>
+      <label class="choice"><input type="radio" name="topic" value="collaboration" data-panel="p-collab">
+        <span><strong>Collaboration</strong><em>Open source, research, writing, a talk</em></span></label>
+      <label class="choice"><input type="radio" name="topic" value="investment" data-panel="p-invest">
+        <span><strong>Investing or advising</strong><em>Angel, pre-seed, advisory, technical diligence</em></span></label>
+      <label class="choice"><input type="radio" name="topic" value="other" data-panel="p-other">
+        <span><strong>Something else</strong><em>Anything that isn't the above</em></span></label>
+    </div>
+  </fieldset>
+
+  <fieldset class="panel" id="p-role">
+    <legend>The role</legend>
+
+    <label for="k-title">Job title</label>
+    <input id="k-title" name="role_title" type="text">
+
+    <div class="intake-row">
+      <div>
+        <label for="k-comp">Compensation range</label>
+        <input id="k-comp" name="role_comp" type="text" placeholder="base + equity, or a band">
+      </div>
+      <div>
+        <label for="k-loc">Location policy</label>
+        <input id="k-loc" name="role_location" type="text" placeholder="remote / hybrid / onsite + city">
+      </div>
+    </div>
+
+    <label for="k-jd">Full job description <span class="req">paste the whole thing</span></label>
+    <textarea id="k-jd" name="role_jd" rows="12"
+      placeholder="The complete JD, not a summary. Team, what the system actually does, who I'd report to, and what the first six months look like."></textarea>
+    <p class="hint">A summary tells me almost nothing. The full text tells me whether the
+    problem is one I want.</p>
+  </fieldset>
+
+  <fieldset class="panel" id="p-collab" hidden>
+    <legend>The collaboration</legend>
+
+    <label for="k-cwhat">What are you building or writing?</label>
+    <textarea id="k-cwhat" name="collab_what" rows="6"
+      placeholder="What it is, where it is, and what stage it's at."></textarea>
+
+    <label for="k-cask">What would you want from me?</label>
+    <textarea id="k-cask" name="collab_ask" rows="5"
+      placeholder="Review, co-authorship, a benchmark, a talk, an implementation. Rough time commitment if you know it."></textarea>
+  </fieldset>
+
+  <fieldset class="panel" id="p-invest" hidden>
+    <legend>Investing or advising</legend>
+
+    <div class="intake-row">
+      <div>
+        <label for="k-istage">Stage</label>
+        <input id="k-istage" name="invest_stage" type="text" placeholder="pre-seed, seed, Series A…">
+      </div>
+      <div>
+        <label for="k-isize">Cheque size or scope</label>
+        <input id="k-isize" name="invest_size" type="text" placeholder="or 'advisory, equity' etc.">
+      </div>
+    </div>
+
+    <label for="k-iwhat">What's the company, and what's the ask?</label>
+    <textarea id="k-iwhat" name="invest_what" rows="7"
+      placeholder="What you're building, who's on the team, and whether you're looking for capital, advisory, or technical diligence."></textarea>
+    <p class="hint">If this is technical diligence on GPU or scheduling infrastructure, say so —
+    it's the version of this I'm most likely to say yes to.</p>
+  </fieldset>
+
+  <fieldset class="panel" id="p-other" hidden>
+    <legend>Go ahead</legend>
+    <label for="k-owhat">What's on your mind?</label>
+    <textarea id="k-owhat" name="other_what" rows="7"></textarea>
+  </fieldset>
+
+  <fieldset>
+    <legend>Anything else</legend>
+    <label for="k-notes" class="sr-only">Anything else</label>
+    <textarea id="k-notes" name="notes" rows="4"
+      placeholder="Optional. Timeline, how you found me, anything that helps."></textarea>
+  </fieldset>
+
+  <button type="submit" class="intake-submit" {{ if not $endpoint }}disabled{{ end }}>
+    Send it
+  </button>
+  <p class="intake-foot">
+    I read every one. A reply comes from my own address if it's a fit — no
+    reply means it wasn't. Nothing here is stored on this site.
+  </p>
+</form>
+</div>
+
+<script>
+  // Progressive enhancement: every panel is in the DOM and only the irrelevant
+  // ones are hidden, so the form still works with JS off — a visitor without
+  // scripts simply sees all four sections and fills the one that applies.
+  (function () {
+    var radios = document.querySelectorAll('.intake-form input[name="topic"]');
+    var panels = document.querySelectorAll('.intake-form .panel');
+    function sync() {
+      var chosen = document.querySelector('.intake-form input[name="topic"]:checked');
+      var want = chosen ? chosen.getAttribute('data-panel') : null;
+      panels.forEach(function (p) { p.hidden = (p.id !== want); });
+    }
+    radios.forEach(function (r) { r.addEventListener('change', sync); });
+    sync();
+  })();
+</script>
