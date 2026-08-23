@@ -1,5 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600" role="img"
-     aria-label="Architecture: an agentic operations layer diagnosing the Slurm control plane, with seven open-source tools attached to the stages they act on.">
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="730" viewBox="0 0 1200 730" role="img"
+     aria-labelledby="mapttl mapdsc">
+  <title id="mapttl">The same allocation problem, two substrates, one measurement layer</title>
+  <desc id="mapdsc">Four bands. The top band, MEASUREMENT, spans the full width and holds slurm-rca-bench and k8s-gpu-scheduler-lab; arrows run down from it to score each control plane below. The middle row is two columns side by side: on the left the SLURM control plane with slurm-scheduler-lab, cluster-sre-agent with slurm-mcp, and epilog-gpu-validator; on the right the KUBERNETES control plane with slinky-gitops and k8s-gpu-scheduler-lab covering Kueue, Volcano and NVIDIA KAI. Arrows run down from both columns into the bottom band, GPU FLEET, which spans the full width and holds gpu-reaper and ib-slurm-exporter. The tools change with the substrate; the fleet beneath and the measurement layer above do not.</desc>
   <defs>
     <style>
       .mono { font-family: 'JetBrains Mono','SF Mono',Menlo,Consolas,monospace; }
@@ -12,6 +14,8 @@
       .t-edge   { font-size: 10px; fill: #7d8894; letter-spacing: 0.6px; }
       .t-mark   { font-size: 30px; font-weight: 500; fill: #f5b544; }
       .t-mark-s { font-size: 15px; font-weight: 500; fill: #f5b544; }
+      .t-cap    { font-size: 13px; fill: #adb8c4; }
+      .t-sched  { font-size: 11.5px; font-weight: 500; fill: #79c0ff; }
     </style>
     <marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto">
       <path d="M0,0 L7,3 L0,6 z" fill="#58a6ff"/>
@@ -26,111 +30,100 @@
     </linearGradient>
   </defs>
 
-  <rect width="1200" height="600" rx="14" fill="#141a23"/>
-  <rect x="0.5" y="0.5" width="1199" height="599" rx="14" fill="none" stroke="#243040"/>
+  <rect width="1200" height="730" rx="14" fill="#141a23"/>
+  <rect x="0.5" y="0.5" width="1199" height="729" rx="14" fill="none" stroke="#243040"/>
 
   <!-- ── header ─────────────────────────────────────────────────────── -->
   <text class="mono t-mark" x="42" y="58">18</text>
   <text class="mono t-mark-s" x="76" y="46">∞</text>
-  <text class="mono t-title" x="104" y="56">ML platforms, and the agents that operate them</text>
-  <text class="mono t-sub" x="104" y="78">GPU cluster infrastructure · Slurm · Kubernetes · agentic operations</text>
+  <text class="mono t-title" x="104" y="56">The same allocation problem, two substrates</text>
+  <text class="mono t-sub" x="104" y="78">Slurm · Kubernetes · one GPU fleet underneath · one measurement layer above</text>
   <rect x="42" y="98" width="1116" height="1" fill="url(#glow)"/>
 
-  <!-- ── band 1: agentic operations ─────────────────────────────────── -->
-  <text class="mono t-band" x="42" y="132">AGENTIC OPERATIONS</text>
+  <!-- ── band 1: measurement, spans both columns ────────────────────── -->
+  <text class="mono t-band" x="42" y="132">MEASUREMENT — the layer that decides whether any of it works</text>
 
   <g>
-    <rect x="222" y="146" width="290" height="60" rx="8" fill="#1b2431" stroke="#f5b544" stroke-opacity="0.55"/>
-    <text class="mono t-node" x="240" y="172">slurm-rca-bench</text>
-    <text class="mono t-desc" x="240" y="190">10 scenarios · 2 undiagnosable · partial credit</text>
+    <rect x="42" y="144" width="1116" height="94" rx="10" fill="#111823" stroke="#f5b544" stroke-opacity="0.42"/>
+
+    <rect x="66" y="162" width="520" height="58" rx="8" fill="#1b2431" stroke="#f5b544" stroke-opacity="0.55"/>
+    <text class="mono t-node" x="88" y="187">slurm-rca-bench</text>
+    <text class="mono t-desc" x="88" y="205">10 scenarios · 2 undiagnosable · degenerate baselines</text>
+
+    <rect x="614" y="162" width="520" height="58" rx="8" fill="#1b2431" stroke="#f5b544" stroke-opacity="0.55"/>
+    <text class="mono t-node" x="636" y="187">k8s-gpu-scheduler-lab</text>
+    <text class="mono t-desc" x="636" y="205">identical traces · kwok substrate · runs with no GPUs</text>
   </g>
 
-  <g>
-    <rect x="688" y="146" width="290" height="60" rx="8" fill="#1b2431" stroke="#f5b544" stroke-opacity="0.55"/>
-    <text class="mono t-node" x="706" y="172">cluster-sre-agent</text>
-    <text class="mono t-desc" x="706" y="190">5 ablatable configs · A → E</text>
-  </g>
-
-  <line x1="512" y1="176" x2="682" y2="176" stroke="#f5b544" stroke-opacity="0.7" stroke-width="1.4" marker-end="url(#ar-a)"/>
-  <text class="mono t-edge" x="556" y="168">scores</text>
-
-  <!-- diagnosis arrow down into the control plane -->
-  <line x1="833" y1="206" x2="833" y2="268" stroke="#f5b544" stroke-opacity="0.45" stroke-width="1.2"
+  <line x1="306" y1="238" x2="306" y2="286" stroke="#f5b544" stroke-opacity="0.45" stroke-width="1.2"
         stroke-dasharray="4 4" marker-end="url(#ar-a)"/>
-  <text class="mono t-edge" x="845" y="242">diagnoses</text>
+  <text class="mono t-edge" x="318" y="266">scores</text>
 
-  <!-- ── band 2: slurm control plane ─────────────────────────────────── -->
-  <text class="mono t-band" x="42" y="300">SLURM CONTROL PLANE — small, static, identical at every site</text>
+  <line x1="874" y1="238" x2="874" y2="286" stroke="#f5b544" stroke-opacity="0.45" stroke-width="1.2"
+        stroke-dasharray="4 4" marker-end="url(#ar-a)"/>
+  <text class="mono t-edge" x="886" y="266">scores</text>
 
-  <g>
-    <rect x="42" y="316" width="1116" height="74" rx="10" fill="#111823" stroke="#243040"/>
-
-    <rect x="66"  y="338" width="176" height="32" rx="6" fill="#16202c" stroke="#2c3a4c"/>
-    <text class="mono t-chain" x="94"  y="359">shared FS</text>
-
-    <rect x="278" y="338" width="176" height="32" rx="6" fill="#16202c" stroke="#2c3a4c"/>
-    <text class="mono t-chain" x="300" y="359">accounting DB</text>
-
-    <rect x="490" y="338" width="176" height="32" rx="6" fill="#16202c" stroke="#2c3a4c"/>
-    <text class="mono t-chain" x="528" y="359">slurmdbd</text>
-
-    <rect x="702" y="338" width="176" height="32" rx="6" fill="#16202c" stroke="#2c3a4c"/>
-    <text class="mono t-chain" x="738" y="359">slurmctld</text>
-
-    <rect x="914" y="338" width="220" height="32" rx="6" fill="#16202c" stroke="#2c3a4c"/>
-    <text class="mono t-chain" x="962" y="359">scheduling</text>
-
-    <line x1="242" y1="354" x2="272" y2="354" stroke="#58a6ff" stroke-width="1.3" marker-end="url(#ar)"/>
-    <line x1="454" y1="354" x2="484" y2="354" stroke="#58a6ff" stroke-width="1.3" marker-end="url(#ar)"/>
-    <line x1="666" y1="354" x2="696" y2="354" stroke="#58a6ff" stroke-width="1.3" marker-end="url(#ar)"/>
-    <line x1="878" y1="354" x2="908" y2="354" stroke="#58a6ff" stroke-width="1.3" marker-end="url(#ar)"/>
-  </g>
-
-  <!-- measured-refutation callout -->
-  <text class="mono t-desc" x="42" y="412" fill="#f5b544">
-    measured: a stalled accounting path does NOT halt scheduling — the folk model is wrong
-  </text>
-
-  <!-- ── band 3: the tools ──────────────────────────────────────────── -->
-  <text class="mono t-band" x="42" y="452">OPEN SOURCE — the lifecycle of a GPU allocation</text>
-
+  <!-- ── band 2a: slurm control plane ───────────────────────────────── -->
+  <text class="mono t-band" x="42" y="306">SLURM CONTROL PLANE</text>
 
   <g>
-    <rect x="42" y="466" width="200" height="72" rx="8" fill="#1b2431" stroke="#3fb950" stroke-opacity="0.40"/>
-    <text class="mono t-node" x="58" y="492">scheduler-lab</text>
-    <text class="mono t-desc" x="58" y="510">policy, before it ships</text>
-    <text class="mono t-desc" x="58" y="526" fill="#3fb950">util 72.2% → 83.6%</text>
+    <rect x="42" y="318" width="546" height="218" rx="10" fill="#111823" stroke="#243040"/>
+
+    <rect x="66" y="338" width="498" height="54" rx="6" fill="#16202c" stroke="#2c3a4c"/>
+    <text class="mono t-chain" x="88" y="360">slurm-scheduler-lab</text>
+    <text class="mono t-desc"  x="88" y="378">replay policy before it reaches a live controller</text>
+
+    <rect x="66" y="402" width="498" height="54" rx="6" fill="#16202c" stroke="#2c3a4c"/>
+    <text class="mono t-chain" x="88" y="424">cluster-sre-agent · slurm-mcp</text>
+    <text class="mono t-desc"  x="88" y="442">diagnosis over an explicit graph, read-only in code</text>
+
+    <rect x="66" y="466" width="498" height="54" rx="6" fill="#16202c" stroke="#2c3a4c"/>
+    <text class="mono t-chain" x="88" y="488">epilog-gpu-validator</text>
+    <text class="mono t-desc"  x="88" y="506">catch a degraded device between jobs, never on ignorance</text>
   </g>
+
+  <!-- ── band 2b: kubernetes control plane ──────────────────────────── -->
+  <text class="mono t-band" x="612" y="306">KUBERNETES CONTROL PLANE</text>
 
   <g>
-    <rect x="264" y="466" width="200" height="72" rx="8" fill="#1b2431" stroke="#3fb950" stroke-opacity="0.40"/>
-    <text class="mono t-node" x="280" y="492">gpu-reaper</text>
-    <text class="mono t-desc" x="280" y="510">waste during a job</text>
-    <text class="mono t-desc" x="280" y="526" fill="#3fb950">observe by default</text>
+    <rect x="612" y="318" width="546" height="218" rx="10" fill="#111823" stroke="#243040"/>
+
+    <rect x="636" y="338" width="498" height="54" rx="6" fill="#16202c" stroke="#2c3a4c"/>
+    <text class="mono t-chain" x="658" y="360">slinky-gitops</text>
+    <text class="mono t-desc"  x="658" y="378">Slurm on Kubernetes · auth-key rotation · GitOps sync</text>
+
+    <rect x="636" y="402" width="498" height="118" rx="6" fill="#16202c" stroke="#2c3a4c"/>
+    <text class="mono t-chain" x="658" y="424">k8s-gpu-scheduler-lab</text>
+    <text class="mono t-desc"  x="658" y="442">the schedulers under comparison</text>
+    <line x1="658" y1="454" x2="1112" y2="454" stroke="#2c3a4c" stroke-width="1"/>
+    <text class="mono t-sched" x="658" y="474">Kueue</text>
+    <text class="mono t-desc"  x="726" y="474">quota · admission</text>
+    <text class="mono t-sched" x="658" y="493">Volcano</text>
+    <text class="mono t-desc"  x="726" y="493">gang scheduling · DRF fairness</text>
+    <text class="mono t-sched" x="658" y="512">NVIDIA KAI</text>
+    <text class="mono t-desc"  x="746" y="512">topology-aware gang · DRA</text>
   </g>
+
+  <line x1="306" y1="536" x2="306" y2="584" stroke="#58a6ff" stroke-width="1.3" marker-end="url(#ar)"/>
+  <text class="mono t-edge" x="318" y="564">allocates</text>
+
+  <line x1="874" y1="536" x2="874" y2="584" stroke="#58a6ff" stroke-width="1.3" marker-end="url(#ar)"/>
+  <text class="mono t-edge" x="886" y="564">allocates</text>
+
+  <!-- ── band 3: gpu fleet, spans both columns ──────────────────────── -->
+  <text class="mono t-band" x="42" y="604">GPU FLEET — the same hardware either way</text>
 
   <g>
-    <rect x="486" y="466" width="200" height="72" rx="8" fill="#1b2431" stroke="#3fb950" stroke-opacity="0.40"/>
-    <text class="mono t-node" x="502" y="492">ib-slurm-exporter</text>
-    <text class="mono t-desc" x="502" y="510">fabric → the job</text>
-    <text class="mono t-desc" x="502" y="526" fill="#3fb950">InfiniBand / RoCE</text>
+    <rect x="42" y="616" width="1116" height="76" rx="10" fill="#111823" stroke="#3fb950" stroke-opacity="0.40"/>
+
+    <rect x="66" y="630" width="520" height="48" rx="8" fill="#1b2431" stroke="#3fb950" stroke-opacity="0.45"/>
+    <text class="mono t-node" x="88" y="651">gpu-reaper</text>
+    <text class="mono t-desc" x="88" y="668">reclaim waste during a job · an outage can never cancel a healthy one</text>
+
+    <rect x="614" y="630" width="520" height="48" rx="8" fill="#1b2431" stroke="#3fb950" stroke-opacity="0.45"/>
+    <text class="mono t-node" x="636" y="651">ib-slurm-exporter</text>
+    <text class="mono t-desc" x="636" y="668">fabric counters → the owning job · refuses to attribute a shared device</text>
   </g>
 
-  <g>
-    <rect x="708" y="466" width="200" height="72" rx="8" fill="#1b2431" stroke="#3fb950" stroke-opacity="0.40"/>
-    <text class="mono t-node" x="724" y="492">epilog-validator</text>
-    <text class="mono t-desc" x="724" y="510">faults between jobs</text>
-    <text class="mono t-desc" x="724" y="526" fill="#3fb950">never on ignorance</text>
-  </g>
-
-  <g>
-    <rect x="930" y="466" width="228" height="72" rx="8" fill="#1b2431" stroke="#3fb950" stroke-opacity="0.40"/>
-    <text class="mono t-node" x="946" y="492">slinky-gitops</text>
-    <text class="mono t-desc" x="946" y="510">Slurm on Kubernetes</text>
-    <text class="mono t-desc" x="946" y="526" fill="#3fb950">auth-key rotation</text>
-  </g>
-
-  <text class="mono t-desc" x="42" y="568" fill="#7d8894">
-    one rule throughout — never act on absent evidence · a telemetry gap is a collector fault, not an idle GPU
-  </text>
+  <text class="mono t-cap" x="42" y="716">The same allocation problem, two substrates, one measurement layer.</text>
 </svg>

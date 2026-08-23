@@ -5,8 +5,8 @@ description: "Open-source infrastructure tooling. Each links to its repository; 
 
 ## Measurement & benchmarks
 
-**[slurm-rca-bench](https://github.com/Zhanyl-tech/slurm-rca-bench)** — the
-first public incident-diagnosis benchmark for HPC schedulers. Ten reproducible
+**[slurm-rca-bench](https://github.com/Zhanyl-tech/slurm-rca-bench)** — a
+public incident-diagnosis benchmark for HPC schedulers. Ten reproducible
 failure scenarios across six fault families, two of them deliberately
 *undiagnosable* so that confident guessing is penalised rather than rewarded.
 Answers are scored with partial credit against degenerate baselines, so a
@@ -29,10 +29,23 @@ sweeping the priority weights barely moved either. The real lever was users'
 Write-up: [Your Slurm priority weights matter less than your users' time
 limits](/experiments/2026-07-26-slurm-backfill-time-limits/)
 
-**k8s-gpu-scheduler-lab** — *in progress.* A controlled comparison of
-Kubernetes GPU schedulers (Kueue, Volcano, NVIDIA KAI) on the same workload
-traces, built on kwok so it runs on a laptop with no GPUs. Nobody has published
-one. Goes public when the baseline is real.
+**[k8s-gpu-scheduler-lab](https://github.com/Zhanyl-tech/k8s-gpu-scheduler-lab)**
+— *phase 1 of 3, public.* A controlled comparison of Kubernetes GPU schedulers
+(Kueue, Volcano, NVIDIA KAI) on the same workload traces, built on kwok so the
+whole benchmark reproduces on a laptop with no GPUs. Nobody has published one.
+Phase 1 ships the substrate, the metrics, the degenerate baselines and K0
+measured on a real control plane. Its most useful finding so far is about a
+metric rather than a scheduler: fragmentation reads 0.0% for the worst policy in
+the set under the queue-relative definition and 55.6% under a fixed reference,
+on identical data — which is why a fragmentation claim that does not state its
+definition cannot be reproduced or disputed.
+
+**[inference-throughput-benchmark](/projects/inference-throughput-benchmark/)**
+— TensorRT-LLM beat vLLM by 18–32% on Llama-3 70B throughput, and vLLM was
+still the right choice. Paged KV-cache admits more concurrent sessions before
+OOM, and for agentic traffic a recoverable throughput gap beats an
+unrecoverable memory ceiling. A first pass on one A100, with the things it does
+not measure stated up front.
 
 ## Cluster tooling
 
@@ -66,6 +79,20 @@ cluster dependency graph, built as five ablatable configurations specified
 before any results existed, scored on slurm-rca-bench. The dependency graph and
 the read-only tool surface are built and tested; the LLM configurations are
 not, so no diagnosis accuracy has been measured yet.
+
+**[slurm-mcp](https://github.com/Zhanyl-tech/slurm-mcp)** — a read-only MCP
+server exposing Slurm scheduler state to agents. The allowlist is enforced in
+code rather than requested in a prompt, and 51 of its tests are real mutating
+and injection attempts rather than assertions about prompt text. Three tools
+instead of one per binary, so the flag surface is not resident in context until
+it is asked for.
+
+**[cluster-ops-skills](https://github.com/Zhanyl-tech/cluster-ops-skills)** —
+eleven on-prem cluster runbooks as loadable Agent Skills. Every one carries a
+mandatory *What not to conclude* section, because the expensive mistakes on a
+cluster are wrong confident diagnoses rather than missing information. A
+validator fails any skill quoting a number without a link to the repo that
+measured it.
 
 ## Research infrastructure
 
