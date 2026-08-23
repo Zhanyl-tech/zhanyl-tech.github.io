@@ -23,6 +23,12 @@ params:
   # deliberately: the form renders disabled and says so rather than posting
   # into a void. No email address appears anywhere on the site.
   formEndpoint: ""
+  # Access key, if the provider uses one instead of a per-form URL (Web3Forms).
+  formAccessKey: ""
+  # Inbox subject prefix. Deliberately loud and unique so a mail filter can
+  # catch it and it never gets lost among newsletters. The script appends
+  # [ROLE] / [COLLAB] / [INVEST] / [OTHER], the organisation, and the sender.
+  formSubjectPrefix: "ZHANYL.TECH"
   author: "Zhanyl Abdybaeva"
   DateFormat: "January 2, 2006"
   defaultTheme: dark
