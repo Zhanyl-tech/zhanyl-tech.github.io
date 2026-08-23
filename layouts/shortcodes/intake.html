@@ -33,9 +33,14 @@
        names are the de-facto convention across Formspree, Web3Forms and Basin. */}}
   <input type="hidden" name="_subject" value="{{ site.Params.formSubjectPrefix | default "INBOUND" }} — new submission">
   <input type="hidden" name="_replyto" value="">
-  {{/* Without this the provider's own branded confirmation page takes over and
-       the visitor is dumped off the site mid-conversation. Send them somewhere
-       that still sounds like a person. */}}
+  {{/* Intended to return the submitter to /thanks/ instead of the provider's
+       own branded confirmation page. Tested against Formspree on 2026-08-23 and
+       it is IGNORED: the field is sent, and formspree.io still renders its own
+       "Thanks!" card. Current Formspree takes the redirect from a dashboard
+       setting (Form settings -> after-submission redirect), not from the form
+       body. Left in place because it is harmless, it is honoured by Web3Forms
+       and Basin, and it starts working the moment the dashboard is configured.
+       /thanks/ exists and is reachable either way. */}}
   <input type="hidden" name="_next" value="{{ absURL "thanks/" }}">
   {{ with site.Params.formAccessKey }}<input type="hidden" name="access_key" value="{{ . }}">{{ end }}
 
