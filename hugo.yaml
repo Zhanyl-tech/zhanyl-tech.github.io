@@ -16,8 +16,10 @@ minify:
 params:
   env: production
   title: "Zhanyl Abdybaeva"
-  description: "Senior HPC & ML Infrastructure Engineer | MS CS (GT) + CQF | Building production AI systems for quantitative trading"
-  keywords: [ML Infrastructure, HPC, GPU Inference, Quantitative Finance, Distributed Training, CUDA]
+  description: "I build the systems that allocate scarce, expensive, heterogeneous compute — and the benchmarks that prove whether they actually work. GPU clusters, scheduling across Slurm and Kubernetes, inference infrastructure."
+  keywords: [ML Infrastructure, HPC, GPU Inference, Kubernetes, GPU scheduling, Kueue, Volcano,
+             benchmarking, MLOps, inference optimization, Slurm, Quantitative Finance,
+             Distributed Training, CUDA]
   # Endpoint for the /contact/ intake form. Any provider that accepts a POST
   # of form fields works (Formspree, Web3Forms, Basin, a Worker). Left empty
   # deliberately: the form renders disabled and says so rather than posting
@@ -154,6 +156,10 @@ menu:
       name: About
       url: /about/
       weight: 50
+    - identifier: now
+      name: Now
+      url: /now/
+      weight: 52
     - identifier: contact
       name: Work with me
       url: /contact/

@@ -79,11 +79,15 @@
        refutation on its face — which is the most differentiated thing here.
        Same asset as the GitHub profile banner, so the two read as one identity. */}}
   <figure class="system-map">
-    <img src="/images/architecture.svg" width="1200" height="600" loading="lazy" decoding="async"
-         alt="Agentic operations over the Slurm control plane: slurm-rca-bench scores
-              cluster-sre-agent, which diagnoses a chain of shared filesystem, accounting
-              database, slurmdbd, slurmctld and scheduling. Underneath, five open-source
-              tools cover the lifecycle of a GPU allocation.">
+    <img src="/images/architecture.svg" width="1200" height="730" loading="lazy" decoding="async"
+         alt="Four bands. Across the top, a measurement layer — slurm-rca-bench and
+              k8s-gpu-scheduler-lab — scores both control planes beneath it. In the middle,
+              two columns side by side: the Slurm control plane with slurm-scheduler-lab,
+              cluster-sre-agent with slurm-mcp, and epilog-gpu-validator; the Kubernetes
+              control plane with slinky-gitops and k8s-gpu-scheduler-lab covering Kueue,
+              Volcano and NVIDIA KAI. Both allocate from a shared GPU fleet along the
+              bottom, held by gpu-reaper and ib-slurm-exporter. The tools change with the
+              substrate; the fleet and the measurement layer do not.">
   </figure>
 
   {{/* Only claim an active cadence when the archive actually backs it up —

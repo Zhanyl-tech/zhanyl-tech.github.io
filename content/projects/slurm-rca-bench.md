@@ -1,8 +1,8 @@
 ---
 title: "slurm-rca-bench"
 date: 2026-08-01
-description: "The first public incident-diagnosis benchmark for HPC schedulers — ten reproducible failure scenarios with measured ground truth and degenerate baselines."
-summary: "The first public incident-diagnosis benchmark for HPC schedulers — ten reproducible failure scenarios with measured ground truth and degenerate baselines."
+description: "A public incident-diagnosis benchmark for HPC schedulers — ten reproducible failure scenarios with measured ground truth and degenerate baselines."
+summary: "A public incident-diagnosis benchmark for HPC schedulers — ten reproducible failure scenarios with measured ground truth and degenerate baselines."
 tags: [slurm, hpc, benchmark, root-cause-analysis, llm-agents]
 status: "Shipped"
 repo: "https://github.com/Zhanyl-tech/slurm-rca-bench"

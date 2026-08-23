@@ -4,12 +4,18 @@ date: 2026-08-16
 description: "A controlled comparison of Kubernetes GPU schedulers on the same workload traces, built on kwok so it runs without GPUs."
 summary: "A controlled comparison of Kubernetes GPU schedulers on the same workload traces, built on kwok so it runs without GPUs."
 tags: [kubernetes, gpu, scheduling, kwok, benchmark]
-status: "In Progress"
+status: "Phase 1 shipped"
+repo: "https://github.com/Zhanyl-tech/k8s-gpu-scheduler-lab"
 weight: 3
 ShowToc: false
 ---
 
-*In progress. Goes public when the baseline is real.*
+**[github.com/Zhanyl-tech/k8s-gpu-scheduler-lab](https://github.com/Zhanyl-tech/k8s-gpu-scheduler-lab)** · Python · MIT
+
+*Phase 1 of 3 is public: the kwok substrate, the workload generator, the metrics,
+the degenerate baselines, and K0 measured on a real control plane. Kueue,
+Volcano, NVIDIA's bin-packing and KAI are not built, and the 34% fragmentation
+claim the repo exists to test has not been tested.*
 
 Slurm and Kubernetes solve the same problem — allocating scarce accelerators
 across competing jobs — with different mechanisms. Slurm uses multifactor
