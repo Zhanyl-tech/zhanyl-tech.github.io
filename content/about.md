@@ -52,7 +52,8 @@ operate them, and the mathematics they run.
 
 ---
 
-**Résumé:** [download as PDF](/resume.pdf)
+**Hiring, collaborating, or investing?** [Start here](/contact/) — tell me what you
+have in mind and I'll send my CV if it's a fit.
 
 **Elsewhere:** [GitHub](https://github.com/Zhanyl-tech) ·
 [LinkedIn](https://www.linkedin.com/in/za-engineering/) ·
