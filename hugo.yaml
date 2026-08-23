@@ -22,7 +22,7 @@ params:
   # of form fields works (Formspree, Web3Forms, Basin, a Worker). Left empty
   # deliberately: the form renders disabled and says so rather than posting
   # into a void. No email address appears anywhere on the site.
-  formEndpoint: ""
+  formEndpoint: "https://formspree.io/f/maewzaoy"
   # Access key, if the provider uses one instead of a per-form URL (Web3Forms).
   formAccessKey: ""
   # Inbox subject prefix. Deliberately loud and unique so a mail filter can
