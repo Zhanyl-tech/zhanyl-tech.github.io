@@ -9,7 +9,7 @@ weight: 3
 status: "Design Phase"
 ---
 
-**Status:** 🔵 Design Phase — Deadline November 2026  
+**Status:** 🔵 Design phase — no public repository yet. Write-up only.  
 **Stack:** CUDA · C++ · Python · QuantLib · NumPy · SciPy · Numba
 
 ---
