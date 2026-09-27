@@ -1,21 +1,31 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="730" viewBox="0 0 1200 730" role="img"
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800" role="img"
      aria-labelledby="mapttl mapdsc">
-  <title id="mapttl">The same allocation problem, two substrates, one measurement layer</title>
-  <desc id="mapdsc">Four bands. The top band, MEASUREMENT, spans the full width and holds slurm-rca-bench and k8s-gpu-scheduler-lab; arrows run down from it to score each control plane below. The middle row is two columns side by side: on the left the SLURM control plane with slurm-scheduler-lab, cluster-sre-agent with slurm-mcp, and epilog-gpu-validator; on the right the KUBERNETES control plane with slinky-gitops and k8s-gpu-scheduler-lab covering Kueue, Volcano and NVIDIA KAI. Arrows run down from both columns into the bottom band, GPU FLEET, which spans the full width and holds gpu-reaper and ib-slurm-exporter. The tools change with the substrate; the fleet beneath and the measurement layer above do not.</desc>
+  <title id="mapttl">The same allocation problem, two substrates, one measurement layer, with the build status of every part</title>
+  <desc id="mapdsc">Every box carries a status: built (code and tests exist), partial (some named parts are not built) or planned (not built). Top band, measurement: slurm-rca-bench, partial, 10 scenarios with 2 causal chains measured and no agent scored yet; k8s-gpu-scheduler-lab, partial, a kind plus kwok control plane with K0 and four degenerate baselines built and a Phase 2 harness that has not yet run on a cluster. Middle left, the Slurm control plane: slurm-scheduler-lab, built, a simulator with no live controller behind its numbers; cluster-sre-agent, partial, dependency graph and read-only guard built, no MCP server of its own, agent configurations planned and no accuracy measured; slurm-mcp, built, a read-only MCP server tested against fixtures; epilog-gpu-validator, built, drains on persistent GPU faults and never on a failed query without fault evidence, simulator-tested and not validated on GPU hardware. Middle right, the Kubernetes control plane: slinky-gitops, partial, Slurm 26.05 on kind via Slinky v1.2, auth-key rotation blocked and rolling back safely, Argo CD not wired; the schedulers under comparison, Kueue, Volcano and NVIDIA KAI, all planned; and S0, the Slurm control on the same trace, partial, with only the Slurm model side built. Bottom band, the GPU fleet: gpu-reaper and ib-slurm-exporter, built, tested on simulated telemetry and synthetic trees, not on hardware; the exporter attributes counters to a job only on a port where that job is the only user it can see. Nothing on the map has run on a production GPU cluster.</desc>
   <defs>
     <style>
       .mono { font-family: 'JetBrains Mono','SF Mono',Menlo,Consolas,monospace; }
       .t-title  { font-size: 26px; font-weight: 600; fill: #e9eff5; letter-spacing: 0.5px; }
-      .t-sub    { font-size: 13px; fill: #828c98; }
-      .t-band   { font-size: 11px; fill: #7d8894; letter-spacing: 2.2px; }
+      .t-sub    { font-size: 13px; fill: #98a3b0; }
+      .t-band   { font-size: 11px; fill: #98a3b0; letter-spacing: 2.2px; }
       .t-node   { font-size: 13px; font-weight: 500; fill: #e9eff5; }
-      .t-desc   { font-size: 10.5px; fill: #98a3b0; }
-      .t-chain  { font-size: 12px; font-weight: 500; fill: #cdd6df; }
-      .t-edge   { font-size: 10px; fill: #7d8894; letter-spacing: 0.6px; }
+      .t-desc   { font-size: 10.5px; fill: #adb8c4; }
+      .t-chain  { font-size: 12px; font-weight: 500; fill: #e9eff5; }
+      .t-edge   { font-size: 10px; fill: #98a3b0; letter-spacing: 0.6px; }
       .t-mark   { font-size: 30px; font-weight: 500; fill: #f5b544; }
       .t-mark-s { font-size: 15px; font-weight: 500; fill: #f5b544; }
-      .t-cap    { font-size: 13px; fill: #adb8c4; }
-      .t-sched  { font-size: 11.5px; font-weight: 500; fill: #79c0ff; }
+      .t-cap    { font-size: 12.5px; fill: #adb8c4; }
+      .t-sched  { font-size: 11.5px; font-weight: 500; fill: #adb8c4; }
+      /* Status badges. The word is always printed, so colour is never the
+         only carrier; planned is also dashed. Contrast against the #16202c
+         cards: green 6.47:1, amber 9.06:1, grey 8.17:1. */
+      .b-txt    { font-size: 10px; font-weight: 600; letter-spacing: 1.2px; }
+      .built    { fill: #3fb950; }
+      .partial  { fill: #f5b544; }
+      .planned  { fill: #adb8c4; }
+      .bx-built   { fill: none; stroke: #3fb950; stroke-width: 1; }
+      .bx-partial { fill: none; stroke: #f5b544; stroke-width: 1; }
+      .bx-planned { fill: none; stroke: #adb8c4; stroke-width: 1; stroke-dasharray: 3 2; }
     </style>
     <marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto">
       <path d="M0,0 L7,3 L0,6 z" fill="#58a6ff"/>
@@ -30,100 +40,145 @@
     </linearGradient>
   </defs>
 
-  <rect width="1200" height="730" rx="14" fill="#141a23"/>
-  <rect x="0.5" y="0.5" width="1199" height="729" rx="14" fill="none" stroke="#243040"/>
+  <rect width="1200" height="800" rx="14" fill="#141a23"/>
+  <rect x="0.5" y="0.5" width="1199" height="799" rx="14" fill="none" stroke="#243040"/>
 
   <!-- ── header ─────────────────────────────────────────────────────── -->
   <text class="mono t-mark" x="42" y="58">18</text>
   <text class="mono t-mark-s" x="76" y="46">∞</text>
   <text class="mono t-title" x="104" y="56">The same allocation problem, two substrates</text>
-  <text class="mono t-sub" x="104" y="78">Slurm · Kubernetes · one GPU fleet underneath · one measurement layer above</text>
+  <text class="mono t-sub" x="104" y="78">Slurm · Kubernetes · one GPU fleet underneath · one measurement layer above · a status on every box</text>
   <rect x="42" y="98" width="1116" height="1" fill="url(#glow)"/>
 
-  <!-- ── band 1: measurement, spans both columns ────────────────────── -->
+  <!-- ── band 1: measurement ────────────────────────────────────────── -->
   <text class="mono t-band" x="42" y="132">MEASUREMENT — the layer that decides whether any of it works</text>
 
   <g>
-    <rect x="42" y="144" width="1116" height="94" rx="10" fill="#111823" stroke="#f5b544" stroke-opacity="0.42"/>
+    <rect x="42" y="144" width="1116" height="108" rx="10" fill="#111823" stroke="#f5b544" stroke-opacity="0.42"/>
 
-    <rect x="66" y="162" width="520" height="58" rx="8" fill="#1b2431" stroke="#f5b544" stroke-opacity="0.55"/>
-    <text class="mono t-node" x="88" y="187">slurm-rca-bench</text>
-    <text class="mono t-desc" x="88" y="205">10 scenarios · 2 undiagnosable · degenerate baselines</text>
+    <rect x="66" y="160" width="520" height="76" rx="8" fill="#16202c" stroke="#f5b544" stroke-opacity="0.55"/>
+    <text class="mono t-node" x="88" y="184">slurm-rca-bench</text>
+    <rect class="bx-partial" x="500" y="172" width="70" height="17" rx="2"/>
+    <text class="mono b-txt partial" x="507" y="185">PARTIAL</text>
+    <text class="mono t-desc" x="88" y="203">10 scenarios · 2 causal chains measured · degenerate baselines</text>
+    <text class="mono t-desc" x="88" y="221">no agent has been scored yet: the leaderboard is empty</text>
 
-    <rect x="614" y="162" width="520" height="58" rx="8" fill="#1b2431" stroke="#f5b544" stroke-opacity="0.55"/>
-    <text class="mono t-node" x="636" y="187">k8s-gpu-scheduler-lab</text>
-    <text class="mono t-desc" x="636" y="205">identical traces · kwok substrate · runs with no GPUs</text>
+    <rect x="614" y="160" width="520" height="76" rx="8" fill="#16202c" stroke="#f5b544" stroke-opacity="0.55"/>
+    <text class="mono t-node" x="636" y="184">k8s-gpu-scheduler-lab</text>
+    <rect class="bx-partial" x="1048" y="172" width="70" height="17" rx="2"/>
+    <text class="mono b-txt partial" x="1055" y="185">PARTIAL</text>
+    <text class="mono t-desc" x="636" y="203">kind + kwok: real control plane, simulated GPU nodes</text>
+    <text class="mono t-desc" x="636" y="221">K0 + 4 degenerate baselines · Phase 2 harness not yet run</text>
   </g>
 
-  <line x1="306" y1="238" x2="306" y2="286" stroke="#f5b544" stroke-opacity="0.45" stroke-width="1.2"
+  <line x1="306" y1="252" x2="306" y2="300" stroke="#f5b544" stroke-opacity="0.45" stroke-width="1.2"
         stroke-dasharray="4 4" marker-end="url(#ar-a)"/>
-  <text class="mono t-edge" x="318" y="266">scores</text>
+  <text class="mono t-edge" x="318" y="280">scores</text>
 
-  <line x1="874" y1="238" x2="874" y2="286" stroke="#f5b544" stroke-opacity="0.45" stroke-width="1.2"
+  <line x1="874" y1="252" x2="874" y2="300" stroke="#f5b544" stroke-opacity="0.45" stroke-width="1.2"
         stroke-dasharray="4 4" marker-end="url(#ar-a)"/>
-  <text class="mono t-edge" x="886" y="266">scores</text>
+  <text class="mono t-edge" x="886" y="280">scores</text>
 
   <!-- ── band 2a: slurm control plane ───────────────────────────────── -->
-  <text class="mono t-band" x="42" y="306">SLURM CONTROL PLANE</text>
+  <text class="mono t-band" x="42" y="320">SLURM CONTROL PLANE</text>
 
   <g>
-    <rect x="42" y="318" width="546" height="218" rx="10" fill="#111823" stroke="#243040"/>
+    <rect x="42" y="332" width="546" height="268" rx="10" fill="#111823" stroke="#243040"/>
 
-    <rect x="66" y="338" width="498" height="54" rx="6" fill="#16202c" stroke="#2c3a4c"/>
-    <text class="mono t-chain" x="88" y="360">slurm-scheduler-lab</text>
-    <text class="mono t-desc"  x="88" y="378">replay policy before it reaches a live controller</text>
+    <rect x="66" y="350" width="498" height="72" rx="6" fill="#16202c" stroke="#2c3a4c"/>
+    <text class="mono t-chain" x="88" y="373">slurm-scheduler-lab</text>
+    <rect class="bx-built" x="494" y="361" width="54" height="17" rx="2"/>
+    <text class="mono b-txt built" x="502" y="374">BUILT</text>
+    <text class="mono t-desc" x="88" y="392">multifactor · Fair Tree · conservative/EASY backfill · preemption</text>
+    <text class="mono t-desc" x="88" y="409">a simulator: no live slurmctld behind any of its numbers</text>
 
-    <rect x="66" y="402" width="498" height="54" rx="6" fill="#16202c" stroke="#2c3a4c"/>
-    <text class="mono t-chain" x="88" y="424">cluster-sre-agent · slurm-mcp</text>
-    <text class="mono t-desc"  x="88" y="442">diagnosis over an explicit graph, read-only in code</text>
+    <!-- Two projects, two badges: slurm-mcp is built on its own page, while
+         cluster-sre-agent has no MCP server of its own. One shared PARTIAL
+         badge used to credit the agent with slurm-mcp's server. -->
+    <rect x="66" y="428" width="498" height="84" rx="6" fill="#16202c" stroke="#2c3a4c"/>
+    <text class="mono t-chain" x="88" y="449">cluster-sre-agent</text>
+    <rect class="bx-partial" x="478" y="437" width="70" height="17" rx="2"/>
+    <text class="mono b-txt partial" x="485" y="450">PARTIAL</text>
+    <text class="mono t-desc" x="88" y="467">graph + read-only guard built · agents A–E planned · none scored</text>
+    <line x1="88" y1="477" x2="548" y2="477" stroke="#2c3a4c" stroke-width="1"/>
+    <text class="mono t-chain" x="88" y="498">slurm-mcp</text>
+    <text class="mono t-desc" x="176" y="498">read-only MCP server · fixture-tested</text>
+    <rect class="bx-built" x="494" y="486" width="54" height="17" rx="2"/>
+    <text class="mono b-txt built" x="502" y="499">BUILT</text>
 
-    <rect x="66" y="466" width="498" height="54" rx="6" fill="#16202c" stroke="#2c3a4c"/>
-    <text class="mono t-chain" x="88" y="488">epilog-gpu-validator</text>
-    <text class="mono t-desc"  x="88" y="506">catch a degraded device between jobs, never on ignorance</text>
+    <rect x="66" y="518" width="498" height="72" rx="6" fill="#16202c" stroke="#2c3a4c"/>
+    <text class="mono t-chain" x="88" y="541">epilog-gpu-validator</text>
+    <rect class="bx-built" x="494" y="529" width="54" height="17" rx="2"/>
+    <text class="mono b-txt built" x="502" y="542">BUILT</text>
+    <text class="mono t-desc" x="88" y="560">drain on persistent GPU faults, never on a query without fault evidence</text>
+    <text class="mono t-desc" x="88" y="577">simulator-tested · not yet validated on GPU hardware</text>
   </g>
 
   <!-- ── band 2b: kubernetes control plane ──────────────────────────── -->
-  <text class="mono t-band" x="612" y="306">KUBERNETES CONTROL PLANE</text>
+  <text class="mono t-band" x="612" y="320">KUBERNETES CONTROL PLANE</text>
 
   <g>
-    <rect x="612" y="318" width="546" height="218" rx="10" fill="#111823" stroke="#243040"/>
+    <rect x="612" y="332" width="546" height="268" rx="10" fill="#111823" stroke="#243040"/>
 
-    <rect x="636" y="338" width="498" height="54" rx="6" fill="#16202c" stroke="#2c3a4c"/>
-    <text class="mono t-chain" x="658" y="360">slinky-gitops</text>
-    <text class="mono t-desc"  x="658" y="378">Slurm on Kubernetes · auth-key rotation · GitOps sync</text>
+    <rect x="636" y="350" width="498" height="88" rx="6" fill="#16202c" stroke="#2c3a4c"/>
+    <text class="mono t-chain" x="658" y="373">slinky-gitops</text>
+    <rect class="bx-partial" x="1048" y="361" width="70" height="17" rx="2"/>
+    <text class="mono b-txt partial" x="1055" y="374">PARTIAL</text>
+    <text class="mono t-desc" x="658" y="392">Slurm 26.05 on kind via Slinky v1.2 · registers a node, runs jobs</text>
+    <text class="mono t-desc" x="658" y="409">auth-key rotation blocked (key does not propagate) · rolls back</text>
+    <text class="mono t-desc" x="658" y="426">Argo CD not wired: GitOps is the goal, not the state</text>
 
-    <rect x="636" y="402" width="498" height="118" rx="6" fill="#16202c" stroke="#2c3a4c"/>
-    <text class="mono t-chain" x="658" y="424">k8s-gpu-scheduler-lab</text>
-    <text class="mono t-desc"  x="658" y="442">the schedulers under comparison</text>
-    <line x1="658" y1="454" x2="1112" y2="454" stroke="#2c3a4c" stroke-width="1"/>
-    <text class="mono t-sched" x="658" y="474">Kueue</text>
-    <text class="mono t-desc"  x="726" y="474">quota · admission</text>
-    <text class="mono t-sched" x="658" y="493">Volcano</text>
-    <text class="mono t-desc"  x="726" y="493">gang scheduling · DRF fairness</text>
-    <text class="mono t-sched" x="658" y="512">NVIDIA KAI</text>
-    <text class="mono t-desc"  x="746" y="512">topology-aware gang · DRA</text>
+    <rect x="636" y="446" width="498" height="136" rx="6" fill="#16202c" stroke="#2c3a4c"/>
+    <text class="mono t-chain" x="658" y="468">k8s-gpu-scheduler-lab — the comparison</text>
+    <line x1="658" y1="478" x2="1112" y2="478" stroke="#2c3a4c" stroke-width="1"/>
+
+    <text class="mono t-sched" x="658" y="498">K1 Kueue</text>
+    <text class="mono t-desc"  x="766" y="498">quota · admission</text>
+    <rect class="bx-planned" x="1048" y="486" width="70" height="17" rx="2"/>
+    <text class="mono b-txt planned" x="1055" y="499">PLANNED</text>
+
+    <text class="mono t-sched" x="658" y="520">K2/K3 Volcano</text>
+    <text class="mono t-desc"  x="766" y="520">gang · DRF · NVIDIA bin-packing</text>
+    <rect class="bx-planned" x="1048" y="508" width="70" height="17" rx="2"/>
+    <text class="mono b-txt planned" x="1055" y="521">PLANNED</text>
+
+    <text class="mono t-sched" x="658" y="542">K4 NVIDIA KAI</text>
+    <text class="mono t-desc"  x="766" y="542">topology-aware gang · DRA</text>
+    <rect class="bx-planned" x="1048" y="530" width="70" height="17" rx="2"/>
+    <text class="mono b-txt planned" x="1055" y="543">PLANNED</text>
+
+    <text class="mono t-sched" x="658" y="564">S0 Slurm</text>
+    <text class="mono t-desc"  x="766" y="564">same trace, Slurm model side built</text>
+    <rect class="bx-partial" x="1048" y="552" width="70" height="17" rx="2"/>
+    <text class="mono b-txt partial" x="1055" y="565">PARTIAL</text>
   </g>
 
-  <line x1="306" y1="536" x2="306" y2="584" stroke="#58a6ff" stroke-width="1.3" marker-end="url(#ar)"/>
-  <text class="mono t-edge" x="318" y="564">allocates</text>
+  <line x1="306" y1="600" x2="306" y2="640" stroke="#58a6ff" stroke-width="1.3" marker-end="url(#ar)"/>
+  <text class="mono t-edge" x="318" y="624">allocates</text>
 
-  <line x1="874" y1="536" x2="874" y2="584" stroke="#58a6ff" stroke-width="1.3" marker-end="url(#ar)"/>
-  <text class="mono t-edge" x="886" y="564">allocates</text>
+  <line x1="874" y1="600" x2="874" y2="640" stroke="#58a6ff" stroke-width="1.3" marker-end="url(#ar)"/>
+  <text class="mono t-edge" x="886" y="624">allocates</text>
 
-  <!-- ── band 3: gpu fleet, spans both columns ──────────────────────── -->
-  <text class="mono t-band" x="42" y="604">GPU FLEET — the same hardware either way</text>
+  <!-- ── band 3: gpu fleet ──────────────────────────────────────────── -->
+  <text class="mono t-band" x="42" y="660">GPU FLEET — the same hardware either way</text>
 
   <g>
-    <rect x="42" y="616" width="1116" height="76" rx="10" fill="#111823" stroke="#3fb950" stroke-opacity="0.40"/>
+    <rect x="42" y="672" width="1116" height="88" rx="10" fill="#111823" stroke="#3fb950" stroke-opacity="0.40"/>
 
-    <rect x="66" y="630" width="520" height="48" rx="8" fill="#1b2431" stroke="#3fb950" stroke-opacity="0.45"/>
-    <text class="mono t-node" x="88" y="651">gpu-reaper</text>
-    <text class="mono t-desc" x="88" y="668">reclaim waste during a job · an outage can never cancel a healthy one</text>
+    <rect x="66" y="684" width="520" height="64" rx="8" fill="#16202c" stroke="#3fb950" stroke-opacity="0.45"/>
+    <text class="mono t-node" x="88" y="705">gpu-reaper</text>
+    <rect class="bx-built" x="516" y="693" width="54" height="17" rx="2"/>
+    <text class="mono b-txt built" x="524" y="706">BUILT</text>
+    <text class="mono t-desc" x="88" y="723">wasted-GPU detection · observe by default · a gap is never idleness</text>
+    <text class="mono t-desc" x="88" y="739">tested on simulated telemetry, not on GPU hardware</text>
 
-    <rect x="614" y="630" width="520" height="48" rx="8" fill="#1b2431" stroke="#3fb950" stroke-opacity="0.45"/>
-    <text class="mono t-node" x="636" y="651">ib-slurm-exporter</text>
-    <text class="mono t-desc" x="636" y="668">fabric counters → the owning job · refuses to attribute a shared device</text>
+    <rect x="614" y="684" width="520" height="64" rx="8" fill="#16202c" stroke="#3fb950" stroke-opacity="0.45"/>
+    <text class="mono t-node" x="636" y="705">ib-slurm-exporter</text>
+    <rect class="bx-built" x="1064" y="693" width="54" height="17" rx="2"/>
+    <text class="mono b-txt built" x="1072" y="706">BUILT</text>
+    <text class="mono t-desc" x="636" y="723">IB/RoCE counters → owning job · only where it is the sole visible user</text>
+    <text class="mono t-desc" x="636" y="739">tested on synthetic /sys, /proc and cgroup trees, not hardware</text>
   </g>
 
-  <text class="mono t-cap" x="42" y="716">The same allocation problem, two substrates, one measurement layer.</text>
+  <text class="mono t-cap" x="42" y="784">built = code and tests exist · partial = named parts not built · planned = not built · none of it has run on a production GPU cluster</text>
 </svg>

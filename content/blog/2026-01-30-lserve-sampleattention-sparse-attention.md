@@ -1,12 +1,20 @@
 ---
 title: "LServe and SampleAttention: What Sparse Attention Actually Changes in Prefill and Decode"
-date: 2026-01-30
+date: 2026-03-31
+lastmod: 2026-09-26
 description: "Structured sparsity aligned with GPU attention kernels: LServe’s unified serving stack for prefill and decode, and SampleAttention’s empirical patterns plus CRA as a runtime quality floor."
 tags: [sparse-attention, llm-serving, prefill, decoding, kv-cache, lserve, sampleattention, gpu-inference]
 summary: "How LServe and SampleAttention use structured sparsity differently for prefill vs decode, and why CRA is the accuracy proxy you actually want."
 ShowToc: true
 draft: false
 ---
+
+*Updated 26 September 2026: the SampleAttention citation is pinned to v3 of
+the paper, whose column/slash wording this post follows (v1 names the same two
+structures "local window" and "column stripe"), and an unverified bit-width for
+LServe's KV quantization is removed. The date
+above is when this post was first committed to the site; it previously carried
+an earlier date.*
 
 Sparse attention is easy to talk about and hard to ship. The question that actually matters isn't "is attention sparse?" — it's *which structure you can exploit cheaply enough that the win survives contact with a GPU kernel*.
 
@@ -59,13 +67,13 @@ LServe's claim is that for any given query token, you don't need the full KV cac
 
 The mechanism: a **hierarchical page selector** scores all pages cheaply using a summary vector per page, picks the top-k, then does fine-grained attention only within those. Selection results are reused across a small window of decode steps to avoid paying the selection cost on every single token.
 
-Combined with **INT4 KV quantization**, the gains stack: sparsity cuts the number of pages you touch; quantization cuts the byte cost of each page you do touch.
+Combined with **KV-cache quantization**, the gains stack: sparsity cuts the number of pages you touch; quantization cuts the byte cost of each page you do touch. (LServe is built on QServe's quantized serving kernels. An earlier version of this post said "INT4"; I could not find the KV bit-width stated in the LServe paper's text, so I no longer state one.)
 
 Prefill and decode are genuinely different optimization problems. LServe treats them that way.
 
 <figure class="blog-figure">
 <img src="/images/figures/lserve-fig2-decode.svg" alt="Figure 2: Hierarchical KV page selection pipeline for decode." width="900" height="300" loading="lazy" />
-<figcaption><strong>Figure 2.</strong> Decode: coarse per-page scoring, top-k subset, then token-level attention only inside selected pages. Constant-ish <em>k</em> vs sequence length is the intended scaling behavior; INT4 KV further reduces bytes per read.</figcaption>
+<figcaption><strong>Figure 2.</strong> Decode: coarse per-page scoring, top-k subset, then token-level attention only inside selected pages. Constant-ish <em>k</em> vs sequence length is the intended scaling behavior; KV quantization further reduces bytes per read.</figcaption>
 </figure>
 
 ## SampleAttention — What Sparse Patterns Are Real
@@ -132,7 +140,7 @@ Treating both with the same mechanism leaves gains on the table.
 ## References
 
 - **LServe: Efficient Long-sequence LLM Serving with Unified Sparse Attention**: [arXiv:2502.14866](https://arxiv.org/abs/2502.14866)
-- **SampleAttention: Near-Lossless Acceleration of Long Context LLM Inference with Adaptive Structured Sparse Attention**: [arXiv:2406.15486](https://arxiv.org/abs/2406.15486)
+- **SampleAttention: Near-Lossless Acceleration of Long Context LLM Inference with Adaptive Structured Sparse Attention**: [arXiv:2406.15486v3](https://arxiv.org/abs/2406.15486v3) (3 September 2025). In v3, CRA is "the minimum sum of remaining attention probabilities per query after sparsification" (§3.3) and the patterns are named column and slash (§3.2). v1 (17 June 2024) also defines CRA but calls the patterns "local window" and "column stripe".
 
 ---
 

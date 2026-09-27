@@ -365,7 +365,7 @@ def copy_and_open(drafts: dict, target: str, url: str, do_open: bool) -> None:
         subprocess.run(["pbcopy"], input=payload.encode("utf-8"), check=True)
         print(f"  ✓ {target} draft copied to clipboard")
     except (FileNotFoundError, subprocess.CalledProcessError):
-        print(f"  ! could not reach pbcopy — draft is on disk")
+        print("  ! could not reach pbcopy — draft is on disk")
 
     if do_open:
         subprocess.run(["open", compose], check=False)

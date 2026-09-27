@@ -1,4 +1,4 @@
 ---
 title: "Lab Notes"
-description: "Lab notebook — tool deployments, benchmarks, field reports, and first-to-document findings. Shorter and rougher than blog posts. The public record of what I'm testing."
+description: "Shorter write-ups of what I tested: scheduler simulations, Slurm upgrade reading, tool behaviour. Each says what it ran, on what, and what it did not measure. Corrections are marked in place and listed on /corrections/."
 ---

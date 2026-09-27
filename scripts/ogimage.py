@@ -7,12 +7,19 @@ Every post gets an og:image. Without one, LinkedIn and X render your link as a
 bare grey text row; with one, it renders as a card. This is the single highest
 leverage thing for click-through, so it runs automatically in the publish flow.
 
-Renders SVG -> PNG via rsvg-convert (already on this machine via librsvg).
-No Python dependencies beyond the stdlib.
+Renders SVG -> PNG with rsvg-convert (librsvg) when it is on PATH. Where it is
+not, it falls back to resvg via the `resvg-py` package, reading fonts only from
+OG_FONT_DIR (for example the OFL Instrument Serif, Inter and JetBrains Mono
+files from github.com/google/fonts), so a card never silently picks up whatever
+system font happens to be installed. After rendering, if Pillow is importable,
+the PNG is re-saved losslessly with maximum zlib compression; the pixels are
+identical.
+
+The core stays standard library only; resvg-py and Pillow are optional.
 
 Usage:
     python3 scripts/ogimage.py --post content/blog/2026-07-26-my-post.md
-    python3 scripts/ogimage.py --all
+    python3 scripts/ogimage.py --all              # every published page
     python3 scripts/ogimage.py --default          # site-wide fallback card
 """
 
@@ -20,7 +27,8 @@ from __future__ import annotations
 
 import argparse
 import html
-import re
+import io
+import os
 import shutil
 import subprocess
 import sys
@@ -43,6 +51,18 @@ ACCENT = "#58a6ff"
 SERIF = "Instrument Serif, Lora, Georgia, 'Times New Roman', serif"
 SANS = "Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif"
 MONO = "'JetBrains Mono', 'SF Mono', Menlo, monospace"
+
+# The site-wide fallback card (--default), served for every page without a
+# card of its own. Its words also feed the og:image:alt of those pages
+# (hugo.yaml params.defaultCardAlt, read by
+# layouts/partials/templates/twitter_cards.html), because alt text has to
+# describe the image, not the page; scripts/tests/test_scripts.py keeps the two
+# in step. Until September 2026 the title ended in the single word "measured",
+# which the fleet-health tools, tested only on simulators and synthetic trees,
+# did not back.
+DEFAULT_CARD_TITLE = "GPU scheduling and fleet health: what was measured, and on what."
+DEFAULT_CARD_KICKER = "GPU CLUSTERS · SLURM & KUBERNETES"
+DEFAULT_CARD_FOOTER = "Scheduler evaluation · GPU fleet health · measured vs asserted"
 
 SECTION_KICKER = {
     "blog": "DEEP DIVE",
@@ -132,18 +152,78 @@ def build_svg(title: str, kicker: str, footer: str) -> str:
 </svg>"""
 
 
-def render(svg: str, out_path: Path) -> None:
+def _render_png(svg: str) -> bytes:
     binary = shutil.which("rsvg-convert")
-    if not binary:
+    if binary:
+        return subprocess.run(
+            [binary, "-w", str(WIDTH), "-h", str(HEIGHT), "-"],
+            input=svg.encode("utf-8"),
+            check=True,
+            capture_output=True,
+        ).stdout
+    try:
+        import resvg_py  # type: ignore[import-not-found]
+    except ImportError:
         raise SystemExit(
-            "rsvg-convert not found. Install with:  brew install librsvg"
+            "No renderer: install librsvg (brew install librsvg) for rsvg-convert,\n"
+            "or `pip install resvg-py` and set OG_FONT_DIR to a directory of .ttf files."
+        ) from None
+    font_dir = os.environ.get("OG_FONT_DIR")
+    if not font_dir or not Path(font_dir).is_dir():
+        raise SystemExit("resvg-py needs OG_FONT_DIR: a directory holding the card fonts (.ttf)")
+    return bytes(
+        resvg_py.svg_to_bytes(
+            svg_string=svg,
+            width=WIDTH,
+            height=HEIGHT,
+            skip_system_fonts=True,
+            font_dirs=[font_dir],
+            serif_family="Instrument Serif",
+            sans_serif_family="Inter",
+            monospace_family="JetBrains Mono",
         )
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-    subprocess.run(
-        [binary, "-w", str(WIDTH), "-h", str(HEIGHT), "-o", str(out_path), "-"],
-        input=svg.encode("utf-8"),
-        check=True,
     )
+
+
+def _optimise(png: bytes) -> bytes:
+    """Lossless re-encode (same pixels, smaller file) when Pillow is present.
+
+    A card is a flat design with anti-aliased text: about a hundred distinct
+    colours and an opaque background. When it has at most 256 colours and no
+    transparency it is stored as a palette PNG, which is exact, not an
+    approximation: the result is decoded again and compared pixel for pixel,
+    and discarded if anything differs. On 2026-09-26 that halved the cards
+    (default.png 33,934 -> 16,740 bytes) with zero pixel difference.
+    """
+    try:
+        from PIL import Image, ImageChops  # type: ignore[import-not-found]
+    except ImportError:
+        return png
+    image = Image.open(io.BytesIO(png))
+    image.load()
+    rgb = image.convert("RGB")
+    opaque = image.mode != "RGBA" or image.getchannel("A").getextrema() == (255, 255)
+    candidates = []
+    if opaque and rgb.getcolors(256) is not None:
+        paletted = rgb.quantize(colors=256, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.NONE)
+        candidates.append(paletted)
+    candidates.append(image)
+    best = png
+    for candidate in candidates:
+        out = io.BytesIO()
+        candidate.save(out, format="PNG", optimize=True, compress_level=9)
+        data = out.getvalue()
+        decoded = Image.open(io.BytesIO(data)).convert("RGBA")
+        if ImageChops.difference(decoded, image.convert("RGBA")).getbbox() is not None:
+            continue
+        if len(data) < len(best):
+            best = data
+    return best
+
+
+def render(svg: str, out_path: Path) -> None:
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_bytes(_optimise(_render_png(svg)))
 
 
 def card_for_post(post: Path) -> Path | None:
@@ -155,7 +235,7 @@ def card_for_post(post: Path) -> Path | None:
 
     section = post.parent.name
     kicker = SECTION_KICKER.get(section, section.upper())
-    footer = meta.get("description", "ML Infrastructure · Quantitative Finance")
+    footer = meta.get("description", "GPU scheduling · Slurm & Kubernetes · fleet health")
     footer = wrap(footer, max_chars=62, max_lines=1)[0] if footer else ""
 
     out_path = OG_DIR / f"{post.stem}.png"
@@ -174,11 +254,9 @@ def main() -> int:
         parser.error("pass one of --post, --all, or --default")
 
     if args.default:
-        svg = build_svg(
-            "Building systems for models, markets, and scale.",
-            "ML INFRASTRUCTURE · QUANTITATIVE FINANCE",
-            "GPU clusters, inference systems, distributed training",
-        )
+        # Matches the homepage headline. An earlier card still advertised
+        # "distributed training", a project that was retired.
+        svg = build_svg(DEFAULT_CARD_TITLE, DEFAULT_CARD_KICKER, DEFAULT_CARD_FOOTER)
         out = OG_DIR / "default.png"
         render(svg, out)
         print(f"  wrote {out.relative_to(ROOT)}")
@@ -193,10 +271,14 @@ def main() -> int:
             return 1
         posts = [candidate]
     elif args.all:
+        # Drafts are skipped: a card for an unpublished page is still served
+        # from static/, which is how retired drafts ended up with public cards.
         posts = sorted(
             p
             for p in (ROOT / "content").rglob("*.md")
-            if p.name != "_index.md" and p.parent.name != "content"
+            if p.name != "_index.md"
+            and p.parent.name != "content"
+            and parse_frontmatter(p).get("draft", "").split("#")[0].strip().lower() != "true"
         )
 
     for post in posts:

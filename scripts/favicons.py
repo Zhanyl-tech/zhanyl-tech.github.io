@@ -8,7 +8,11 @@ page load produced 404s. This renders a simple monogram in the site palette.
 
 Run once; re-run only if the mark changes.
 
-Usage:  python3 scripts/favicons.py
+DEPRECATED. scripts/logo.py now draws the favicons from the current mark.
+Running this would overwrite them with the old "Z" monogram, so it refuses
+unless passed --force.
+
+Usage:  python3 scripts/favicons.py --force
 """
 
 from __future__ import annotations
@@ -16,7 +20,6 @@ from __future__ import annotations
 import shutil
 import struct
 import subprocess
-import zlib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -96,4 +99,11 @@ def main() -> None:
 
 
 if __name__ == "__main__":
+    import sys
+
+    if "--force" not in sys.argv[1:]:
+        raise SystemExit(
+            "favicons.py is deprecated: scripts/logo.py owns the favicons now, and this would\n"
+            "overwrite them with the old monogram. Pass --force if that is really what you want."
+        )
     main()

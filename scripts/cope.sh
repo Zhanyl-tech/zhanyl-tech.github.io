@@ -1,6 +1,11 @@
 #!/bin/bash
 # COPE Workflow: Create Once, Publish Everywhere
 # Usage: ./scripts/cope.sh content/blog/my-post.md [--hn]
+#
+# DEPRECATED. scripts/social.py replaces this: it drafts from the post's own
+# text instead of bracketed placeholders, and weekly.sh calls it. Kept only
+# because old notes refer to it; it publishes nothing, it only writes
+# templates into cope-drafts/ (gitignored).
 
 set -e
 
@@ -31,7 +36,6 @@ fi
 # Extract frontmatter fields
 TITLE=$(grep '^title:' "$POST_PATH" | head -1 | sed 's/title: *"*//;s/"*$//')
 DESCRIPTION=$(grep '^description:' "$POST_PATH" | head -1 | sed 's/description: *"*//;s/"*$//')
-TAGS=$(grep '^tags:' "$POST_PATH" | head -1 | sed 's/tags: *\[//;s/\]//')
 DATE=$(date +%Y-%m-%d)
 
 # Create output dirs

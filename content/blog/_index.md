@@ -1,4 +1,4 @@
 ---
 title: "Blog"
-description: "Technical deep dives on ML infrastructure, GPU inference, distributed training, and the systems engineering behind quantitative platforms. 2000–4000 words. Written from a practitioner's perspective."
+description: "Longer technical explainers, mostly on LLM-serving papers (KV-cache paging, sparse attention). Each one cites the paper its numbers come from."
 ---

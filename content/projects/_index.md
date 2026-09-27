@@ -1,103 +1,109 @@
 ---
 title: "Projects"
-description: "Open-source infrastructure tooling. Each links to its repository; each has a runnable demo or a reproducible benchmark."
+description: "Open-source GPU-cluster tooling and the benchmarks that check it. Each entry says whether it is built, partial or planned, and what it was tested against."
 ---
 
-## Measurement & benchmarks
+Every project links to its repository. <span class="status status-built">built</span>
+means code and tests exist; <span class="status status-partial">partial</span>
+means some named parts do not; <span class="status status-planned">planned</span>
+means not built. **None of it has run on a production GPU cluster.** Where
+something was measured, the entry says on what, and numbers that turned out to
+be wrong are listed on [corrections](/corrections/).
 
-**[slurm-rca-bench](https://github.com/Zhanyl-tech/slurm-rca-bench)** — a
-public incident-diagnosis benchmark for HPC schedulers. Ten reproducible
-failure scenarios across six fault families, two of them deliberately
-*undiagnosable* so that confident guessing is penalised rather than rewarded.
-Answers are scored with partial credit against degenerate baselines, so a
-number means something: an agent that answers `db.mysql` to every question and
-reads no telemetry scores 0.145, and anything that fails to clear the floor has
-demonstrated fluency rather than diagnosis. Its first finding was about itself
-— the flagship scenario, built around the widely-repeated model that a storage
-stall backs up through the accounting path until scheduling halts, does not
-happen. Measured on a live cluster, scheduling continued throughout.
+## Scheduler evaluation across Slurm and Kubernetes
 
-**[slurm-scheduler-lab](https://github.com/Zhanyl-tech/slurm-scheduler-lab)** —
-replays real Slurm job traces against multifactor priority and EASY backfill, a
-discrete-event simulator for testing scheduling policy before it reaches a
-production controller. Reads `PriorityWeight*` straight from a `slurm.conf` and
-replays `sacct` output. The measured result: enabling backfill moved CPU
-utilisation from 72.2% to 83.6% and mean wait from 1,913 to 374 minutes, while
-sweeping the priority weights barely moved either. The real lever was users'
-`--time` limits.
+**[k8s-gpu-scheduler-lab](/projects/k8s-gpu-scheduler-lab/)**
+<span class="status status-partial">partial</span> — a controlled comparison of
+Kubernetes GPU schedulers on the same traces, on a real control plane with
+simulated GPU nodes (kind + kwok). K0, the default scheduler, and four
+degenerate baselines are built, and a Phase 2 measurement harness (repeats,
+spreads, queue parity) is built but has not run on a cluster. Kueue, Volcano,
+NVIDIA's Volcano bin-packing and KAI are not built. Its most useful finding so
+far is about a metric: the same largest-first run read 0.0% fragmentation under
+a queue-relative definition and 55.6% under a fixed reference (Phase 1, one
+run), so a fragmentation claim that does not state its definition cannot be
+reproduced. I have not found a published controlled comparison on an identical
+trace and substrate; [Radiant's 2026 comparison](https://radiant.co/blog/benchmarking-kueue-volcano-and-slinky-on-radiant)
+of Kueue, Volcano and Slinky used different GPUs for Kueue than for the others.
 
-Write-up: [Your Slurm priority weights matter less than your users' time
-limits](/experiments/2026-07-26-slurm-backfill-time-limits/)
+**[slurm-scheduler-lab](/projects/slurm-scheduler-lab/)**
+<span class="status status-built">built</span> — a discrete-event model of
+Slurm's multifactor priority, Fair Tree fairshare, backfill (Slurm-style
+conservative by default, EASY as an option) and preemption. Reads a real
+`slurm.conf`, replays `sacct` traces, and serves as the Slurm side (S0) of the
+Kubernetes comparison. On its synthetic workload, backfill cut mean wait by a
+median 3.8× over 20 seeds, and an extreme job-size weight moved it by a
+comparable amount; a model, not a controller.
 
-**[k8s-gpu-scheduler-lab](https://github.com/Zhanyl-tech/k8s-gpu-scheduler-lab)**
-— *phase 1 of 3, public.* A controlled comparison of Kubernetes GPU schedulers
-(Kueue, Volcano, NVIDIA KAI) on the same workload traces, built on kwok so the
-whole benchmark reproduces on a laptop with no GPUs. Nobody has published one.
-Phase 1 ships the substrate, the metrics, the degenerate baselines and K0
-measured on a real control plane. Its most useful finding so far is about a
-metric rather than a scheduler: fragmentation reads 0.0% for the worst policy in
-the set under the queue-relative definition and 55.6% under a fixed reference,
-on identical data — which is why a fragmentation claim that does not state its
-definition cannot be reproduced or disputed.
+## Slurm on Kubernetes
 
-**[inference-throughput-benchmark](/projects/inference-throughput-benchmark/)**
-— TensorRT-LLM beat vLLM by 18–32% on Llama-3 70B throughput, and vLLM was
-still the right choice. Paged KV-cache admits more concurrent sessions before
-OOM, and for agentic traffic a recoverable throughput gap beats an
-unrecoverable memory ceiling. A first pass on one A100, with the things it does
-not measure stated up front.
+**[slinky-gitops](/projects/slinky-gitops/)**
+<span class="status status-partial">partial</span> — Slurm 26.05 on kind with
+SchedMD's Slinky operator v1.2, in one command, plus an auth-key rotation that
+measures its own result: it hashes the key inside every slurmd pod. On v1.2 the
+new key does not reach slurmd, so the script rolls back and says so. Along the
+way: `kubectl rollout restart` silently skips pods owned by Slinky's `NodeSet`
+resource. No GitOps controller is wired up yet.
 
-## Cluster tooling
+## GPU fleet health
 
-**[gpu-reaper](https://github.com/Zhanyl-tech/gpu-reaper)** — detects and
-reclaims wasted GPU allocations on Slurm clusters, with guardrails that fail
-safe when telemetry is stale. Observe-by-default; a gap in the samples is
-treated as a collector fault rather than an idle GPU, so a monitoring outage
-can never cancel the cluster; and a kill requires a history of prior warnings.
+Three Go tools built on one rule, never act on absent evidence. All three are
+tested against simulators and synthetic trees, not hardware.
 
-**[ib-slurm-exporter](https://github.com/Zhanyl-tech/ib-slurm-exporter)** —
-correlates InfiniBand/RoCE fabric counters with the Slurm job that owns them,
-for diagnosing multi-node training slowdowns. Refuses to attribute a device two
-jobs share rather than guessing.
+**[epilog-gpu-validator](/projects/epilog-gpu-validator/)**
+<span class="status status-built">built</span> — a Slurm Epilog check that
+drains a node for evidence of a persistent GPU fault. Slurm drains a node when
+the Epilog exits non-zero, so a failed query without a documented
+hardware-fault exit code, an unreadable field or an idle PCIe link exits 0;
+report-only by default.
 
-**[epilog-gpu-validator](https://github.com/Zhanyl-tech/epilog-gpu-validator)**
-— node-level GPU validation in the Slurm epilog path, catching degraded devices
-before the next job lands on them. Slurm drains a node when the epilog exits
-non-zero, so the tool distinguishes persistent faults from transient ones and
-never drains on ignorance: a failed query exits clean.
+**[gpu-reaper](/projects/gpu-reaper/)**
+<span class="status status-built">built</span> — finds allocated-but-idle GPUs
+on Slurm and, only if enabled, drains and cancels. Observe by default; a gap,
+stale sample or unreadable field is never read as idleness; a new dcgm-exporter
+source is unverified and can only alert.
 
-**[slinky-gitops](https://github.com/Zhanyl-tech/slinky-gitops)** — Slurm on
-Kubernetes via Slinky (SchedMD/NVIDIA), with auth-key rotation and GitOps
-continuous sync. Documents honestly what does and does not work on the current
-release, including that the rotation does not propagate.
+**[ib-slurm-exporter](/projects/ib-slurm-exporter/)**
+<span class="status status-built">built</span> — attributes InfiniBand/RoCE
+counters to the Slurm job using the HCA, refuses to attribute a port it can
+see is shared (in its default mode kernel RDMA users are invisible to it), and
+handles Slurm 26.05's SLUID-named cgroups (from the documentation; not
+validated on a live 26.05 node).
 
-## Agents
+## Measurement and agents
 
-**[cluster-sre-agent](https://github.com/Zhanyl-tech/cluster-sre-agent)** —
-*design published, agent in build.* Multi-agent diagnosis over an explicit
-cluster dependency graph, built as five ablatable configurations specified
-before any results existed, scored on slurm-rca-bench. The dependency graph and
-the read-only tool surface are built and tested; the LLM configurations are
-not, so no diagnosis accuracy has been measured yet.
+**[slurm-rca-bench](/projects/slurm-rca-bench/)**
+<span class="status status-partial">partial</span> — an incident-diagnosis
+benchmark for the Slurm control plane: ten scenarios, six runnable, scored
+with partial credit against degenerate baselines. Its first finding was about
+itself: the flagship chain, a stalled accounting database halting scheduling,
+did not happen when measured on a Docker test cluster. The runnable suite is
+currently degenerate (answering `db.mysql` to everything scores 0.333, above
+its own 0.25 threshold), and it says so. No agent has been scored.
 
-**[slurm-mcp](https://github.com/Zhanyl-tech/slurm-mcp)** — a read-only MCP
-server exposing Slurm scheduler state to agents. The allowlist is enforced in
-code rather than requested in a prompt, and 51 of its tests are real mutating
-and injection attempts rather than assertions about prompt text. Three tools
-instead of one per binary, so the flag surface is not resident in context until
-it is asked for.
+**[cluster-sre-agent](/projects/cluster-sre-agent/)**
+<span class="status status-partial">partial</span> — an LLM diagnosis agent
+built as five ablatable configurations. The failure-propagation graph (12
+edges, 4 measured) and the read-only guard are built; the configurations are
+not, so no accuracy has been measured.
 
-**[cluster-ops-skills](https://github.com/Zhanyl-tech/cluster-ops-skills)** —
-eleven on-prem cluster runbooks as loadable Agent Skills. Every one carries a
-mandatory *What not to conclude* section, because the expensive mistakes on a
-cluster are wrong confident diagnoses rather than missing information. A
-validator fails any skill quoting a number without a link to the repo that
-measured it.
+**[slurm-mcp](/projects/slurm-mcp/)**
+<span class="status status-built">built</span> — a read-only MCP server for
+Slurm state. The allowlist of command shapes is enforced in code and tested
+with 70 adversarial command lines; three tools with progressive disclosure.
+Fixture-tested, not yet run against a real cluster.
 
-## Research infrastructure
+**[cluster-ops-skills](/projects/cluster-ops-skills/)**
+<span class="status status-built">built</span> — eleven operator runbooks as
+Agent Skills, each naming the wrong conclusion it exists to prevent. A
+validator enforces the sections and a claims ledger for every figure. Three of
+the eleven rest on an observed failure, each on a single test cluster (two on
+the benchmark's Docker cluster, one on kind); the rest on documentation or
+design.
 
-**[research-platform](https://github.com/Zhanyl-tech/research-platform)** —
-point-in-time data semantics for quantitative research: as-of queries, feature
-lineage, and leakage detection. Every record carries the date it became
-*knowable* separately from the date it describes, which makes an entire class
-of backtest bug structurally impossible rather than carefully avoided.
+## Quantitative research infrastructure
+
+**[research-platform](/projects/research-platform/)**
+<span class="status status-partial">partial</span> — a point-in-time data layer
+for backtesting: an append-only bitemporal store where every query takes an
+as-of date. Phase 1 of 6; feature lineage and leakage detection are planned.

@@ -34,7 +34,8 @@ MONO = "'JetBrains Mono', 'SF Mono', Menlo, monospace"
 # Measured, not guessed. At a common font-size the ∞ glyph's ink is 148px tall
 # against 303px for "18" in JetBrains Mono, so matching their apparent size
 # needs 303/148 = 2.047x. Used by the stacked icon, where the two glyphs sit at
-# equal weight. Re-derive with scripts/measure_glyphs.py if the typeface changes.
+# equal weight. (The script that measured them, measure_glyphs.py, was never
+# committed; re-measure by hand if the typeface changes.)
 INFINITY_SCALE = 2.047
 
 # ── Glyph metrics ───────────────────────────────────────────────────────────
@@ -47,7 +48,8 @@ INFINITY_SCALE = 2.047
 #   18       +0.100      +1.135    -0.745       +0.010    0.755
 #   ∞        +0.020      +0.580    -0.495       -0.125    0.370
 #
-# Re-derive with scripts/measure_glyphs.py if the typeface ever changes.
+# Re-measure by hand if the typeface ever changes (measure_glyphs.py was never
+# committed).
 M_DIGITS = {"left": 0.100, "right": 1.135, "top": -0.745, "bottom": 0.010, "h": 0.755}
 M_INF = {"left": 0.020, "right": 0.580, "top": -0.495, "bottom": -0.125, "h": 0.370}
 

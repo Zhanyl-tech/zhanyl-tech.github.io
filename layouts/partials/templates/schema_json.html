@@ -1,0 +1,116 @@
+{{- /* Local override of PaperMod's schema_json.html (theme 10d3dcc).
+
+     Homepage: a schema.org Person. Only fields this site itself backs up are
+     emitted: the name, the site URL, the description from hugo.yaml and the
+     three profiles the site links to. No jobTitle, employer, alumniOf or
+     image: those are claims a crawler would repeat as fact, and none of them
+     is stated verifiably here. (The theme's Person variant used the favicon
+     as "image", which is a logo, not a person.)
+
+     Pages: BlogPosting only for dated writing (blog, lab notes, notes);
+     SoftwareSourceCode for a project page that links a public repository;
+     WebPage for everything else. The theme typed About/Now/Contact as
+     BlogPosting with a datePublished of 0001-01-01. */}}
+{{ if .IsHome }}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": {{ site.Params.author | default site.Title }},
+  "url": {{ site.Home.Permalink }},
+  "description": {{ site.Params.description | plainify }},
+  "sameAs": [
+    {{- range $i, $e := site.Params.schema.sameAs }}{{ if $i }}, {{ end }}{{ trim $e " " }}{{ end -}}
+  ]
+}
+</script>
+{{- else if (or .IsPage .IsSection) }}
+{{/* BreadcrumbList */}}
+{{- $url := replace .Parent.Permalink ( printf "%s" site.Home.Permalink) "" }}
+{{- $lang_url := strings.TrimPrefix ( printf "%s/" .Lang) $url }}
+{{- $bc_list := (split $lang_url "/")}}
+
+{{- $scratch := newScratch }}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+  {{- range $index, $element := $bc_list }}
+
+    {{- $scratch.Add "path" (printf "%s/" $element ) | safeJS }}
+    {{- $bc_pg := site.GetPage ($scratch.Get "path") -}}
+
+    {{- if (and ($bc_pg) (gt (len . ) 0))}}
+    {{- if (and $index)}}, {{end }}
+    {
+      "@type": "ListItem",
+      "position": {{ add 1 $index  }},
+      "name": {{ $bc_pg.Name }},
+      "item": {{ $bc_pg.Permalink | safeHTML }}
+    }
+    {{- end }}
+
+  {{- end }}
+  {{- /*  self-page addition  */ -}}
+  {{- if (ge (len $bc_list) 2) }}, {{end }}
+    {
+      "@type": "ListItem",
+      "position": {{len $bc_list}},
+      "name": {{ .Name }},
+      "item": {{ .Permalink | safeHTML }}
+    }
+  ]
+}
+</script>
+{{- if .IsPage }}
+{{- $person := dict "@type" "Person" "name" (site.Params.author | default site.Title) "url" site.Home.Permalink }}
+{{- $desc := "" }}{{ with .Description }}{{ $desc = . | plainify }}{{ else }}{{ $desc = .Summary | plainify }}{{ end }}
+{{- if and (in (slice "blog" "experiments" "notes") .Section) (not .Date.IsZero) }}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": {{ .Title | plainify }},
+  "name": {{ .Title | plainify }},
+  "description": {{ $desc }},
+  "keywords": [
+    {{- range $i, $e := .Params.tags }}{{ if $i }}, {{ end }}{{ $e }}{{ end -}}
+  ],
+  "wordCount": {{ .WordCount }},
+  "inLanguage": {{ site.Language.Locale | default "en-US" }},
+  "datePublished": {{ .PublishDate }},
+  "dateModified": {{ .Lastmod }},
+  "author": {{ $person }},
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": {{ .Permalink | safeHTML }}
+  }
+}
+</script>
+{{- else if and (eq .Section "projects") .Params.repo }}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": {{ .Title | plainify }},
+  "description": {{ $desc }},
+  "codeRepository": {{ .Params.repo }},
+  "url": {{ .Permalink }},
+  "author": {{ $person }}
+}
+</script>
+{{- else }}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": {{ .Title | plainify }},
+  "description": {{ $desc }},
+  "url": {{ .Permalink }}
+}
+</script>
+{{- end }}
+{{- end }}{{/* .IsPage end */}}
+
+{{- end -}}

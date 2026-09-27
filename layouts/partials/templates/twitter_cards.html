@@ -8,6 +8,9 @@
   Resolution order:  post cover.image  ->  /images/og/<slug>.png  ->  default.png
 */}}
 {{- $ogImage := "" }}
+{{- /* True when the site-wide fallback card was chosen: its alt text has to
+     describe that card, which does not show this page's title. */}}
+{{- $isDefaultCard := false }}
 
 {{- with .Params.cover.image }}
   {{- if (ne $.Params.cover.relative true) }}
@@ -29,6 +32,7 @@
 {{- if not $ogImage }}
   {{- if os.FileExists "static/images/og/default.png" }}
     {{- $ogImage = "/images/og/default.png" | absURL }}
+    {{- $isDefaultCard = true }}
   {{- end }}
 {{- end }}
 
@@ -38,12 +42,26 @@
 <meta property="og:image" content="{{ $ogImage }}">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="{{ (or .Title site.Title) | plainify }} — Zhanyl Abdybaeva">
+{{- /* A per-slug card (scripts/ogimage.py) shows the page's title, so the
+     title is its alt text. The fallback card shows the site headline instead;
+     giving it the page's title described About, the section lists and every
+     tag page as a card that says something else. On the homepage .Title is
+     the site title, which used to render "Zhanyl Abdybaeva — Zhanyl
+     Abdybaeva". */}}
+{{- $alt := printf "%s — Zhanyl Abdybaeva" ((or .Title site.Title) | plainify) }}
+{{- if $isDefaultCard }}
+  {{- $alt = site.Params.defaultCardAlt | default site.Params.homeTitle | default site.Title | plainify }}
+{{- else if .IsHome }}
+  {{- $alt = site.Params.homeTitle | default site.Title | plainify }}
+{{- end }}
+<meta property="og:image:alt" content="{{ $alt }}">
 {{- else }}
 <meta name="twitter:card" content="summary">
 {{- end }}
 
-{{- with or .Title site.Title site.Params.title | plainify }}
+{{- $twTitle := or .Title site.Title site.Params.title }}
+{{- if .IsHome }}{{ $twTitle = site.Params.homeTitle | default $twTitle }}{{ end }}
+{{- with $twTitle | plainify }}
 <meta name="twitter:title" content="{{ . }}">
 {{- end }}
 

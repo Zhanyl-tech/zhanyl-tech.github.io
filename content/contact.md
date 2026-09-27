@@ -13,8 +13,13 @@ the ones that aren't. Tell me what you have in mind here instead.
 own address, usually within a week, and send my CV then. If you don't hear
 back, it wasn't one — no follow-up needed, and no hard feelings.
 
-**Be specific.** For a role, paste the whole job description rather than a
-summary; comp range and location policy save us both a round trip. For anything
-else, the more concrete the ask, the faster I can tell you yes or no.
+**Only your name and email are required.** For a role, the
+job description, compensation range and location policy help if you have them
+to hand, and I'll send my CV once I've read it. For anything else, the more
+concrete the ask, the faster I can tell you yes or no.
+
+<!-- OWNER: an audit recommended offering a one-page CV (or a CV-request link)
+directly here, because hiring managers expect it. The public resume was removed
+in c7a3174. Add one only if you want it public. -->
 
 {{< intake >}}

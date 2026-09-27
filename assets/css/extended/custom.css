@@ -272,12 +272,17 @@ a:hover { color: var(--accent-2); }
   line-height: 1.04;
   letter-spacing: -0.021em;
   color: var(--ink);
-  max-width: 15ch;
+  /* 22ch: the headline is a sentence about the work. At 15ch the 55-character
+     version wrapped to four lines and pushed the evidence tiles below the
+     first screen, so it went to 19ch; the September 2026 rewording is 64
+     characters and needed 22ch to stay on three lines at 1280px (checked in
+     headless Chrome on 2026-09-26). */
+  max-width: 22ch;
   margin: 0 0 26px;
 }
 
-/* The one italic accent word. Restraint is what makes it read as editorial
-   rather than decorative. */
+/* The one italic accent (a word, or the closing phrase). Restraint is what
+   makes it read as editorial rather than decorative. */
 .hero-title em {
   font-style: italic;
   color: var(--accent);
@@ -545,12 +550,15 @@ a:hover { color: var(--accent-2); }
 
 .project-list-simple li > a:hover { color: var(--accent); }
 
+/* Status text was 9.5px in --ink-4, which measures 4.32:1 against
+   --bg-raised: under WCAG AA's 4.5:1, on the one label that says whether a
+   project exists. It is now 11px in --ink-2 (7.75:1 on --bg-raised). */
 .project-list-simple .post-meta-inline {
   display: inline-block;
-  font-size: 9.5px;
-  letter-spacing: 0.13em;
-  text-transform: uppercase;
-  color: var(--ink-4);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: none;
+  color: var(--ink-2);
   border: 1px solid var(--rule-2);
   border-radius: 2px;
   padding: 1px 6px;
@@ -575,9 +583,9 @@ a:hover { color: var(--accent-2); }
 
 .project-tags .tag {
   font-family: var(--font-mono);
-  font-size: 9.5px;
-  letter-spacing: 0.06em;
-  color: var(--ink-4);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--ink-3);
   border: 1px solid var(--rule);
   border-radius: 2px;
   padding: 1px 6px;
@@ -1018,6 +1026,115 @@ a:hover { color: var(--accent-2); }
   height: auto;
   border-radius: 14px;
   border: 1px solid var(--border, #243040);
+}
+
+/* ── Status badges ────────────────────────────────────────────── */
+/* One vocabulary everywhere a status appears: the proof tiles, the system
+   map legend, the project list and the project pages. Colour is never the
+   only carrier (the word is always printed), and every pairing clears
+   WCAG AA on --bg and --bg-raised: green 6.14:1, amber 8.60:1, and
+   --ink-2 7.75:1 on --bg-raised (computed 2026-09-26). Planned is dashed so
+   it reads as absent even in greyscale. */
+.status {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1.4;
+  border: 1px solid currentColor;
+  border-radius: 2px;
+  padding: 0 6px;
+  margin-right: 6px;
+  vertical-align: 1px;
+}
+.status-built   { color: var(--green); }
+.status-partial { color: var(--mark); }
+.status-planned { color: var(--ink-2); border-style: dashed; }
+
+/* A project page's status line, directly under its title. */
+.post-content p.project-status {
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--ink-2);
+  border-left: 2px solid var(--rule-2);
+  padding: 2px 0 2px 14px;
+  margin-bottom: 26px;
+}
+
+/* ── Proof tiles (homepage) ───────────────────────────────────── */
+.proof { margin: 0 0 12px; }
+
+.proof-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+.proof-tile {
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  background: rgba(28, 36, 49, .55);
+  padding: 18px 20px 16px;
+  min-width: 0;
+}
+
+.proof-area {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  color: var(--ink);
+  margin: 0 0 8px;
+}
+
+.proof-status { margin: 0 0 10px; line-height: 1.5; }
+
+.proof-note {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--ink-2);
+}
+
+.proof-fact {
+  font-size: 15px;
+  line-height: 1.62;
+  color: var(--ink-2);
+  margin: 0 0 12px;
+}
+
+.proof-fact strong { color: var(--ink); font-weight: 600; }
+.proof-fact code {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--ink);
+  background: var(--code-bg);
+  border-radius: 3px;
+  padding: 1px 4px;
+}
+
+.proof-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.system-map-caption {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.8;
+  color: var(--ink-2);
+  margin: 12px 2px 0;
+}
+
+.project-repo-none { color: var(--ink-3); }
+
+@media (max-width: 900px) {
+  .proof-grid { grid-template-columns: 1fr; }
 }
 
 /* ── Intake form ──────────────────────────────────────────────── */
