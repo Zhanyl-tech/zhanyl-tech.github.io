@@ -6,7 +6,13 @@ summary: "Books I recommend"
 ShowToc: true
 ---
 
-Books that shaped how I think about systems, markets, and engineering. Updated quarterly.
+Books that shaped how I think about systems, markets, and engineering.
+
+<!-- OWNER: this list was last updated in March 2026 and promised quarterly
+updates, so the promise was removed. It lists no scheduling, HPC or GPU
+sources, which is what most visitors now arrive for; add the ones you actually
+use (for example the Slurm documentation you cite, or papers behind the
+scheduler labs) only if you would recommend them. -->
 
 ## Systems & Engineering
 

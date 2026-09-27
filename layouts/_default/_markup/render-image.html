@@ -1,0 +1,42 @@
+{{- /* Local override of PaperMod's render-image hook (theme 10d3dcc).
+
+     The theme's hook is kept as-is for every image except one case: an SVG
+     under /images/diagrams/ that has an animation-free twin named
+     <name>.static.svg. Those diagrams animate with SMIL, and SMIL ignores
+     CSS, so an <img> of them cannot honour prefers-reduced-motion or be
+     paused (WCAG 2.2.2). A <picture> whose <source> matches
+     (prefers-reduced-motion: reduce) serves the still version instead; the
+     browser evaluates that media query before fetching. The twins are made
+     by scripts/static_diagrams.py and must be regenerated when a diagram
+     changes. */ -}}
+{{- $u := urls.Parse .Destination -}}
+{{- $src := $u.String -}}
+{{- if not $u.IsAbs -}}
+  {{- $path := strings.TrimPrefix "./" $u.Path }}
+  {{- with or (.PageInner.Resources.Get $path) (resources.Get $path) -}}
+    {{- $src = .RelPermalink -}}
+    {{- with $u.RawQuery -}}
+      {{- $src = printf "%s?%s" $src . -}}
+    {{- end -}}
+    {{- with $u.Fragment -}}
+      {{- $src = printf "%s#%s" $src . -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- $still := "" -}}
+{{- if and (not $u.IsAbs) (strings.HasPrefix $u.Path "/images/diagrams/") (strings.HasSuffix $u.Path ".svg") -}}
+  {{- $candidate := replaceRE `\.svg$` ".static.svg" $u.Path -}}
+  {{- if os.FileExists (printf "static%s" $candidate) -}}
+    {{- $still = $candidate -}}
+  {{- end -}}
+{{- end -}}
+{{- $attributes := merge .Attributes (dict "alt" .Text "src" $src "title" (.Title | transform.HTMLEscape) "loading" "lazy") -}}
+{{- if $still -}}<picture><source media="(prefers-reduced-motion: reduce)" srcset="{{ $still }}">{{- end -}}
+<img
+  {{- range $k, $v := $attributes -}}
+    {{- if $v -}}
+      {{- printf " %s=%q" $k $v | safeHTMLAttr -}}
+    {{- end -}}
+  {{- end -}}>
+{{- if $still -}}</picture>{{- end -}}
+{{- /**/ -}}

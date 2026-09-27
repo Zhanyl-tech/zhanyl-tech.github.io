@@ -20,6 +20,11 @@
     {{- range sort $pages "Date" "desc" }}
     <li>
       <a href="{{ .Permalink }}">{{ .Title }}</a>
+      {{- /* Project pages carry a stage (built / partial / planned); show it in
+           the list so the index never makes an unbuilt project look shipped. */}}
+      {{- with .Params.stage }}
+      <span class="status status-{{ . | urlize }}">{{ . }}</span>
+      {{- end }}
       <span class="post-meta-inline">{{ .Date.Format "Jan 2, 2006" }}</span>
       {{- with .Description }}
       <p class="post-summary">{{ . }}</p>

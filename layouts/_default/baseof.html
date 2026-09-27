@@ -3,13 +3,17 @@
 {{- end -}}
 
 <!DOCTYPE html>
+{{- /* .Language.LanguageDirection was deprecated in Hugo 0.158 in favour of
+     .Language.Direction; lang comes from the `locale` key in hugo.yaml. */}}
 {{- $theme := site.Params.defaultTheme | default "auto" }}
+{{- $lang := site.Language.Locale | default site.Language.Lang }}
+{{- $dir := .Language.Direction | default "auto" }}
 {{- if eq $theme "dark" }}
-<html lang="{{ site.Language }}" dir="{{ .Language.LanguageDirection | default "auto" }}" data-theme="dark">
+<html lang="{{ $lang }}" dir="{{ $dir }}" data-theme="dark">
 {{- else if eq $theme "light" }}
-<html lang="{{ site.Language }}" dir="{{ .Language.LanguageDirection | default "auto" }}" data-theme="light">
+<html lang="{{ $lang }}" dir="{{ $dir }}" data-theme="light">
 {{- else }}
-<html lang="{{ site.Language }}" dir="{{ .Language.LanguageDirection | default "auto" }}" data-theme="auto">
+<html lang="{{ $lang }}" dir="{{ $dir }}" data-theme="auto">
 {{- end }}
 
 <head>

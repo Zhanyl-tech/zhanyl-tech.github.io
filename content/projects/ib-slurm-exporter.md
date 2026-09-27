@@ -1,110 +1,117 @@
 ---
 title: "IB Slurm Exporter"
 date: 2026-07-26
-description: "Correlate InfiniBand and RoCE counters with the Slurm job that owns them, so a slow collective can be traced to the fabric."
-summary: "Correlate InfiniBand and RoCE counters with the Slurm job that owns them, so a slow collective can be traced to the fabric."
+lastmod: 2026-09-27
+description: "A Prometheus exporter that attributes InfiniBand and RoCE counters to the Slurm job using the HCA, refuses to attribute a port it can see is shared, and handles Slurm 26.05's SLUID cgroup layout."
+summary: "Attribute InfiniBand and RoCE counters to the Slurm job using the HCA, and refuse to attribute a port it can see is shared."
 tags: [slurm, infiniband, rdma, prometheus, golang]
-status: "Shipped"
+status: "Synthetic /sys, /proc and cgroup trees only · not hardware"
+stage: "built"
 repo: "https://github.com/Zhanyl-tech/ib-slurm-exporter"
-weight: 3
-ShowToc: false
+weight: 6
+ShowToc: true
 ---
 
 **[github.com/Zhanyl-tech/ib-slurm-exporter](https://github.com/Zhanyl-tech/ib-slurm-exporter)** · Go · MIT
+
+<p class="project-status"><span class="status status-built">built</span>
+Validated only against synthetic <code>/sys</code>, <code>/proc</code> and
+cgroup trees built from the kernel and Slurm documentation. <strong>Not run on
+InfiniBand hardware or on a Slurm 26.05 node.</strong> The packaging (systemd
+unit, DaemonSet, container image) has not been run on a real host either.</p>
+
+<!-- OWNER: this page describes the repository's improve/2026-09 branch as of
+2026-09-26. Merge or push it before publishing. -->
 
 ```
 make demo
 ```
 
-No InfiniBand, no cluster, no Linux required — it builds a synthetic `/sys`,
+No InfiniBand, no cluster, no Linux required: it builds a synthetic `/sys`,
 `/proc` and cgroup tree and serves real metrics off it.
 
 ## The problem
 
-A 64-node run drops from 4,200 to 900 samples/sec. GPUs look busy. Slurm says
-`RUNNING`. Your Slurm exporter reports job count, state, and runtime — none of
-which move.
+*An illustrative scenario, not a measured incident:* a 64-node training run
+drops from 4,200 to 900 samples/sec. GPUs look busy, Slurm says `RUNNING`, and
+a Slurm exporter's job count, state and runtime do not move. The cause is one
+HCA retransmitting — `packet_seq_err` climbing on `mlx5_1` — stalling the
+all-reduce and idling every GPU behind it. Fabric monitoring can see that
+counter; what it usually cannot tell you is which job on a shared compute node
+was using that HCA.
 
-The cause is one HCA retransmitting: `packet_seq_err` climbing on `mlx5_1`,
-stalling the all-reduce and idling every GPU behind it.
-
-Fabric monitoring can see that counter. It just cannot tell you *which job* owns
-it, because nothing connects a Slurm job ID to a network device.
-
-![Five hop chain from a Slurm cgroup through a PID and an open uverbs file descriptor to the per-port hardware counter](/images/diagrams/ib-join-chain.svg)
+![Five-hop chain from a Slurm cgroup through a PID and an open uverbs file descriptor to the per-port hardware counter](/images/diagrams/ib-join-chain.svg)
 
 ## The join
 
-Neither Slurm nor the HCA knows about the other. The bridge turns out to be a
-file descriptor — any process doing RDMA holds one open on a uverbs device:
+Neither Slurm nor the HCA knows about the other. By default the bridge is a
+file descriptor: a process doing RDMA through libibverbs holds one open on a
+uverbs device.
 
 ```
-job_918001/step_0/cgroup.procs → PID 41001
+<scope>/<job>/step_0/user/task_0/cgroup.procs → PID 41001
   → /proc/41001/fd/3 → /dev/infiniband/uverbs0
   → /sys/class/infiniband_verbs/uverbs0/ibdev → "mlx5_0"
   → /sys/class/infiniband/mlx5_0/ports/1/hw_counters/packet_seq_err
 ```
 
-That last hop goes through sysfs on purpose. `uverbs3` does **not** have to mean
-`mlx5_3` — the numbering is independent. A host where they happen to match is
-exactly the host where the shortcut looks correct and is wrong somewhere else.
+The last hop goes through sysfs on purpose. `uverbs3` does **not** have to mean
+`mlx5_3`; the numbering is independent, and a host where they happen to match
+is exactly the host where the shortcut looks correct and is wrong elsewhere.
+
+An opt-in second mode reads queue-pair ownership from the kernel's RDMA
+resource tracking instead, which attributes per port and counts kernel RDMA
+users (NFS/RDMA, Lustre o2ib, IPoIB) that the fd mode is blind to. It has a
+blind spot of its own, listed below. Its key names come from iproute2's source;
+it has not been run on hardware.
 
 ## What it refuses to do
 
-**InfiniBand counters are per-device. The HCA counts packets; it has no idea
-which process sent them.**
+Port counters are per port. The HCA counts packets; the counters do not record
+which process sent them. When two jobs share `mlx5_1`, splitting its
+`port_xmit_data` between them is not hard, it is impossible. Exporters that
+paper over this put a noisy neighbour's retries on a healthy job, and mislead
+you exactly when you are debugging with them.
 
-When two jobs share a node and both use `mlx5_1`, splitting `port_xmit_data`
-between them is not hard — it's impossible. The information isn't in the
-hardware.
+So there are two families. `ib_slurm_job_*` appears **only** for a port whose
+sole visible user is that job, and accumulates only the increase seen while it
+was the sole user, so a visible neighbour's traffic never lands in it.
+`ib_slurm_device_*` always appears and carries no job label. Anything that
+leaves the user set incomplete (unreadable `/proc`, an unresolved SLUID, a
+failed QP listing) suppresses all job attribution for that sample and is
+exported as a metric of its own. In the demo `mlx5_1` is shared: the synthetic
+fixture starts it at 48,221 `packet_seq_err` and keeps it climbing, and that
+count is still exported, at device level, where it is true.
 
-Exporters that paper over this emit job-labelled series that are wrong in the
-worst way: a noisy neighbour's retries land on a healthy job, so the metric
-misleads you precisely when you're using it to debug an incident.
+## Slurm 26.05 changed the cgroup layout
 
-So there are two families. `ib_slurm_job_*` appears **only** when a job is the
-device's sole user. `ib_slurm_device_*` always appears and is never
-job-labelled. A third series, `ib_slurm_device_jobs`, shows *why* attribution is
-missing instead of leaving a mysterious gap.
+From the [26.05 release notes](https://slurm.schedmd.com/release_notes.html)
+(read 2026-09-27): "cgroup/v2 directory structures are now keyed off of SLUID
+and not the JobId." With `cgroup.conf`'s `CgroupJobIdPaths` at its default
+(`no`), the job directory is the bare SLUID, such as `sEKNKTV3WPV500`,
+with no `job_` prefix ([cgroup.conf](https://slurm.schedmd.com/cgroup.conf.html)).
+Version 0.1.0 of this exporter assumed `job_<SLUID>` and would have found no
+jobs at all on such a node. All three layouts (cgroup v1, v2 by job ID, v2 by
+SLUID) are now handled; a SLUID is resolved from the job's slurmstepd process
+title or from `squeue`, and anything unresolved is counted, never guessed. That
+handling is implemented from the documentation and tested on synthetic trees,
+not on a live 26.05 node.
 
-Suppressing attribution never loses data. In the demo `mlx5_1` is shared, and
-its 48,221 `packet_seq_err` are still exported — at device level, where they're
-true.
+## Limitations
 
-## Slurm 26.05 broke the usual approach
-
-From the release notes:
-
-> cgroup/v2 directory structures are now keyed off of SLUID and not the JobId.
-
-Anything doing `Atoi` on the segment after `job_` now gets a parse error, or
-worse, a number that isn't a job ID. Nothing errors at runtime. Series just stop
-appearing, or appear against the wrong job.
-
-All three layouts are handled — v1, v2, and 26.05's SLUID form. Identifiers are
-treated as opaque; non-numeric ones resolve through `scontrol`, and anything
-that fails to resolve is **counted, never guessed**. A metric on the wrong job is
-worse than a metric on no job.
-
-I found this while writing up the [25.11 vs 26.05
-comparison](/experiments/2026-07-26-slurm-25-11-upgrade-notes/), which is the
-only reason this tool handles it — the approach I'd sketched a day earlier was
-already obsolete.
-
-Worth knowing separately: PIDs live in the *step* cgroups, not the job-level
-one. An exporter reading only `job_*/cgroup.procs` finds nothing and reports an
-empty cluster.
-
-## Honest caveat
-
-The SLUID path is implemented from the release notes and has **not** been
-validated against a live 26.05 cluster. If you run one, I'd like to know what
-the real directory names look like.
-
-## Design note
-
-Every root — sysfs, proc, verbs, cgroup — is injectable. That's what lets a
-Linux-only exporter be tested and demoed on a laptop, and it's why the 14 tests
-run anywhere. It also means the synthetic tree is deliberately awkward: two jobs
-share an HCA so the suppression path is exercised, and one allocation is keyed
-by SLUID so the 26.05 layout is too.
+- **Never run on InfiniBand hardware.**
+- **Ports it can see are shared are never job-attributed**, by design; in fd
+  mode, where NCCL opens every active HCA, per-job attribution in practice
+  needs node-exclusive jobs.
+- **"Sole user" means sole *visible* user.** In the default fd mode, kernel
+  RDMA users (IPoIB, NFS/RDMA, Lustre o2ib) are invisible, so their traffic can
+  land on a job that looks like the only user; in qp mode, userspace queue
+  pairs created through mlx5 DEVX (UCX's default on mlx5) are invisible. The
+  README's ownership table lists each case.
+- **No per-QP counter binding yet.** Binding the mlx5 retry counters per
+  process would turn suppression into real per-job attribution for that
+  signal; it is the next milestone.
+- **mlx5-centric** hardware counters; RoCE PFC pause counters are netdev
+  counters and are not collected.
+- **Endpoint symptoms only.** An HCA counter says something on the path is
+  dropping or reordering, not which link; pair it with a switch-side exporter.

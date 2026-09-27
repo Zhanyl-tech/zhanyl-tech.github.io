@@ -14,80 +14,90 @@
 {{- $lastPublished := "" }}
 {{- with first 1 $written }}{{ range . }}{{ $lastPublished = .Date }}{{ end }}{{ end }}
 
-{{/* Scattered notation behind the homepage. Each glyph is one this work
-     actually runs on — σ volatility, Σ covariance, ∂ the Greeks, ∇ gradient,
-     dW the Brownian increment. Purely decorative, so aria-hidden; sizes and
-     hues vary per glyph and the whole layer sits at very low opacity behind
-     the content. Homepage only. */}}
-<div class="glyph-field" aria-hidden="true">
-  <span style="--x:  4%; --y:  8%; --s: 190px; --c: var(--gl-amber);  --r: -8deg">∞</span>
-  <span style="--x: 88%; --y:  5%; --s: 120px; --c: var(--gl-blue);   --r: 12deg">σ</span>
-  <span style="--x: 72%; --y: 22%; --s:  74px; --c: var(--gl-violet); --r: -5deg">Σ</span>
-  <span style="--x: 13%; --y: 34%; --s:  96px; --c: var(--gl-cyan);   --r: 7deg">∂</span>
-  <span style="--x: 92%; --y: 46%; --s: 150px; --c: var(--gl-green);  --r: -10deg">∇</span>
-  <span style="--x: 34%; --y: 58%; --s:  62px; --c: var(--gl-amber);  --r: 4deg">dW</span>
-  <span style="--x:  6%; --y: 66%; --s: 128px; --c: var(--gl-violet); --r: -14deg">λ</span>
-  <span style="--x: 79%; --y: 71%; --s:  88px; --c: var(--gl-blue);   --r: 9deg">∫</span>
-  <span style="--x: 50%; --y: 84%; --s: 104px; --c: var(--gl-cyan);   --r: -6deg">Δ</span>
-  <span style="--x: 21%; --y: 92%; --s:  70px; --c: var(--gl-green);  --r: 11deg">μ</span>
-  <span style="--x: 63%; --y: 96%; --s: 116px; --c: var(--gl-amber);  --r: -9deg">ρ</span>
-  <span style="--x: 41%; --y: 15%; --s:  58px; --c: var(--gl-violet); --r: 15deg">θ</span>
-</div>
+{{/* The finance-notation glyph field (σ, Σ, ∂, dW …) that used to sit behind
+     this page was removed in September 2026. It told a first-time reader
+     "quantitative finance" before a word of the page did, and the work this
+     page leads with is GPU scheduling and fleet health. The quant work is
+     still here, one section down the project list. The .glyph-field styles
+     remain in custom.css for any page that wants the texture back. */}}
 
 <div class="home-wrap">
 
   <section class="hero">
-    <p class="hero-kicker">Agentic AI/ML · Quantitative Finance</p>
-    <h1 class="hero-title">Systems for models, <em>markets</em>, and scale.</h1>
+    {{/* Until September 2026 the headline ended in the single word
+         "measured". The fleet-health tools have been tested only against
+         simulators and synthetic trees, and the scheduling numbers are
+         simulator runs and single kind + kwok runs, so that word promised more
+         than the pages below it show. The headline, homeTitle in hugo.yaml and
+         the default social card (scripts/ogimage.py) now say what the site
+         does: label each result with what it was measured on, or say that it
+         was not. scripts/check_content.py keeps the old wording out. */}}
+    <p class="hero-kicker">GPU clusters · Slurm &amp; Kubernetes · measured versus asserted</p>
+    <h1 class="hero-title">GPU scheduling and fleet health: <em>what was measured, and on what</em>.</h1>
     <div class="hero-copy">
       <p>
-        I'm <strong>Zhanyl Abdybaeva</strong>, an ML infrastructure and quantitative finance engineer
-        working at a quantitative trading firm. My work spans GPU clusters, inference systems,
-        distributed training, and the schedulers that decide what runs when.
+        I'm <strong>Zhanyl Abdybaeva</strong>. I build the systems that allocate
+        scarce, expensive, heterogeneous compute, and the benchmarks that check
+        whether they work.
       </p>
       <p>
-        This site is where I publish long-form technical writing, shorter field notes, and
-        project pages for the systems I'm building.
+        The public work covers three things: <strong>controlled evaluation of GPU
+        schedulers across Slurm and Kubernetes</strong> (including Slurm on
+        Kubernetes via Slinky), <strong>GPU fleet-health automation</strong> that
+        refuses to act on missing evidence, and a habit of publishing
+        <strong>what was measured separately from what was asserted</strong>,
+        negative results and <a href="/corrections/">corrections</a> included.
+        Every project page states what is built, partial or planned.
       </p>
     </div>
     <p class="hero-links">
+      <a href="/projects/">Projects</a>
       <a href="https://github.com/Zhanyl-tech">GitHub</a>
       <a href="https://www.linkedin.com/in/za-engineering/">LinkedIn</a>
       <a href="/contact/">Work with me</a>
       <a href="/about/">About</a>
-      <a href="/index.xml">RSS</a>
     </p>
   </section>
 
-  {{/* Qualitative rather than vanity metrics — nothing here is a number that
-       would need defending in an interview. Edit in hugo.yaml → params.facts. */}}
-  {{- with .Site.Params.facts }}
-  <div class="facts">
-    {{- range . }}
-    <div class="fact">
-      <p class="fact-label">{{ .label }}</p>
-      <p class="fact-value">{{ .value | safeHTML }}</p>
+  {{/* Proof tiles: one checkable fact each, with its status and the page that
+       backs it. Edit in hugo.yaml → params.proof, which also documents the
+       rules for what may go in a tile. */}}
+  {{- with .Site.Params.proof }}
+  <section class="proof" aria-labelledby="proof-heading">
+    <h2 class="home-heading" id="proof-heading">cat ./evidence</h2>
+    <div class="proof-grid">
+      {{- range . }}
+      <article class="proof-tile">
+        <p class="proof-area">{{ .area }}</p>
+        <p class="proof-status">
+          <span class="status status-{{ .status | urlize }}">{{ .status }}</span>
+          <span class="proof-note">{{ .note }}</span>
+        </p>
+        <p class="proof-fact">{{ .fact | safeHTML }}</p>
+        <p class="proof-links">
+          {{- range .links }}<a href="{{ .url }}">{{ .text }} →</a>{{ end }}
+        </p>
+      </article>
+      {{- end }}
     </div>
-    {{- end }}
-  </div>
-
+  </section>
   {{- end }}
 
-  {{/* The system diagram. Sits after the hero and facts so a reader meets the
-       person before the architecture. It does in one image what
-       the project list does in eight rows, and it carries the measured
-       refutation on its face — which is the most differentiated thing here.
-       Same asset as the GitHub profile banner, so the two read as one identity. */}}
+  {{/* The system map. Every box carries the same status words as the tiles
+       above and the project pages (built / partial / planned). An earlier
+       version drew Kueue, Volcano and NVIDIA KAI as if they were running; they
+       are not built yet, and the map now says so on its face. The same asset
+       used to back the GitHub profile banner; that copy lives in the profile
+       repository and has to be updated there separately. */}}
   <figure class="system-map">
-    <img src="/images/architecture.svg" width="1200" height="730" loading="lazy" decoding="async"
-         alt="Four bands. Across the top, a measurement layer — slurm-rca-bench and
-              k8s-gpu-scheduler-lab — scores both control planes beneath it. In the middle,
-              two columns side by side: the Slurm control plane with slurm-scheduler-lab,
-              cluster-sre-agent with slurm-mcp, and epilog-gpu-validator; the Kubernetes
-              control plane with slinky-gitops and k8s-gpu-scheduler-lab covering Kueue,
-              Volcano and NVIDIA KAI. Both allocate from a shared GPU fleet along the
-              bottom, held by gpu-reaper and ib-slurm-exporter. The tools change with the
-              substrate; the fleet and the measurement layer do not.">
+    <img src="/images/architecture.svg" width="1200" height="800" loading="lazy" decoding="async"
+         alt="System map with a status on every box. Top band, measurement: slurm-rca-bench (partial: 10 scenarios, 2 causal chains measured, no agent scored) and k8s-gpu-scheduler-lab (partial: K0 and four degenerate baselines built; the Phase 2 harness is built but has not run on a cluster). Middle left, the Slurm control plane: slurm-scheduler-lab (built: a simulator, no live controller behind its numbers), cluster-sre-agent (partial: dependency graph and read-only guard built, no MCP server of its own, agent configurations planned), slurm-mcp (built: a read-only MCP server, fixture-tested), and epilog-gpu-validator (built, simulator-tested; drains only on fault evidence, never on a failed query without it). Middle right, the Kubernetes control plane: slinky-gitops (partial: Slurm on kind built, auth-key rotation blocked and rolls back safely, Argo CD not wired) and the schedulers under comparison, Kueue, Volcano and NVIDIA KAI, all planned. Bottom band, the GPU fleet: gpu-reaper and ib-slurm-exporter (built, tested on simulated telemetry and synthetic trees, not on hardware; the exporter attributes counters to a job only where it is the sole visible user of the port). Built means code and tests exist; nothing here has run on a production GPU cluster.">
+    <figcaption class="system-map-caption">
+      <span class="status status-built">built</span> code and tests exist ·
+      <span class="status status-partial">partial</span> some named parts are not built ·
+      <span class="status status-planned">planned</span> not built.
+      Nothing on this map has run on a production GPU cluster; each project page says what it was tested against.
+    </figcaption>
   </figure>
 
   {{/* Only claim an active cadence when the archive actually backs it up —
@@ -97,29 +107,15 @@
   {{- $active := le $daysSince 21 }}
   <p class="cadence">
     <span class="cadence-dot{{ if not $active }} cadence-dot-idle{{ end }}" aria-hidden="true"></span>
-    {{ if $active }}New writing most weeks · last published{{ else }}Last published{{ end }}
+    {{ if $active }}Writing actively · last published{{ else }}Last published{{ end }}
     {{ .Format "January 2, 2006" }}
   </p>
   {{- end }}
 
   <section class="home-grid">
     <div class="home-primary">
-      {{- if $latestBlog }}
-      <section class="home-section">
-        <h2 class="home-heading">ls ./writing --featured</h2>
-        {{- range $latestBlog }}
-        <article class="feature-story">
-          <p class="feature-meta">{{ .Date.Format "January 2006" }} · blog · {{ .ReadingTime }} min read</p>
-          <h3><a href="{{ .Permalink }}">{{ .Title }}</a></h3>
-          {{- with .Description }}
-          <p>{{ . }}</p>
-          {{- end }}
-        </article>
-        {{- end }}
-        <p class="section-more"><a href="/blog/">All deep dives →</a></p>
-      </section>
-      {{- end }}
-
+      {{/* Lab notes first: they are the scheduling and upgrade write-ups, which
+           is what this page is about. The deep dives are paper explainers. */}}
       {{- if $latestExp }}
       <section class="home-section">
         <h2 class="home-heading">tail ./lab-notes</h2>
@@ -132,6 +128,22 @@
           {{- end }}
         </ul>
         <p class="section-more"><a href="/experiments/">All lab notes →</a></p>
+      </section>
+      {{- end }}
+
+      {{- if $latestBlog }}
+      <section class="home-section">
+        <h2 class="home-heading">ls ./writing</h2>
+        {{- range $latestBlog }}
+        <article class="feature-story">
+          <p class="feature-meta">{{ .Date.Format "January 2006" }} · blog · {{ .ReadingTime }} min read</p>
+          <h3><a href="{{ .Permalink }}">{{ .Title }}</a></h3>
+          {{- with .Description }}
+          <p>{{ . }}</p>
+          {{- end }}
+        </article>
+        {{- end }}
+        <p class="section-more"><a href="/blog/">All deep dives →</a></p>
       </section>
       {{- end }}
 
@@ -151,15 +163,25 @@
       {{- end }}
     </div>
 
+    {{/* Projects, grouped. Infrastructure first; quantitative-research work is
+         its own group so the GPU-cluster story reads as one thread. A page
+         joins the second group with `group: quant` in its front matter. */}}
     {{- if $projects }}
     <aside class="home-secondary">
+      {{- $infra := where $projects "Params.group" "ne" "quant" }}
+      {{- $quant := where $projects "Params.group" "quant" }}
+      {{- range $g := slice (dict "heading" "ls ./projects" "pages" $infra) (dict "heading" "ls ./projects/quant-research" "pages" $quant) }}
+      {{- with $g.pages }}
       <section class="home-section">
-        <h2 class="home-heading">ls ./projects</h2>
+        <h2 class="home-heading">{{ $g.heading }}</h2>
         <ul class="project-list-simple">
-          {{- range sort $projects "Weight" }}
+          {{- range sort . "Weight" }}
           <li>
             <a href="{{ .Permalink }}">{{ .Title }}</a>
-            <span class="post-meta-inline">{{ .Params.status | default "In Progress" }}</span>
+            {{- with .Params.stage }}
+            <span class="status status-{{ . | urlize }}">{{ . }}</span>
+            {{- end }}
+            <span class="post-meta-inline">{{ .Params.status | default "In progress" }}</span>
             {{- with .Description }}
             <p class="project-oneliner">{{ . }}</p>
             {{- end }}
@@ -170,11 +192,15 @@
             {{- end }}
             {{- with .Params.repo }}
             <p class="project-repo"><a href="{{ . }}">Source →</a></p>
+            {{- else }}
+            <p class="project-repo project-repo-none">No public code</p>
             {{- end }}
           </li>
           {{- end }}
         </ul>
       </section>
+      {{- end }}
+      {{- end }}
     </aside>
     {{- end }}
   </section>

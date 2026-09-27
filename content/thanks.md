@@ -5,6 +5,10 @@ url: "/thanks/"
 summary: "Your message reached my inbox."
 ShowToc: false
 robotsNoIndex: true
+# noindex and also out of sitemap.xml: listing a page in the sitemap while
+# telling crawlers not to index it sends them contradictory instructions.
+sitemap:
+  disable: true
 ---
 
 It's in my inbox.

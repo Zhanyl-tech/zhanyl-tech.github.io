@@ -1,20 +1,66 @@
 ---
+draft: true  # Withdrawn 2026-09-26: the numbers below are not physically plausible and have no artefact. See the comment at the top of the body and /corrections/.
 title: "vLLM vs TensorRT-LLM: Inference Throughput"
 date: 2026-01-20
-description: "A measured throughput comparison of vLLM and TensorRT-LLM on Llama-3 70B, and why the faster engine is not automatically the right one."
-summary: "A measured throughput comparison of vLLM and TensorRT-LLM on Llama-3 70B, and why the faster engine is not automatically the right one."
-tags: [vllm, tensorrt-llm, inference, benchmark, llama, gpu, a100]
-status: "First pass — measured, single GPU"
+description: "WITHDRAWN. A throughput comparison of vLLM and TensorRT-LLM on Llama-3 70B whose numbers could not be backed by any artefact and are not physically plausible on the stated hardware."
+summary: "WITHDRAWN. A throughput comparison whose numbers are not physically plausible on the stated hardware."
+tags: [vllm, tensorrt-llm, inference, benchmark]
+status: "Withdrawn"
+stage: "planned"
 weight: 6
 ShowToc: false
 ---
 
-*A first-pass comparison on one A100, not a rigorous study. The limitations
-below bound every number here.*
+<!--
+WITHDRAWN on 2026-09-26. draft: true keeps this page off the public site; it
+is kept in the repository, not deleted, so the record of what was published
+stays inspectable. The public note is on /corrections/.
 
-**Setup.** Single NVIDIA A100 80GB SXM · Llama-3 70B (BF16) · vLLM 0.4.1 ·
+Why it was withdrawn (every figure below was checked on 2026-09-26):
+
+1. The setup cannot run as stated. Llama-3-70B has 70,553,706,496 parameters
+   (Hugging Face model card / API). In BF16 that is about 141 GB of weights,
+   and the stated hardware is ONE A100 80GB with "no quantization". The model
+   does not fit.
+2. The batch-1 numbers exceed the memory-bandwidth ceiling. Batch-1 decode
+   reads every weight once per generated token. 141.1 GB / 2,039 GB/s (NVIDIA
+   A100 80GB SXM datasheet bandwidth) = 69 ms per token, i.e. at most about
+   14 tokens/s. The table claims 412 and 487 tok/s at batch 1, roughly 30x
+   that ceiling.
+3. The conclusion rests on a false premise. TensorRT-LLM v0.9.0, the version
+   named here, lists "Paged KV Cache for the Attention" and "In-flight
+   Batching" in its README, so "TensorRT-LLM trades paging away for
+   throughput" is wrong, and the page itself says KV-cache pressure was not
+   measured.
+4. There is no artefact: no repository, scripts, logs, or hardware inventory.
+   The page is dated 2026-01-20; git first records its content on 2026-03-28
+   (commit ac8c811, "seed content").
+
+What evidence would be needed to republish anything under this title:
+
+- a public repository with the exact launch scripts, pinned engine versions
+  (vLLM, TensorRT-LLM, CUDA, driver) and the build/quantization flags;
+- a configuration that fits the hardware: for example tensor parallelism
+  across 2x A100-80GB for a 70B model in BF16, or an 8B model on one GPU,
+  stated with the GPU model and count and nvidia-smi output;
+- raw per-request logs (arrival time, input/output tokens, TTFT, per-token
+  latency) from which every table cell can be recomputed by a committed
+  script, with repeat runs and their spread;
+- a workload that measures the claim actually of interest: concurrent
+  sessions and p50/p99 latency at a fixed KV-cache budget under a realistic
+  arrival process, not static-batch throughput;
+- a sanity check against the bandwidth ceiling above, printed with the
+  results.
+
+Until then nothing on this page may be quoted anywhere on the site.
+-->
+
+*Withdrawn. See [corrections](/corrections/).*
+
+**Setup as originally stated.** Single NVIDIA A100 80GB SXM · Llama-3 70B (BF16) · vLLM 0.4.1 ·
 TensorRT-LLM 0.9.0 · 512 input → 128 output tokens · no quantization, no
-speculative decoding.
+speculative decoding. (This configuration does not fit in 80 GB; see the
+comment at the top of this file.)
 
 | batch | vLLM (tok/s) | TensorRT-LLM (tok/s) | delta |
 |---|---|---|---|
@@ -23,37 +69,22 @@ speculative decoding.
 | 8 | 2,240 | 2,890 | +29% |
 | 16 | 3,180 | 4,210 | +32% |
 
-TensorRT-LLM is consistently faster and the gap widens with batch size, which
-is what ahead-of-time compilation and fused kernels are for.
+*The table above is withdrawn and kept only as the record of what was
+published. It has no artefact behind it.*
 
-## The result that decided the choice
+## What the original page argued, and what was wrong with it
 
-**The faster engine was not the one worth deploying.** vLLM's PagedAttention
-manages KV-cache in pages rather than contiguously, so it admits more
-concurrent sessions before it runs out of memory. TensorRT-LLM trades that
-flexibility for raw throughput.
-
-For an agentic workload — many concurrent sessions, bursty arrivals, tool-call
-round trips — a 30% throughput reduction is recoverable by adding hardware.
-**Running out of memory when session 87 spins up is not.** Throughput is the
-number everyone quotes and it was not the number that mattered.
+The original argument was that vLLM's PagedAttention admits more concurrent
+sessions before running out of memory, and that TensorRT-LLM "trades that
+flexibility for raw throughput". The second half is false for the version
+named: the TensorRT-LLM v0.9.0 README lists a paged KV cache and in-flight
+batching. Which engine admits more sessions at a given KV-cache budget is an
+empirical question this page never measured.
 
 ## What this does not measure
 
-Stated here rather than at the bottom, because these bound every figure above.
-
 - **Continuous batching.** Real agentic traffic does not arrive in uniform
-  batches, and this test does.
-- **KV-cache pressure.** The session count at which each engine begins to
-  degrade is the interesting threshold, and it is not measured here.
-- **Latency percentiles.** Throughput hides p99 variance, which is what a
-  user of a tool-calling agent actually feels.
-- **Quantization.** INT8 and FP8 on TensorRT-LLM would likely change the
-  picture substantially.
-- **One GPU, one model, one version pair.** Nothing here generalises to a
-  different card, a smaller model, or a later release.
-
-The continuous-batching comparison is the number that would actually settle
-this, and it has not been run.
-
-**Write-up:** [vLLM vs TensorRT-LLM: first throughput numbers on Llama-3 70B](/experiments/2026-01-20-vllm-vs-tensorrt-llm-first-look/)
+  batches.
+- **KV-cache pressure.** The session count at which each engine degrades.
+- **Latency percentiles.** Throughput hides p99 variance.
+- **Quantization.** INT8 and FP8 would change the picture.

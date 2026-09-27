@@ -1,8 +1,15 @@
 baseURL: "https://zhanyl-tech.github.io/"
 title: "Zhanyl Abdybaeva"
-paginate: 10
 theme: PaperMod
-languageCode: en-us
+# `locale` replaced `languageCode` in Hugo 0.158 (gohugo.io/configuration/all,
+# "languageCode — Deprecated in v0.158.0 — Use locale instead"). It feeds the
+# html lang attribute, the RSS <language> element and og:locale, which is why
+# it is written in the RFC 5646 form (en-US, not en-us).
+locale: en-US
+
+# `paginate` is the pre-0.128 spelling of this key.
+pagination:
+  pagerSize: 10
 
 enableRobotsTXT: true
 buildDrafts: false
@@ -16,14 +23,36 @@ minify:
 params:
   env: production
   title: "Zhanyl Abdybaeva"
-  description: "I build the systems that allocate scarce, expensive, heterogeneous compute — and the benchmarks that prove whether they actually work. GPU clusters, scheduling across Slurm and Kubernetes, inference infrastructure."
-  keywords: [ML Infrastructure, HPC, GPU Inference, Kubernetes, GPU scheduling, Kueue, Volcano,
-             benchmarking, MLOps, inference optimization, Slurm, Quantitative Finance,
-             Distributed Training, CUDA]
+  # The meta description, og:description and the Person JSON-LD description.
+  # It names only work that exists in a public repository; see /projects/ for
+  # what is built, partial or planned.
+  description: "Zhanyl Abdybaeva builds and tests the systems that allocate GPUs: controlled evaluation of schedulers across Slurm and Kubernetes (Slinky), GPU fleet-health automation that never acts on missing evidence, and benchmarks that separate what was measured from what was asserted."
+  # <title> of the homepage only. Every other page keeps "Page | Zhanyl
+  # Abdybaeva"; see layouts/partials/head.html.
+  homeTitle: "Zhanyl Abdybaeva — GPU scheduling across Slurm and Kubernetes, and GPU fleet health"
+  # og:image:alt of every page whose social card is the site-wide fallback,
+  # /images/og/default.png (the homepage, About, the section lists, every tag
+  # page). Alt text describes the image, and that card shows these words, not
+  # the page's title. It must contain DEFAULT_CARD_TITLE from
+  # scripts/ogimage.py; a test in scripts/tests checks.
+  defaultCardAlt: "GPU scheduling and fleet health: what was measured, and on what. Zhanyl Abdybaeva, zhanyl-tech.github.io"
+  keywords: [GPU scheduling, Slurm, Kubernetes, Slinky, slurm-operator, Kueue, Volcano,
+             KAI Scheduler, backfill, fairshare, GPU fleet health, nvidia-smi,
+             InfiniBand, Prometheus, HPC, ML infrastructure, benchmarking]
+  # schema.org JSON-LD on the homepage. PaperMod emits "@type": "Person" when
+  # publisherType is Person. sameAs lists only the profiles linked from this
+  # site; the default would have included the relative /index.xml, which is not
+  # a profile URL.
+  schema:
+    publisherType: Person
+    sameAs:
+      - "https://github.com/Zhanyl-tech"
+      - "https://www.linkedin.com/in/za-engineering/"
+      - "https://x.com/ZhanylAbd"
   # Endpoint for the /contact/ intake form. Any provider that accepts a POST
-  # of form fields works (Formspree, Web3Forms, Basin, a Worker). Left empty
-  # deliberately: the form renders disabled and says so rather than posting
-  # into a void. No email address appears anywhere on the site.
+  # of form fields works (Formspree, Web3Forms, Basin, a Worker). With this
+  # empty the form renders disabled and says so rather than posting into a
+  # void. No email address appears anywhere on the site.
   formEndpoint: "https://formspree.io/f/maewzaoy"
   # Access key, if the provider uses one instead of a per-form URL (Web3Forms).
   formAccessKey: ""
@@ -77,17 +106,43 @@ params:
 
   subtitle: "Senior HPC & ML Infrastructure Engineer"
 
-  # Homepage facts strip. These appear publicly — edit the wording here rather
-  # than in the template. Kept qualitative on purpose: no invented metrics.
-  facts:
-    - label: "Role"
-      value: 'Infrastructure engineering at a <span class="dim">quantitative trading firm</span>'
-    - label: "Focus"
-      value: 'GPU clusters · inference · <span class="dim">Slurm at scale</span>'
-    - label: "Studying"
-      value: 'MS CS — ML @ Georgia Tech<br><span class="dim">CQF</span>'
-    - label: "Writing"
-      value: 'Deep dives &amp; lab notes<br><span class="dim">most weeks</span>'
+  # Homepage proof tiles. They replaced a qualitative facts strip (role, focus,
+  # studying, "writing most weeks") that told a hiring manager nothing checkable.
+  # Rules for editing them, because they are the first thing anyone reads:
+  #   - one fact per tile, and it must link to the repo or page that shows it;
+  #   - every number must already be on the linked page with how it was made;
+  #   - status is one of built / partial / planned, the same words the system
+  #     map and the project pages use. "built" means code and tests exist; it
+  #     does not mean it has run on production hardware, and the note says so.
+  proof:
+    - area: "Scheduler evaluation · Slurm × Kubernetes"
+      status: "partial"
+      note: "Slurm model built · Kubernetes K0 + three degenerate baselines measured once (D-preempt model-only) · Kueue, Volcano, KAI planned"
+      fact: 'The same largest-first schedule reads <strong>0.0%</strong> or <strong>55.6%</strong> GPU fragmentation depending on the definition used. A fragmentation claim that does not state its definition cannot be reproduced. (kind + kwok control plane, Phase 1, one run.)'
+      links:
+        - { text: "k8s-gpu-scheduler-lab", url: "/projects/k8s-gpu-scheduler-lab/" }
+        - { text: "slurm-scheduler-lab", url: "/projects/slurm-scheduler-lab/" }
+    - area: "Slurm on Kubernetes · Slinky"
+      status: "partial"
+      note: "bring-up built · key rotation blocked, fails safe · Argo CD not wired"
+      fact: '<code>kubectl rollout restart</code> silently skips slurmd pods owned by Slinky''s NodeSet custom resource. The rotation script hashes the key inside every slurmd pod and rolls back when it does not match the Secret.'
+      links:
+        - { text: "slinky-gitops", url: "/projects/slinky-gitops/" }
+    - area: "GPU fleet health · Go"
+      status: "built"
+      note: "tested against simulators and synthetic trees, not on GPU or InfiniBand hardware"
+      fact: 'Three tools, one rule: never act on missing evidence. An <code>nvidia-smi</code> query that fails without a documented hardware-fault exit code exits 0 instead of draining; a gap in telemetry is a collector fault, not an idle GPU; a port with more than one visible user is never attributed to a job, and the project page lists the users each mode cannot see.'
+      links:
+        - { text: "epilog-gpu-validator", url: "/projects/epilog-gpu-validator/" }
+        - { text: "gpu-reaper", url: "/projects/gpu-reaper/" }
+        - { text: "ib-slurm-exporter", url: "/projects/ib-slurm-exporter/" }
+    - area: "Measured versus asserted"
+      status: "partial"
+      note: "10 scenarios · 2 causal chains measured · no agent scored yet"
+      fact: 'The incident benchmark''s flagship scenario encoded a widely repeated chain: a stalled accounting database halts scheduling. On a CPU-only Docker Compose test cluster (Slurm 25.11.4) it did not, so the scenario was rewritten. Corrections to this site are listed too.'
+      links:
+        - { text: "slurm-rca-bench", url: "/projects/slurm-rca-bench/" }
+        - { text: "corrections", url: "/corrections/" }
 
   socialIcons:
     - name: github
@@ -140,14 +195,16 @@ menu:
       name: Lab Notes
       url: /experiments/
       weight: 20
-    - identifier: notes
-      name: Notes
-      url: /notes/
-      weight: 25
+    # Notes is out of the menu while /notes/ has no published pages: a nav
+    # item that opens onto "Nothing here yet" is a broken promise. The section
+    # still builds, so adding the first note and this entry back is all it takes.
+
+    # Projects first: it is the page that says what is built, partial or
+    # planned, which is the question a reader arrives with.
     - identifier: projects
       name: Projects
       url: /projects/
-      weight: 30
+      weight: 5
     - identifier: reading
       name: Reading
       url: /reading/

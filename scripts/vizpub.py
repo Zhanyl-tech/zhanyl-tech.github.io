@@ -10,12 +10,28 @@ Interactive or flag-driven content pipeline for:
 
 Generates:
 1. Diagram source + PNG
-2. Draft post
+2. Draft post (content/<section>/<slug>.md, always draft: true)
 3. Learning summary
 4. LinkedIn draft (optional)
 5. X thread draft (optional)
 6. Hacker News draft (optional)
+
+Nothing this script writes is publishable on its own. The post is a draft,
+it carries a review marker that scripts/check_content.py refuses to publish,
+and every generated image, slide and PDF goes to cope-drafts/vizpub/<slug>/
+(gitignored), not static/. Hugo serves everything under static/ whatever a
+post's draft status, so writing there published unreviewed, model-generated
+files. scripts/weekly.sh copies into static/ only the files the post
+references (scripts/post_assets.py), after showing them and the post to a
+person and getting a confirmation; scripts/preview.sh renders them during
+review without copying anything.
 """
+
+# Annotations such as `list[str] | None` are evaluated at import time without
+# this, and raise TypeError on Python 3.9, which is what /usr/bin/python3 is on
+# macOS. The other scripts already had it; this one did not, so the documented
+# `python3 -m unittest discover -s scripts/tests` failed to import it there.
+from __future__ import annotations
 
 import argparse
 import json
@@ -29,26 +45,38 @@ from pathlib import Path
 from textwrap import dedent
 from typing import Any
 
-try:
-    import anthropic
-except ImportError:
-    print("Install anthropic: .venv/bin/python -m pip install anthropic")
-    sys.exit(1)
+# anthropic and requests are imported where they are used, not here, so the
+# pure helpers below (slugs, front matter, SVG sanitising) can be imported and
+# tested without either installed. main() checks both before doing any work.
 
-try:
-    import requests
-except ImportError:
-    print("Install requests: .venv/bin/python -m pip install requests")
-    sys.exit(1)
+
+def require_dependencies() -> None:
+    missing = []
+    for module in ("anthropic", "requests"):
+        try:
+            __import__(module)
+        except ImportError:
+            missing.append(module)
+    if missing:
+        print(f"Install {' and '.join(missing)}: .venv/bin/python -m pip install {' '.join(missing)}")
+        sys.exit(1)
 
 
 HUGO_ROOT = Path(__file__).parent.parent
 CONTENT_DIR = HUGO_ROOT / "content"
-STATIC_DIR = HUGO_ROOT / "static" / "images" / "vizpub"
-SLIDES_DIR = HUGO_ROOT / "static" / "images" / "slides"
-SLIDES_HTML_DIR = HUGO_ROOT / "static" / "slides"
 DRAFTS_DIR = HUGO_ROOT / "cope-drafts"
-MODEL = "claude-opus-4-5"
+# Generated assets wait here, per slug, in the same layout they will have
+# under static/ once published: <slug>/images/vizpub/, <slug>/images/slides/,
+# <slug>/slides/. weekly.sh copies the tree into static/ after review.
+REVIEW_ROOT = DRAFTS_DIR / "vizpub"
+# claude-opus-5 replaced claude-opus-4-5 in September 2026, matching
+# scripts/social.py. On this model adaptive thinking is on when `thinking` is
+# omitted, so a response can open with a thinking block: read text blocks
+# only, never content[0] (see _complete below).
+MODEL = "claude-opus-5"
+# Put in every generated post. check_content.py fails the build while a
+# non-draft post still contains it, so a draft cannot go live unedited.
+REVIEW_MARKER = "VIZPUB-REVIEW-TODO"
 DEFAULT_SITE_URL = "https://zhanyl-tech.github.io"
 SECTION_ALIASES = {
     "blog": "blog",
@@ -91,6 +119,53 @@ def slugify(text: str) -> str:
     text = re.sub(r"[^\w\s-]", "", text)
     text = re.sub(r"[-\s]+", "-", text)
     return text[:60].rstrip("-")
+
+
+def safe_slug(*candidates: str) -> str:
+    """First candidate that survives slugify, restricted to [a-z0-9-].
+
+    The model proposes a slug (brief["suggested_slug"]) and it becomes a file
+    name in several directories. Passed through raw, a value such as
+    "../../layouts/partials/extend_head" would write over a Hugo partial that
+    renders on every page. slugify() already drops "/" and ".", and the ASCII
+    filter below drops the non-ASCII word characters \\w would keep.
+    """
+    for candidate in candidates:
+        slug = re.sub(r"[^a-z0-9-]", "", slugify(candidate or ""))
+        slug = slug.strip("-")
+        if slug:
+            return slug
+    raise ValueError("no usable slug: every candidate slugified to empty")
+
+
+def inside(path: Path, root: Path) -> Path:
+    """Return path if it resolves inside root; raise otherwise."""
+    resolved = path.resolve()
+    if not resolved.is_relative_to(root.resolve()):
+        raise ValueError(f"refusing to write outside {root}: {path}")
+    return resolved
+
+
+# Model-generated SVG is served from this site's origin once published, and an
+# SVG opened directly runs any <script> in it. Review should catch that; this
+# removes the obvious vectors anyway, as defence in depth: scripts,
+# foreignObject, on* event attributes, and href/xlink:href that is not a
+# fragment (#id) or a data:image URI.
+_SVG_DROP_ELEMENTS = re.compile(
+    r"<(script|foreignObject)\b[^>]*>.*?</\1\s*>|<(script|foreignObject)\b[^>]*/>",
+    re.IGNORECASE | re.DOTALL,
+)
+_SVG_EVENT_ATTR = re.compile(r"\s+on[a-z]+\s*=\s*(\"[^\"]*\"|'[^']*'|[^\s>]+)", re.IGNORECASE)
+_SVG_HREF = re.compile(
+    r"\s+(?:xlink:)?href\s*=\s*(\"(?!#|data:image/)[^\"]*\"|'(?!#|data:image/)[^']*')",
+    re.IGNORECASE,
+)
+
+
+def sanitize_svg(svg: str) -> str:
+    svg = _SVG_DROP_ELEMENTS.sub("", svg)
+    svg = _SVG_EVENT_ATTR.sub("", svg)
+    return _SVG_HREF.sub("", svg)
 
 
 def load_local_env() -> None:
@@ -194,6 +269,8 @@ def prompt_interactively() -> dict[str, Any]:
 
 
 def fetch_reference_context(url: str) -> str:
+    import requests
+
     if "arxiv.org" in url:
         arxiv_url = url.replace("/pdf/", "/abs/").rstrip(".pdf")
         try:
@@ -234,15 +311,40 @@ def build_reference_context(urls: list[str]) -> str:
     return "\n\n".join(chunks)
 
 
-def call_claude_json(system_prompt: str, user_prompt: str, max_tokens: int = 5000) -> dict[str, Any]:
+def _complete(system_prompt: str, user_prompt: str, max_tokens: int) -> str:
+    """One request to MODEL; returns the concatenated text blocks.
+
+    Streams because these calls can produce long outputs, and a non-streaming
+    request with a large max_tokens risks the SDK's HTTP timeout. Thinking is
+    adaptive (the model's default); its tokens count against max_tokens, which
+    is why the callers ask for more than the visible output needs.
+    """
+    import anthropic
+
     client = anthropic.Anthropic()
-    message = client.messages.create(
+    with client.messages.stream(
         model=MODEL,
         max_tokens=max_tokens,
+        thinking={"type": "adaptive"},
         system=system_prompt,
         messages=[{"role": "user", "content": user_prompt}],
-    )
-    raw = message.content[0].text.strip()
+    ) as stream:
+        message = stream.get_final_message()
+    if message.stop_reason == "refusal":
+        print("Error: the request was declined (stop_reason=refusal). Nothing was written.")
+        sys.exit(1)
+    if message.stop_reason == "max_tokens":
+        print(f"Error: output hit max_tokens={max_tokens} and is truncated. Nothing was written.")
+        sys.exit(1)
+    text = "".join(block.text for block in message.content if block.type == "text").strip()
+    if not text:
+        print("Error: the response contained no text. Nothing was written.")
+        sys.exit(1)
+    return text
+
+
+def call_claude_json(system_prompt: str, user_prompt: str, max_tokens: int = 16000) -> dict[str, Any]:
+    raw = _complete(system_prompt, user_prompt, max_tokens)
     if raw.startswith("```"):
         raw = re.sub(r"^```(?:json)?\s*", "", raw)
         raw = re.sub(r"\s*```$", "", raw)
@@ -290,7 +392,7 @@ def refine_brief(topic: str, focus: str, section: str, targets: list[str], refer
         {references or "(no references provided)"}
         """
     )
-    return call_claude_json(system, user, max_tokens=1800)
+    return call_claude_json(system, user, max_tokens=8000)
 
 
 def generate_content_package(
@@ -393,7 +495,7 @@ def generate_content_package(
         {references or "(no references provided)"}
         """
     )
-    return call_claude_json(system, user, max_tokens=7000)
+    return call_claude_json(system, user, max_tokens=32000)
 
 
 def normalize_payload(payload: dict[str, Any], targets: list[str]) -> dict[str, Any]:
@@ -422,15 +524,8 @@ def normalize_payload(payload: dict[str, Any], targets: list[str]) -> dict[str, 
     return payload
 
 
-def call_claude_text(system_prompt: str, user_prompt: str, max_tokens: int = 8000) -> str:
-    client = anthropic.Anthropic()
-    message = client.messages.create(
-        model=MODEL,
-        max_tokens=max_tokens,
-        system=system_prompt,
-        messages=[{"role": "user", "content": user_prompt}],
-    )
-    return message.content[0].text.strip()
+def call_claude_text(system_prompt: str, user_prompt: str, max_tokens: int = 16000) -> str:
+    return _complete(system_prompt, user_prompt, max_tokens)
 
 
 SVG_STYLE_GUIDE = """\
@@ -472,7 +567,7 @@ References:
 
 Generate a two-panel 1400x800 SVG overview infographic in ByteByteGo style.
 """
-    return call_claude_text(system, user, max_tokens=6000)
+    return call_claude_text(system, user, max_tokens=24000)
 
 
 def generate_slide_svgs(brief: dict[str, Any], payload: dict[str, Any], references: str) -> list[str]:
@@ -497,25 +592,38 @@ Generate 4 slides covering:
 
 Each slide: dark navy header, colored section cards, real SVG shapes for diagrams.
 """
-    raw = call_claude_text(system, user, max_tokens=10000)
+    raw = call_claude_text(system, user, max_tokens=32000)
     # strip markdown fences if present
     raw = re.sub(r"^```(?:json)?\s*", "", raw)
     raw = re.sub(r"\s*```$", "", raw)
     try:
         items = json.loads(raw)
-        return [item["svg"] for item in items]
+        return [sanitize_svg(item["svg"]) for item in items]
     except Exception as exc:
         print(f"Warning: could not parse slide SVGs from Claude response: {exc}")
         return []
 
 
-def write_slides_html(slug: str, num_slides: int) -> Path:
-    SLIDES_HTML_DIR.mkdir(parents=True, exist_ok=True)
+def slides_html(slug: str, num_slides: int, section: str, pdf_name: str | None = None) -> str:
+    """The slide deck page, served at /slides/<slug>.html once published.
+
+    The post link is root-relative and uses the post's own section. It used to
+    be a hard-coded ../../blog/<slug>/, which is wrong for the default section
+    (experiments) and for notes, and the PDF link was written even when no PDF
+    was produced (no Chrome). weekly.sh link-checks the build before it
+    commits, so either one blocked the publish. The PDF link appears only when
+    `pdf_name` is given, i.e. after the PDF exists.
+    """
     slide_figures = "\n".join(
         f'  <figure class="slide"><img src="../images/slides/{slug}-0{i+1}.svg" alt="Slide {i+1}"></figure>'
         for i in range(num_slides)
     )
-    html = f"""\
+    links = []
+    if pdf_name:
+        links.append(f'PDF: <a href="./{pdf_name}">{pdf_name}</a>')
+    links.append(f'Post: <a href="/{section}/{slug}/">{section}/{slug}/</a>')
+    meta = " ·\n    ".join(links)
+    return f"""\
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -533,8 +641,7 @@ def write_slides_html(slug: str, num_slides: int) -> Path:
 <body>
   <h1>{slug} — slide deck</h1>
   <p class="meta">
-    PDF: <a href="./{slug}.pdf">./{slug}.pdf</a> ·
-    Post: <a href="../../blog/{slug}/">blog/{slug}/</a>
+    {meta}
   </p>
   <div class="slides">
 {slide_figures}
@@ -542,8 +649,14 @@ def write_slides_html(slug: str, num_slides: int) -> Path:
 </body>
 </html>
 """
-    path = SLIDES_HTML_DIR / f"{slug}.html"
-    path.write_text(html)
+
+
+def write_slides_html(
+    slug: str, num_slides: int, slides_html_dir: Path, section: str, pdf_name: str | None = None
+) -> Path:
+    slides_html_dir.mkdir(parents=True, exist_ok=True)
+    path = inside(slides_html_dir / f"{slug}.html", REVIEW_ROOT)
+    path.write_text(slides_html(slug, num_slides, section, pdf_name))
     return path
 
 
@@ -642,7 +755,10 @@ def write_post(
     date = datetime.now().strftime("%Y-%m-%d")
     section_dir = CONTENT_DIR / section
     section_dir.mkdir(parents=True, exist_ok=True)
-    post_path = section_dir / f"{slug}.md"
+    post_path = inside(section_dir / f"{slug}.md", CONTENT_DIR)
+    if post_path.exists():
+        print(f"Error: {post_path} already exists; refusing to overwrite it.")
+        sys.exit(1)
     show_toc = "true" if section == "blog" else "false"
 
     if diagram_rendered:
@@ -650,19 +766,7 @@ def write_post(
     else:
         diagram_md = f'```mermaid\n{payload["mermaid"]}\n```\n*{payload["diagram_caption"]}*'
 
-    frontmatter = dedent(
-        f"""\
-        ---
-        title: "{payload['title']}"
-        date: {date}
-        description: "{payload['description']}"
-        tags: {json.dumps(payload['tags'])}
-        summary: "{payload['description']}"
-        ShowToc: {show_toc}
-        draft: true
-        ---
-        """
-    )
+    frontmatter = build_frontmatter(payload, date, show_toc)
 
     sources_md = build_sources_md(reference_urls)
     body_parts = [
@@ -679,12 +783,39 @@ def write_post(
             "",
             "---",
             "",
-            "*Generated with vizpub, then reviewed and edited for accuracy. Review every claim before publishing.*",
+            # Not a disclosure yet: nobody has reviewed anything at this
+            # point. The author replaces this line with a true one, and
+            # check_content.py blocks publishing until they do.
+            f"<!-- {REVIEW_MARKER}: replace this comment with a disclosure you can stand behind, "
+            "for example: *Drafted with an LLM; every claim checked against the sources above on YYYY-MM-DD.* "
+            "scripts/check_content.py fails the build while this marker is in a published post. -->",
             "",
         ]
     )
     post_path.write_text("\n".join(body_parts))
     return post_path
+
+
+def build_frontmatter(payload: dict[str, Any], date: str, show_toc: str) -> str:
+    """YAML front matter with every string emitted as a JSON string.
+
+    JSON string syntax is valid YAML, so a title containing a double quote, a
+    colon or a leading "-" stays one scalar. The previous f-string
+    (title: "{title}") broke the whole Hugo build on the first model title
+    with a quote in it, which blocks every deploy until fixed by hand.
+    """
+    lines = [
+        "---",
+        f"title: {json.dumps(str(payload['title']), ensure_ascii=False)}",
+        f"date: {date}",
+        f"description: {json.dumps(str(payload['description']), ensure_ascii=False)}",
+        f"tags: {json.dumps([str(t) for t in payload['tags']], ensure_ascii=False)}",
+        f"summary: {json.dumps(str(payload['description']), ensure_ascii=False)}",
+        f"ShowToc: {show_toc}",
+        "draft: true",
+        "---",
+    ]
+    return "\n".join(lines) + "\n"
 
 
 def write_learning_summary(payload: dict[str, Any], brief: dict[str, Any], slug: str) -> Path:
@@ -812,9 +943,11 @@ def print_summary(
         print(f"{label:>11}: {path}")
     print("\nNext steps:")
     print("1. Review the learning summary and diagram first")
-    print("2. Edit the draft until every claim is defendable")
-    print("3. Set draft: false when ready")
-    print("4. git add . && git commit && git push")
+    print(f"2. Edit the draft until every claim is defendable, and replace the {REVIEW_MARKER} line")
+    print("3. Preview locally, generated images included: ./scripts/preview.sh <post>")
+    print("4. ./scripts/weekly.sh <post> — shows the post and opens the generated files it")
+    print("   references, asks for confirmation, copies only those into static/, and commits")
+    print("   to a publish/ branch for a pull request (link the slides from the post to publish them)")
     print("5. Post manual social / HN only when the piece is strong enough")
 
 
@@ -862,8 +995,8 @@ def main() -> None:
             "slug": args.slug or "",
         }
 
+    require_dependencies()
     require_api_key()
-    STATIC_DIR.mkdir(parents=True, exist_ok=True)
 
     references = build_reference_context(config["papers"])
 
@@ -882,7 +1015,16 @@ def main() -> None:
     else:
         section = normalize_section(config["section"])
 
-    slug = config["slug"] or brief.get("suggested_slug") or slugify(brief.get("refined_topic", config["topic"]))
+    slug = safe_slug(
+        config["slug"],
+        str(brief.get("suggested_slug") or ""),
+        str(brief.get("refined_topic") or ""),
+        config["topic"],
+    )
+    review_dir = inside(REVIEW_ROOT / slug, REVIEW_ROOT)
+    vizpub_dir = review_dir / "images" / "vizpub"
+    slides_dir = review_dir / "images" / "slides"
+    slides_html_dir = review_dir / "slides"
     section = normalize_section(section)
     post_url = build_post_url(config["site_url"], section, slug)
 
@@ -892,24 +1034,24 @@ def main() -> None:
 
     # ── Visual assets ──────────────────────────────────────────────
     print("🎨 Generating ByteByteGo-style SVG overview...")
-    STATIC_DIR.mkdir(parents=True, exist_ok=True)
-    overview_svg_path = STATIC_DIR / f"{slug}.svg"
+    vizpub_dir.mkdir(parents=True, exist_ok=True)
+    overview_svg_path = vizpub_dir / f"{slug}.svg"
     try:
-        overview_svg = generate_overview_svg(brief, payload, references)
+        overview_svg = sanitize_svg(generate_overview_svg(brief, payload, references))
         overview_svg_path.write_text(overview_svg)
         print(f"   ✅ Overview SVG: {overview_svg_path}")
     except Exception as exc:
         print(f"   ⚠️  Overview SVG failed: {exc}")
 
     print("🎨 Generating ByteByteGo-style slide deck (4 slides)...")
-    SLIDES_DIR.mkdir(parents=True, exist_ok=True)
+    slides_dir.mkdir(parents=True, exist_ok=True)
     slide_svgs: list[str] = []
     try:
         slide_svgs = generate_slide_svgs(brief, payload, references)
         for i, svg_code in enumerate(slide_svgs):
-            slide_path = SLIDES_DIR / f"{slug}-0{i+1}.svg"
+            slide_path = slides_dir / f"{slug}-0{i+1}.svg"
             slide_path.write_text(svg_code)
-        print(f"   ✅ {len(slide_svgs)} slides written to {SLIDES_DIR}")
+        print(f"   ✅ {len(slide_svgs)} slides written to {slides_dir}")
     except Exception as exc:
         print(f"   ⚠️  Slide SVGs failed: {exc}")
 
@@ -917,16 +1059,19 @@ def main() -> None:
     slides_html_path: Path | None = None
     slides_pdf_path: Path | None = None
     if slide_svgs:
-        slides_html_path = write_slides_html(slug, len(slide_svgs))
+        # Written twice on purpose: once without a PDF link, to print the PDF
+        # from, and again with the link only if the PDF was actually produced.
+        slides_html_path = write_slides_html(slug, len(slide_svgs), slides_html_dir, section)
         print(f"   ✅ Slides HTML: {slides_html_path}")
         print("   📄 Generating PDF...")
         slides_pdf_path = generate_pdf_from_html(slides_html_path)
         if slides_pdf_path:
+            write_slides_html(slug, len(slide_svgs), slides_html_dir, section, slides_pdf_path.name)
             print(f"   ✅ PDF: {slides_pdf_path}")
 
     # ── Mermaid fallback diagram ────────────────────────────────────
-    mermaid_source_path = STATIC_DIR / f"{slug}.mmd"
-    diagram_path = STATIC_DIR / f"{slug}.png"
+    mermaid_source_path = vizpub_dir / f"{slug}.mmd"
+    diagram_path = vizpub_dir / f"{slug}.png"
     mermaid_source_path.write_text(payload["mermaid"])
     diagram_rendered = render_mermaid(payload["mermaid"], diagram_path)
 

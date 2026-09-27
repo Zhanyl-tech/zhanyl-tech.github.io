@@ -6,6 +6,15 @@ name: Weekly drop
 #
 # It also reports how long it has been since the last post — an honest number
 # is more motivating than a reminder that pretends nothing has slipped.
+#
+# This workflow cannot publish anything, by construction:
+#   - its token can read the repository and write issues, nothing else
+#     (contents: read), so it cannot push a commit or merge a pull request;
+#   - it never runs a generator (vizpub.py, social.py) and holds no API key;
+#   - the checklist it opens points at scripts/weekly.sh, which refuses to run
+#     without a terminal, makes you read the post and type its slug, and then
+#     pushes a publish/<slug> branch for a pull request, never main.
+# Content reaches the site only when a person merges that pull request.
 
 on:
   schedule:
@@ -20,60 +29,71 @@ jobs:
   open-issue:
     runs-on: ubuntu-latest
     steps:
+      # Actions are pinned to the commit their tag pointed at on 2026-09-26
+      # (git ls-remote), so a moved tag cannot change what runs here.
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
-          fetch-depth: 0
+          persist-credentials: false
 
+      # Days since the newest *published post*, read from front matter. The
+      # previous version used the last commit touching the content folders, so
+      # any edit to an old post reset the count (it reported 48 days when the
+      # real figure was 62).
       - name: Measure days since last post
         id: cadence
         run: |
-          LAST=$(git log -1 --format=%ct -- content/blog content/experiments content/notes || echo 0)
-          if [ "$LAST" = "0" ]; then
-            echo "days=unknown" >> "$GITHUB_OUTPUT"
-          else
-            echo "days=$(( ( $(date +%s) - LAST ) / 86400 ))" >> "$GITHUB_OUTPUT"
-          fi
+          set -euo pipefail
+          DAYS="$(python3 scripts/last_published.py --days)"
+          echo "days=${DAYS}" >> "$GITHUB_OUTPUT"
+          echo "last=$(python3 scripts/last_published.py)" >> "$GITHUB_OUTPUT"
           echo "week=$(date +'%Y-W%V')" >> "$GITHUB_OUTPUT"
 
       - name: Open this week's issue
-        uses: actions/github-script@v7
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
         env:
           DAYS: ${{ steps.cadence.outputs.days }}
+          LAST: ${{ steps.cadence.outputs.last }}
           WEEK: ${{ steps.cadence.outputs.week }}
         with:
           script: |
-            const { DAYS, WEEK } = process.env;
+            const { DAYS, LAST, WEEK } = process.env;
             const title = `Weekly drop — ${WEEK}`;
+            const since = DAYS === 'unknown'
+              ? 'No published post found.'
+              : `**${DAYS} days** since the last post (${LAST}).`;
 
             const body = [
-              `**${DAYS} days** since the last post.`,
+              since,
               '',
               'Pick one. A lab note that ships beats a deep dive that does not.',
               '',
               '| Type | Where | Length |',
               '| --- | --- | --- |',
-              '| Deep dive | `content/blog/` | 2000-4000 words |',
+              '| Deep dive | `content/blog/` | 1500-3000 words |',
               '| Lab note | `content/experiments/` | 500-1500 words |',
               '| Note | `content/notes/` | 100-500 words |',
               '',
               '### Ship it',
               '```bash',
               'hugo new experiments/$(date +%F)-slug.md   # write it, keep draft: true',
-              './scripts/weekly.sh                        # card, build, push, drafts',
+              'hugo server -D                             # read it rendered, locally',
+              './scripts/weekly.sh content/experiments/<file>.md',
               '```',
               '',
-              '`weekly.sh` renders the social card, verifies the build, pushes to',
-              'GitHub Pages, and writes LinkedIn/X drafts from the post itself.',
+              '`weekly.sh` shows you the post and asks you to type its slug, refuses',
+              'a post that still has the vizpub review marker, builds and link-checks',
+              'the site, and pushes a `publish/<slug>` branch. Open a pull request;',
+              'merging it is what deploys. It also writes LinkedIn/X drafts.',
               '',
               '### Then',
-              '- [ ] Post published (site live)',
+              '- [ ] Pull request merged (site live)',
               '- [ ] LinkedIn — Tue-Thu 8-10 AM ET, native image, link in first comment',
               '- [ ] X thread — Wed 8-10 AM ET, card on tweet 1',
               '- [ ] HN — deep dives only',
               '',
               '---',
-              '<sub>Opened automatically by `.github/workflows/weekly-drop.yml`.</sub>',
+              '<sub>Opened automatically by `.github/workflows/weekly-drop.yml`, which cannot publish.</sub>',
             ].join('\n');
 
             const open = await github.rest.issues.listForRepo({
@@ -94,7 +114,7 @@ jobs:
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: issue.number,
-                body: 'Superseded by this week&apos;s drop.',
+                body: "Superseded by this week's drop.",
               });
               await github.rest.issues.update({
                 owner: context.repo.owner,
