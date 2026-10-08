@@ -17,7 +17,7 @@ Four rules, all about not publishing something by accident:
 3. A published page does not name a working branch (`improve/…`,
    `publish/…`) outside an HTML comment. Branches are deleted after they
    merge, so a result pinned to one cannot be reproduced for long; name a
-   commit or a tag, as the backfill write-up does with `c02b52f`.
+   commit or a tag, as the backfill write-up does with `8c83324`.
 4. Wording this site withdrew stays withdrawn (WITHDRAWN below). Each entry
    was published, or about to be, and then corrected because the source or
    the repository said otherwise. The rule stops it coming back through a

@@ -38,9 +38,8 @@ said 26.05 had shipped on 14 July.]* And 26.05 upgrades **directly** from
 25.05 — which means 25.11 is not the only target for a cluster on 25.05, and
 possibly not the right one.
 
-So this is the comparison I actually needed: three versions, what breaks between
-them, and which one a cluster with one head node and 250 compute nodes should
-be aiming at.
+So this is the comparison worth making: three versions, what breaks between
+them, and which one a cluster still on 25.05 should be aiming at.
 
 ## The short version
 

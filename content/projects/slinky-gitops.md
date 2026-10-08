@@ -45,8 +45,7 @@ NodeName=slinky-0 Arch=aarch64 State=IDLE+DYNAMIC_NORM
 
 Versions are pinned in the Makefile: Slinky operator and charts 1.2.0, the
 `kindest/node:v1.32.2` image by digest, cert-manager 1.20.4. **Slinky v1.2
-ships Slurm 26.05**, a release ahead of 25.11
-planning for.
+ships Slurm 26.05**, a release ahead of 25.11, the previous stable series.
 
 ## On Slinky the shared secret is auth/slurm, not MUNGE
 

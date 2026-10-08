@@ -24,7 +24,7 @@ Why (checked on 2026-09-26):
   version named: the TensorRT-LLM v0.9.0 README lists "Paged KV Cache for the
   Attention" and "In-flight Batching".
 - No scripts, logs or hardware inventory exist. The note is dated 2026-01-20
-  and was first committed on 2026-03-28 (ac8c811).
+  and was first committed on 2026-03-28 (192eb3a).
 - It promised "the continuous batching test next week"; that test was never
   run.
 

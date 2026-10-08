@@ -34,7 +34,7 @@ Why it was withdrawn (every figure below was checked on 2026-09-26):
    measured.
 4. There is no artefact: no repository, scripts, logs, or hardware inventory.
    The page is dated 2026-01-20; git first records its content on 2026-03-28
-   (commit ac8c811, "seed content").
+   (commit 192eb3a, "seed content").
 
 What evidence would be needed to republish anything under this title:
 

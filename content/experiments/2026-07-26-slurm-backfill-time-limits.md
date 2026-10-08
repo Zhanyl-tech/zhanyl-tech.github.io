@@ -16,7 +16,7 @@ draft: false
 >
 > 1. **It was one synthetic seed, not a trace.** Every number came from the
 >    simulator's synthetic generator: 300 jobs on 16 nodes, **seed 5**, with
->    simulator version 0.1 (commit `c02b52f`). The post never said which seed,
+>    simulator version 0.1 (commit `8c83324`). The post never said which seed,
 >    and other pages called the result "measured" on "real job traces".
 > 2. **"The weights barely matter" does not survive other seeds.** Over seeds
 >    0–19 of the same code, sweeping `PriorityWeightJobsize` moved mean wait
@@ -45,13 +45,13 @@ divided by the smallest.
 
 | simulator | backfill: mean-wait ratio | backfill: CPU-utilisation gain | jobsize sweep: mean-wait ratio | sweep > backfill |
 | --- | --- | --- | --- | --- |
-| v0.1 (`c02b52f`, EASY, classic fairshare) | median 4.65×, range 2.27–6.92× | median +16.1 pts, range 7.6–32.5 | median 3.06×, range 1.43–4.27× | 3 of 20 seeds |
+| v0.1 (`8c83324`, EASY, classic fairshare) | median 4.65×, range 2.27–6.92× | median +16.1 pts, range 7.6–32.5 | median 3.06×, range 1.43–4.27× | 3 of 20 seeds |
 | current (unreleased, conservative backfill, Fair Tree) | median 3.84×, range 2.17–5.71× | median +16.4 pts, range 5.1–28.8 | median 3.18×, range 2.15–3.87× | 6 of 20 seeds |
 
 Per seed *s* in 0–19: `schedlab --compare-backfill --jobs 300 --seed s` and
 `schedlab --sweep jobsize --jobs 300 --seed s`, with the mean-wait lines read
 from the CLI's text report. The v0.1 rows ran on a `git archive` of commit
-`c02b52f`. The current rows ran on the simulator's next version as it stood on
+`8c83324`. The current rows ran on the simulator's next version as it stood on
 2026-09-27, before it was committed or released. They will be re-run and pinned
 to a commit when it is released; until then they cannot be reproduced exactly.
 (An earlier state of that unreleased code, before it rounded invented time
@@ -59,7 +59,7 @@ limits up to whole minutes as Slurm does, gave median 3.89×, +16.0 points and
 3.12× here, and 442.5 minutes for seed 5 with backfill on.)
 <!-- OWNER: pin the "current" rows before this correction goes live. They
 were re-run on 2026-09-27 against slurm-scheduler-lab's working tree: HEAD
-c02b52f (the v0.1 commit) plus uncommitted changes on its improve/2026-09
+8c83324 (the v0.1 commit) plus uncommitted changes on its improve/2026-09
 branch, working-tree fingerprint 0c64a952cad1 (SHA-256 of `git diff HEAD
 --binary` followed by the sha256 lines of each untracked file in sorted order,
 first 12 hex digits: the recipe in that repository's README, "Running S0").
@@ -70,7 +70,7 @@ comparison at that commit, update every table in this post, the medians here,
 on about.md ("a median 3.8x across 20 seeds"), projects/_index.md and
 slurm-scheduler-lab.md, then replace "unreleased" in the summary table and the
 sentence above with the commit hash or release tag, as the v0.1 rows do with
-c02b52f. Point the README link under "Slurm is not EASY" at that tag.
+8c83324. Point the README link under "Slurm is not EASY" at that tag.
 scripts/check_content.py refuses a published page that names a working branch
 outside a comment. -->
 
@@ -142,7 +142,8 @@ The project page is [slurm-scheduler-lab](/projects/slurm-scheduler-lab/).
 
 ## The original post (26 July 2026), with corrections marked
 
-*Text is unchanged except where a correction is marked in brackets.*
+*Text is unchanged except for corrections marked in brackets and a few later
+wording edits that change no number or result.*
 
 Changing `PriorityWeightFairshare` on a live cluster is a hard experiment to
 justify. The feedback loop is days long, the blast radius is everyone's queue,
@@ -161,7 +162,7 @@ seed. See above.]*
 
 Baseline, 300 jobs on 16 nodes *[synthetic generator, seed 5, simulator v0.1;
 reproduce with `schedlab --compare-backfill --jobs 300 --seed 5` on commit
-`c02b52f`]*:
+`8c83324`]*:
 
 ```
 backfill OFF                          backfill ON

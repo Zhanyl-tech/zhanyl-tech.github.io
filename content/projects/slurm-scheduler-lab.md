@@ -113,7 +113,7 @@ requests bought some throughput and cost waiting on this workload.
 claim it makes through it.
 
 <!-- OWNER: these figures were produced on 2026-09-27 from slurm-scheduler-lab's
-working tree: commit c02b52f plus uncommitted changes, working-tree fingerprint
+working tree: commit 8c83324 plus uncommitted changes, working-tree fingerprint
 0c64a952cad1 (the recipe in that README's "Running S0" section, applied to this
 repository). Before this change they read 89.9% / 442.5 min, 3.89x, +16.0 and
 3.12x, from an earlier state of the same uncommitted tree, before time limits

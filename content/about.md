@@ -15,12 +15,8 @@ on Kubernetes, rack-scale disaggregated hardware. The problem doesn't. Somebody
 has to decide which job gets which accelerator, show the decision was right, and
 diagnose it when the answer stops being obvious.
 
-<!-- OWNER: the homepage used to say "a company" and this page
-"a company". This page's wording is kept and the homepage no
-longer names the employer; confirm this is the description you want public. -->
-I'm a infrastructure engineer, working on the GPU compute platform behind machine-learning research.
-Scheduling and fairshare policy, GPU lifecycle, distributed storage, and the
-telemetry that turns "the cluster feels slow" into a number.
+The problems I keep coming back to are scheduling and fairshare policy, GPU
+lifecycle, and the telemetry that turns "the cluster feels slow" into a number.
 
 ## What the public work covers
 
@@ -78,9 +74,9 @@ yet.
 
 ## Background
 
-Ten years of production infrastructure: Linux systems at fleet
-scale. MS in Computer Science (machine learning) at Georgia Tech, the
-Certificate in Quantitative Finance, and NVIDIA's NCP-AIO.
+Ten years of production infrastructure and Linux systems at fleet scale. MS in
+Computer Science (machine learning) at Georgia Tech, the Certificate in Quantitative Finance, and
+NVIDIA's NCP-AIO.
 
 The combination is intentional. I want to build ML platforms for people doing
 quantitative research, which means understanding the systems, the agents that

@@ -174,7 +174,7 @@ class CheckContentBranchesAndWithdrawn(unittest.TestCase):
             write(content / "experiments" / "a.md",
                   "---\ntitle: a\n---\nThe rows ran on the `improve/2026-09` branch.\n")
             write(content / "experiments" / "b.md",
-                  "---\ntitle: b\n---\nPinned to `c02b52f`.\n<!-- OWNER: merge improve/2026-09\nfirst. -->\n")
+                  "---\ntitle: b\n---\nPinned to `8c83324`.\n<!-- OWNER: merge improve/2026-09\nfirst. -->\n")
             problems = check_content.check(content)
             self.assertEqual(len(problems), 1)
             self.assertIn("a.md", problems[0])
