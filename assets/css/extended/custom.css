@@ -1274,3 +1274,9 @@ a:hover { color: var(--accent-2); }
   .intake-row { grid-template-columns: 1fr; gap: 0; }
   .intake-form fieldset { padding: 14px 15px 18px; }
 }
+
+/* Credentials line under the hero introduction (layouts/index.html). */
+.hero-creds {
+  font-size: 0.92rem;
+  opacity: 0.8;
+}

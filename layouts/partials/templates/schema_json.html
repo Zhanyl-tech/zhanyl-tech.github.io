@@ -1,11 +1,11 @@
 {{- /* Local override of PaperMod's schema_json.html (theme 10d3dcc).
 
      Homepage: a schema.org Person. Only fields this site itself backs up are
-     emitted: the name, the site URL, the description from hugo.yaml and the
-     three profiles the site links to. No jobTitle, employer, alumniOf or
-     image: those are claims a crawler would repeat as fact, and none of them
-     is stated verifiably here. (The theme's Person variant used the favicon
-     as "image", which is a logo, not a person.)
+     emitted: the name, the site URL, the description from hugo.yaml, the
+     topics the public work covers (knowsAbout), jobTitle when
+     params.schema.jobTitle is set, and the three profiles the site links to.
+     No employer, alumniOf or image: a crawler repeats those as fact. (The theme's Person
+     variant used the favicon as "image", which is a logo, not a person.)
 
      Pages: BlogPosting only for dated writing (blog, lab notes, notes);
      SoftwareSourceCode for a project page that links a public repository;
@@ -19,6 +19,12 @@
   "name": {{ site.Params.author | default site.Title }},
   "url": {{ site.Home.Permalink }},
   "description": {{ site.Params.description | plainify }},
+  {{- with site.Params.schema.jobTitle }}
+  "jobTitle": {{ . }},
+  {{- end }}
+  {{- with site.Params.schema.knowsAbout }}
+  "knowsAbout": {{ . | jsonify | safeJS }},
+  {{- end }}
   "sameAs": [
     {{- range $i, $e := site.Params.schema.sameAs }}{{ if $i }}, {{ end }}{{ trim $e " " }}{{ end -}}
   ]

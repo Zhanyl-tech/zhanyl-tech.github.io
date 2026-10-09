@@ -24,27 +24,36 @@ params:
   env: production
   title: "Zhanyl Abdybaeva"
   # The meta description, og:description and the Person JSON-LD description.
-  # It names only work that exists in a public repository; see /projects/ for
-  # what is built, partial or planned.
-  description: "Zhanyl Abdybaeva builds and tests the systems that allocate GPUs: controlled evaluation of schedulers across Slurm and Kubernetes (Slinky), GPU fleet-health automation that never acts on missing evidence, and benchmarks that separate what was measured from what was asserted."
+  # The title comes first because it is what a search result is skimmed for;
+  # the rest names only work that exists in a public repository (see /projects/
+  # for what is built, partial or planned).
+  description: "Zhanyl Abdybaeva, HPC and ML infrastructure engineer. Independent public work: controlled evaluation of GPU schedulers across Slurm and Kubernetes (Slinky), GPU fleet-health automation that never acts on missing evidence, and benchmarks that separate what was measured from what was asserted."
   # <title> of the homepage only. Every other page keeps "Page | Zhanyl
   # Abdybaeva"; see layouts/partials/head.html.
-  homeTitle: "Zhanyl Abdybaeva — GPU scheduling across Slurm and Kubernetes, and GPU fleet health"
+  homeTitle: "Zhanyl Abdybaeva — HPC & GPU infrastructure engineer: Slurm, Kubernetes and GPU fleet health"
   # og:image:alt of every page whose social card is the site-wide fallback,
   # /images/og/default.png (the homepage, About, the section lists, every tag
   # page). Alt text describes the image, and that card shows these words, not
   # the page's title. It must contain DEFAULT_CARD_TITLE from
   # scripts/ogimage.py; a test in scripts/tests checks.
   defaultCardAlt: "GPU scheduling and fleet health: what was measured, and on what. Zhanyl Abdybaeva, zhanyl-tech.github.io"
-  keywords: [GPU scheduling, Slurm, Kubernetes, Slinky, slurm-operator, Kueue, Volcano,
-             KAI Scheduler, backfill, fairshare, GPU fleet health, nvidia-smi,
-             InfiniBand, Prometheus, HPC, ML infrastructure, benchmarking]
+  keywords: [HPC engineer, GPU infrastructure, ML infrastructure, GPU cluster,
+             GPU scheduling, cluster orchestration, Slurm, Kubernetes, Slinky,
+             slurm-operator, Kueue, Volcano, KAI Scheduler, backfill, fairshare,
+             GPU fleet health, GPU reliability, nvidia-smi, DCGM, MIG,
+             InfiniBand, RDMA, Prometheus, Linux, Go, Python, benchmarking]
   # schema.org JSON-LD on the homepage. PaperMod emits "@type": "Person" when
   # publisherType is Person. sameAs lists only the profiles linked from this
   # site; the default would have included the relative /index.xml, which is not
   # a profile URL.
   schema:
     publisherType: Person
+    # Emitted on the homepage Person (layouts/partials/templates/schema_json.html).
+    # knowsAbout lists only topics a public repository or post on this site
+    # covers. A jobTitle key is also supported.
+    knowsAbout: [HPC, GPU clusters, Slurm, Kubernetes, GPU scheduling,
+                 GPU fleet health, InfiniBand, RDMA, Prometheus, Linux, Go,
+                 Python, ML infrastructure, quantitative finance]
     sameAs:
       - "https://github.com/Zhanyl-tech"
       - "https://www.linkedin.com/in/za-engineering/"
@@ -98,13 +107,13 @@ params:
   profileMode:
     enabled: false
     title: "Zhanyl Abdybaeva"
-    subtitle: "GPU scheduling across Slurm and Kubernetes"
+    subtitle: "Senior HPC & ML Infrastructure Engineer"
     imageUrl: "/images/avatar.jpg"
     imageWidth: 80
     imageHeight: 80
     imageTitle: "Zhanyl Abdybaeva"
 
-  subtitle: "GPU scheduling across Slurm and Kubernetes"
+  subtitle: "Senior HPC & ML Infrastructure Engineer"
 
   # Homepage proof tiles. They replaced a qualitative facts strip (role, focus,
   # studying, "writing most weeks") that told a hiring manager nothing checkable.

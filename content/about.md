@@ -20,7 +20,8 @@ lifecycle, and the telemetry that turns "the cluster feels slow" into a number.
 
 ## What the public work covers
 
-Everything below links to a repository, and each project page says what is
+Everything below is independent work: coursework, CQF projects and my own
+research. It all links to a repository, and each project page says what is
 built, partial or planned, and what it was tested against. None of it has run
 on a production GPU cluster; where something was measured, the page says on
 what.
@@ -71,6 +72,20 @@ the calibration than in the agent: a read-only tool surface enforced in code
 ([slurm-mcp](/projects/slurm-mcp/)) and an explicit failure-propagation graph
 ([cluster-sre-agent](/projects/cluster-sre-agent/)). No agent has been scored
 yet.
+
+## Skills, and where to see them
+
+| Skill | Where it shows |
+|---|---|
+| **Slurm**: multifactor priority, Fair Tree, backfill, QOS preemption, epilog checks, accounting | [slurm-scheduler-lab](/projects/slurm-scheduler-lab/), [epilog-gpu-validator](/projects/epilog-gpu-validator/), [slurm-rca-bench](/projects/slurm-rca-bench/) |
+| **Kubernetes**: kube-scheduler configuration, kind and kwok, operators and custom resources (Slinky) | [k8s-gpu-scheduler-lab](/projects/k8s-gpu-scheduler-lab/), [slinky-gitops](/projects/slinky-gitops/) |
+| **GPU fleet health**: `nvidia-smi` fault classes, dcgm-exporter, MIG | [epilog-gpu-validator](/projects/epilog-gpu-validator/), [gpu-reaper](/projects/gpu-reaper/) |
+| **InfiniBand / RoCE**: port counters, attributing traffic to the job that owns the HCA | [ib-slurm-exporter](/projects/ib-slurm-exporter/) |
+| **Observability**: Prometheus exporters and metrics | [ib-slurm-exporter](/projects/ib-slurm-exporter/), [gpu-reaper](/projects/gpu-reaper/) |
+| **Go** | [gpu-reaper](/projects/gpu-reaper/), [epilog-gpu-validator](/projects/epilog-gpu-validator/), [ib-slurm-exporter](/projects/ib-slurm-exporter/) |
+| **Python**: simulators, benchmarks, an MCP server | [slurm-scheduler-lab](/projects/slurm-scheduler-lab/), [k8s-gpu-scheduler-lab](/projects/k8s-gpu-scheduler-lab/), [slurm-rca-bench](/projects/slurm-rca-bench/), [slurm-mcp](/projects/slurm-mcp/) |
+| **Agentic operations with guardrails**: read-only tool surfaces enforced in code | [slurm-mcp](/projects/slurm-mcp/), [cluster-ops-skills](/projects/cluster-ops-skills/), [cluster-sre-agent](/projects/cluster-sre-agent/) |
+| **Quantitative research data**: point-in-time (bitemporal) storage | [research-platform](/projects/research-platform/) |
 
 ## Background
 

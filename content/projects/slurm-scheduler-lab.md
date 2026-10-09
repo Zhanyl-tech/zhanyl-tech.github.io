@@ -72,7 +72,7 @@ sacct -a -X --parsable2 --starttime=now-30days \
       --format=JobID,User,Account,Submit,Elapsed,Timelimit,NNodes,ReqCPUS,ReqTRES \
       > trace.txt
 
-schedlab --slurm-conf /etc/slurm/slurm.conf --sacct trace.txt --nodes 1000 --cpus 32 --gpus 4
+schedlab --slurm-conf /etc/slurm/slurm.conf --sacct trace.txt --nodes 64 --cpus 32 --gpus 4
 ```
 
 No controller is touched. `--sched-params` tries a `SchedulerParameters`
@@ -113,7 +113,7 @@ requests bought some throughput and cost waiting on this workload.
 claim it makes through it.
 
 <!-- OWNER: these figures were produced on 2026-09-27 from slurm-scheduler-lab's
-working tree: commit 8c83324 plus uncommitted changes, working-tree fingerprint
+working tree: commit c02b52f plus uncommitted changes, working-tree fingerprint
 0c64a952cad1 (the recipe in that README's "Running S0" section, applied to this
 repository). Before this change they read 89.9% / 442.5 min, 3.89x, +16.0 and
 3.12x, from an earlier state of the same uncommitted tree, before time limits
